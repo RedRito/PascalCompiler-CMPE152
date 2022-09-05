@@ -2,7 +2,6 @@
 #include <string>
 using namespace std;
 
-
 FileReader::FileReader(string fileName)
 {
     line = 1;

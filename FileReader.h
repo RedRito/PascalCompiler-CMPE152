@@ -16,7 +16,7 @@ class FileReader{
         
     public:
         /*
-            Constructor
+           //Constructor
         */
         FileReader(string fileName);
         //getter method, gets the current line of the program
