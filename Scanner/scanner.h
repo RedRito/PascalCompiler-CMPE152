@@ -1,6 +1,7 @@
 #ifndef SCANNER_H
 #define SCANNER_H
 #include <iostream>
+#include "..FileReader.h"
 using namespace std;
 
 
@@ -102,8 +103,11 @@ enum class Token
 class Scanner
 {
     public:
-    Token nextToken();
+    Token *nextToken();
     private:
+    FileReader *file;
+    char currentCh;
+    Scanner(FileReader *file);
     void skipWhiteSpace();
 };
 
