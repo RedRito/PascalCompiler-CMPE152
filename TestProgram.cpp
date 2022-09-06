@@ -2,9 +2,10 @@
 #include "FileReader.cpp"
 using namespace std;
 
-int main()
+int main(int argc, char *argv[])
 {
-    FileReader *file = new FileReader("HelloWorld.pas");
+    string fileName = argv[1];
+    FileReader *file = new FileReader(fileName);
     char currentCh = file -> getCurrentChar();
     while(currentCh != EOF)
     {

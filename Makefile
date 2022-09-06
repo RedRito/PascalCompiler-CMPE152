@@ -8,4 +8,4 @@ TestProgram.o: TestProgram.cpp
 	g++ -c TestProgram.cpp
 
 clean:
-	rm *.o
+	rm *.o main
