@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-    FileReader *file = new FileReader("HelloWorld.txt");
+    FileReader *file = new FileReader("HelloWorld.pas");
     char currentCh = file -> getCurrentChar();
     while(currentCh != EOF)
     {
