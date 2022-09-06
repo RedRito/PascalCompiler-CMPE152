@@ -103,11 +103,15 @@ enum class Token
 class Scanner
 {
     public:
+    //Scans for the next token
     Token *nextToken();
     private:
     FileReader *file;
     char currentCh;
+    //construtor
+    //Constructs the scanner from a given file
     Scanner(FileReader *file);
+    //skips the whitespace characters
     void skipWhiteSpace();
 };
 

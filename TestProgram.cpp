@@ -1,5 +1,5 @@
 #include <string>
-#include "FileReader.cpp"
+#include "Scanner/FileReader.cpp"
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
     while(currentCh != EOF)
     {
         currentCh = file -> nextChar();
-        cout << currentCh << endl;
+        cout << currentCh;
     }
+    cout << endl;
+    cout << "END OF FILE" << endl;
 }
