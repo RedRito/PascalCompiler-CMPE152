@@ -4,13 +4,13 @@
 #include <iostream>
 #include <string>
 #include <map>
-//#include "FileReader.h"
+#include "FileReader.cpp"
 using namespace std;
 
 enum class PToken
 {
     INVALID,
-    EOF,
+    END_OF_FILE,
     //Reserved
     AND,
     ARRAY,
@@ -188,7 +188,7 @@ static const string PTOKEN_STR[] =
     "LCOMMENT",
     "RCOMMENT"
 };
-
+/*
 constexpr PToken INVALID    = PToken::INVALID;
 //constexpr PToken EOF        = PToken::EOF;
 constexpr PToken AND        = PToken::AND;
@@ -272,6 +272,7 @@ constexpr PToken LBRACE      = PToken::LBRACE;
 constexpr PToken RBRACE      = PToken::RBRACE;
 constexpr PToken LCOMMENT      = PToken::LCOMMENT;
 constexpr PToken RCOMMENT      = PToken::RCOMMENT;
+*/
 
 class Token
 {
@@ -298,7 +299,7 @@ class Token
         static Token *ReservedWord(char currentCh, FileReader * file);
         static Token *Number(char currentCh, FileReader * file);
         static Token *String(char currentCh, FileReader * file);
-        static Token *Symbols(char currentCh, FileReader * file);
+        static Token *SpeicalSymbols(char currentCh, FileReader * file);
 
 
 
