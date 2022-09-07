@@ -1,4 +1,4 @@
-#include "scanner.h"
+#include "../scanner.h"
 #include "FileReader.h"
 #include <string>
 using namespace std;
@@ -21,5 +21,10 @@ void Scanner::skipWhiteSpace()
 
 Token *Scanner::nextToken()
 {
+    char ch = nextNonblankCharacter();
 
+    if (isalpha(ch))      return Token::Word(ch, source);
+    else if (isdigit(ch)) return Token::Number(ch, source);
+    else if (ch == '\'')  return Token::CharacterOrString(ch, source);
+    else                  return Token::SpecialSymbol(ch, source);
 }
