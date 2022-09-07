@@ -273,15 +273,37 @@ constexpr PToken RBRACE      = PToken::RBRACE;
 constexpr PToken LCOMMENT      = PToken::LCOMMENT;
 constexpr PToken RCOMMENT      = PToken::RCOMMENT;
 
-class TokenMap
+class Token
 {
     private:
         static map<string, PToken> ReservedWords;
+        static map<string, PToken> Symbols;
+        
     public:
-        static void initMap();
+        static void initMaps();
+        
         PToken datatype;    //what's the token's datatype
         string datatext;    //the token's text
         int linenum;        //the current line number
+        /*
+            The value of the token if it exists.
+        */
+        int tokenValueInt;
+        double tokenValueReal;
+        string tokenValueString;
+        bool tokenValueBoolean;
+
+        Token(char currentCh); //constructor
+        //part of the class thus should be static
+        static Token *ReservedWord(char currentCh, FileReader * file);
+        static Token *Number(char currentCh, FileReader * file);
+        static Token *String(char currentCh, FileReader * file);
+        static Token *Symbols(char currentCh, FileReader * file);
+
+
+
+
+
 };
 
 #endif
