@@ -16,11 +16,11 @@ class Scanner
     void printError(Token *token, string msg);
     void printTokens();
     void printToFile(string fileName);
-    private:
-    FileReader *file;
     //construtor
     //Constructs the scanner from a given file
     Scanner(FileReader *file);
+    private:
+    FileReader *file;
     //skips the whitespace characters
     void skipWhiteSpace();
 };
