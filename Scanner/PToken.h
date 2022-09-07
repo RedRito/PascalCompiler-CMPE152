@@ -216,7 +216,7 @@ class Token
         static Token *Number(char currentCh, FileReader * file);
         static Token *String(char currentCh, FileReader * file);
         static Token *SpecialSymbols(char currentCh, FileReader * file);
-        static Token *Error(Token *token, string msg);
+        static void   Error(Token *token, string msg);
         static string toString(Token *token);
 
 
