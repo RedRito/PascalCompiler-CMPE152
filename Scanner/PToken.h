@@ -18,6 +18,7 @@ enum class PToken
     BEGIN,
     BREAK,
     CASE,
+    CHARACTER,
     CONST,
     CONSTRUCTOR,
     CONTINUE,
@@ -98,6 +99,9 @@ enum class PToken
     RBRACE,
     LCOMMENT,
     RCOMMENT,
+    COLON,
+    DOT_DOT,
+    PERIOD,
 };
 
 static const string PTOKEN_STR[] =
@@ -110,6 +114,7 @@ static const string PTOKEN_STR[] =
     "BEGIN",
     "BREAK",
     "CASE",
+    "CHARACTER",
     "CONST",
     "CONSTRUCTOR",
     "CONTINUE",
@@ -186,7 +191,10 @@ static const string PTOKEN_STR[] =
     "LBRACE",
     "RBRACE",
     "LCOMMENT",
-    "RCOMMENT"
+    "RCOMMENT",
+    "COLON",
+    "DOT_DOT",
+    "PERIOD",
 };
 static map<string, PToken> ReservedWords = 
         {
@@ -197,6 +205,7 @@ static map<string, PToken> ReservedWords =
             {"BEGIN", PToken::BEGIN},
             {"BREAK", PToken::BREAK},
             {"CASE", PToken::CASE},
+            {"CHARACTER", PToken::CHARACTER},
             {"CONST", PToken::CONST},
             {"CONSTRUCTOR", PToken::CONSTRUCTOR},
             {"CONTINUE", PToken::CONTINUE},
@@ -274,6 +283,9 @@ static map<string, PToken> Symbols =
             {"RBRACE", PToken::RBRACE},
             {"LCOMMENT", PToken::LCOMMENT},
             {"RCOMMENT", PToken::RCOMMENT},
+            {"COLON", PToken::COLON},
+            {"DOT_DOT", PToken::DOT_DOT},
+            {"PERIOD", PToken::PERIOD},
         };
 
 class Token
@@ -305,8 +317,9 @@ class Token
         static Token *Number(char currentCh, FileReader * file);
         static Token *String(char currentCh, FileReader * file);
         static Token *SpecialSymbols(char currentCh, FileReader * file);
-        static void Error(Token *token, string msg);
+        static string Error(Token *token, string msg);
         static string toString(Token *token);
+        static string strToUpper (string str);
 
 
 };

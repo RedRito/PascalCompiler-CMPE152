@@ -1,5 +1,7 @@
 #include "scanner.h"
 #include <string>
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 Scanner::Scanner(FileReader *file)
@@ -11,17 +13,22 @@ Scanner::Scanner(FileReader *file)
 Token *Scanner::nextToken()
 {
     char ch = file -> nextChar();
-    cout << ch << endl;
     while(isspace(ch))
     {
         ch = file -> nextChar();
     }
-    if (isalpha(ch))      
+    if (isalpha(ch))
+    {
         return Token::ReservedWord(ch, file);
+    }      
     else if (isdigit(ch)) 
+    {
         return Token::Number(ch, file);
-    else if (ch == '\'')  
+    }
+    else if (ch == '\'')
+    {
         return Token::String(ch, file);
+    }  
     else                  
         return Token::SpecialSymbols(ch, file);
 }
@@ -29,26 +36,32 @@ Token *Scanner::nextToken()
 void Scanner::printTokens()
 {
     Token *token = nextToken();
-    token = nextToken();
-    //cout << Token::toString(token) << endl;
-    /*
     stack <PToken> symbolStack;
-    while(token -> datatype != PToken::END_OF_FILE)
+    while(token -> datatype != PToken::END_OF_FILE && file -> getCurrentChar() != EOF)
     {
+        if(token->datatype == PToken::INVALID)
+        {
+            cout << token -> Error(token, "token");
+        }
         if(token -> datatype == PToken::LPAREN || token -> datatype == PToken::LBRACKET || token -> datatype == PToken::LBRACE)
         {
             symbolStack.push(token -> datatype);
         }
         else if(token -> datatype == PToken::RPAREN || token -> datatype == PToken::RBRACKET || token ->datatype == PToken::RBRACE)
         {
+            if(symbolStack.empty())
+            {
+                token -> datatype = PToken::INVALID;
+                cout << token -> Error(token, "token");
+            }
             switch (token -> datatype)
             {
             case PToken::RPAREN:
             {
                 if(symbolStack.top() != PToken::LPAREN)
                 {
-                    token -> datatype == PToken::INVALID;
-                    Token::Error(token, "bye");
+                    token -> datatype = PToken::INVALID;
+                    cout << token -> Error(token, "token");
                 }
                 else
                 {
@@ -60,8 +73,8 @@ void Scanner::printTokens()
             {
                 if(symbolStack.top() != PToken::LBRACKET)
                 {
-                    token -> datatype == PToken::INVALID;
-                    Token::Error(token, "bye");
+                    token -> datatype = PToken::INVALID;
+                    cout << token -> Error(token, "token");
                 }
                 else
                 {
@@ -73,8 +86,8 @@ void Scanner::printTokens()
             {
                 if(symbolStack.top() != PToken::LBRACE)
                     {
-                        token -> datatype == PToken::INVALID;
-                        Token::Error(token, "bye");
+                        token -> datatype = PToken::INVALID;
+                        cout << token -> Error(token, "token");
                     }
                 else
                 {
@@ -90,5 +103,85 @@ void Scanner::printTokens()
         
         token = nextToken();
     }
-    */
+}
+
+void Scanner::printToFile(string filename)
+{
+    ofstream printFile;
+    printFile.open(filename);
+    if (printFile.fail())
+    {
+        cout << " COULD NOT OPEN THE FILE " << filename << endl;
+        exit(1);
+    }
+    Token *token = nextToken();
+    stack <PToken> symbolStack;
+    while(token -> datatype != PToken::END_OF_FILE && file -> getCurrentChar() != EOF)
+    {
+        if(token->datatype == PToken::INVALID)
+        {
+            printFile << token -> Error(token, "token");
+        }
+        if(token -> datatype == PToken::LPAREN || token -> datatype == PToken::LBRACKET || token -> datatype == PToken::LBRACE)
+        {
+            symbolStack.push(token -> datatype);
+        }
+        else if(token -> datatype == PToken::RPAREN || token -> datatype == PToken::RBRACKET || token ->datatype == PToken::RBRACE)
+        {
+            if(symbolStack.empty())
+            {
+                token -> datatype = PToken::INVALID;
+                printFile << token -> Error(token, "token");
+            }
+            switch (token -> datatype)
+            {
+            case PToken::RPAREN:
+            {
+                if(symbolStack.top() != PToken::LPAREN)
+                {
+                    token -> datatype = PToken::INVALID;
+                    printFile << token -> Error(token, "token");
+                }
+                else
+                {
+                    symbolStack.pop();
+                }
+                break;
+            }
+            case PToken::RBRACKET:
+            {
+                if(symbolStack.top() != PToken::LBRACKET)
+                {
+                    token -> datatype = PToken::INVALID;
+                    printFile << token -> Error(token, "token");
+                }
+                else
+                {
+                    symbolStack.pop();
+                }
+                break;
+            }
+            case PToken::RBRACE:
+            {
+                if(symbolStack.top() != PToken::LBRACE)
+                    {
+                        token -> datatype = PToken::INVALID;
+                        printFile << token -> Error(token, "token");
+                    }
+                else
+                {
+                    symbolStack.pop();
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        printFile << token -> toString(token) << endl;
+        
+        token = nextToken();
+    }
+    printFile.close();
+
 }

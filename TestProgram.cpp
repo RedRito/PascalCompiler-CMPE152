@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     if(argc != 2)
     {
-        cout << "RUN BY ./main \"FileName\"" << endl;
+        cout << "RUN BY ./main [\"FileName\"]" << endl;
         exit(1);
     }
     string fileName = argv[1];
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     cout << "END OF FILE" << endl;
     */
    Scanner *test = new Scanner(file);
-   Token *token = test -> nextToken();
-   cout << Token::toString(token) << endl;
+   //test ->printTokens();
+   test ->printToFile("masterTestCaseOutput.txt");
 
 }
