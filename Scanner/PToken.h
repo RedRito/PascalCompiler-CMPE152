@@ -188,18 +188,7 @@ static const string PTOKEN_STR[] =
     "LCOMMENT",
     "RCOMMENT"
 };
-
-class Token
-{
-    private:
-        
-    public:
-        static void initMaps();
-    /*
-        static map<string, PToken> ReservedWords;
-        static map<string, PToken> Symbols;
-    */
-            static const map<string, PToken> ReservedWords = 
+static const map<string, PToken> ReservedWords = 
         {
             //{"a", 1},
             {"AND", PToken::AND},
@@ -286,6 +275,18 @@ class Token
             {"LCOMMENT", PToken::LCOMMENT},
             {"RCOMMENT", PToken::RCOMMENT},
         };
+
+class Token
+{
+    private:
+        
+    public:
+        static void initMaps();
+    /*
+        static map<string, PToken> ReservedWords;
+        static map<string, PToken> Symbols;
+    */
+            
         
         PToken datatype;    //what's the token's datatype
         string datatext;    //the token's text

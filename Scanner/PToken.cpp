@@ -2,9 +2,10 @@
 #include <string>
 #include "PToken.h"
 using namespace std;
-map<string, PToken> Symbols;
-map<string, Token> ReservedWords;
+//map<string, PToken> Symbols;
+//map<string, Token> ReservedWords;
 //Initialize symbols map:
+/*
 void Token::initMaps()
 {
     ReservedWords["AND"] = PToken::AND;
@@ -90,7 +91,7 @@ void Token::initMaps()
     Symbols["RCOMMENT"] = PToken::RCOMMENT;
     
 }
-
+*/
 /*
 Token *Token::Word(char firstChar, FileReader *file)
 {
@@ -284,7 +285,17 @@ Token *Token::String(char currentCh, FileReader * file)
     
 }
 
-
+Token::Token(char currentChar)
+{
+    linenum = 0;
+    datatype = PToken::INVALID;
+    datatext = "";
+    tokenValueInt = 0;
+    tokenValueReal = 0.0;
+    tokenValueString = "";
+    tokenValueBoolean = false;
+    datatext += currentChar;
+}
 Token *Token::SpecialSymbols(char currentCh, FileReader * file)
 {
     
@@ -296,20 +307,20 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         token -> datatext += ch;
         if(ch == '=')
         {
-            token->datatype = Symbols[token->datatext]; //datatype = ASSIGN
+            token->datatype = Symbols.at(token->datatext); //datatype = ASSIGN
         }
     }
     else if(Symbols.find(token -> datatext) != Symbols.end())
     {
-        token->datatype = Symbols[token->datatext];
+        token->datatype = Symbols.at(token->datatext);
     }
     else if (currentCh == EOF)
     {
-        token->datatype = Symbols["EOF"];
+        token->datatype = Symbols.at("EOF");
     }
     else
     {
-        token->datatype = Symbols["INVALID"];
+        token->datatype = Symbols.at("INVALID");
     }
 
 
@@ -322,7 +333,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Token::Symbols[token->datatext]; //datatype = PLUSEQUAL
+                token->datatype = Symbols.at(token->datatext); //datatype = PLUSEQUAL
                 if(token->datatype == PToken::PLUSEQUAL)
                 {
                     cout << "works fine" << endl;
@@ -337,7 +348,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Token::Symbols[token->datatext]; //datatype = MINUSEQUAL
+                token->datatype = Symbols.at(token->datatext); //datatype = MINUSEQUAL
             }
             break;
         }
@@ -348,11 +359,11 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Token::Symbols[token->datatext]; //datatype = MULTEQUAL
+                token->datatype = Symbols.at(token->datatext); //datatype = MULTEQUAL
             }
             else if(ch == ')')
             {
-                token->datatype = Token::Symbols[token->datatext]; //datatype = RCOMMENT
+                token->datatype = Symbols.at(token->datatext); //datatype = RCOMMENT
             }
             break;
         }
@@ -363,7 +374,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Token::Symbols[token->datatext]; //datatype = DIVEQUAL
+                token->datatype = Symbols.at(token->datatext); //datatype = DIVEQUAL
             }
             break;
         }
@@ -373,11 +384,11 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Token::Symbols[token->datatext]; //datatype = LTEQ
+                token->datatype = Symbols.at(token->datatext); //datatype = LTEQ
             }
             else if(ch == '>')
             {
-                token->datatype = Token::Symbols[token->datatext]; //datatype = NE
+                token->datatype = Symbols.at(token->datatext); //datatype = NE
             }
             break;
         }
@@ -387,7 +398,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Token::Symbols[token->datatext]; //datatype = GTEQ
+                token->datatype = Symbols.at(token->datatext); //datatype = GTEQ
             }
             break;
         }
@@ -397,7 +408,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '*')
             {
-                token->datatype = Token::Symbols[token->datatext]; //datatype = LCOMMENT
+                token->datatype = Symbols.at(token->datatext); //datatype = LCOMMENT
             }
             break;
         }
