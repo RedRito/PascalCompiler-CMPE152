@@ -188,7 +188,7 @@ static const string PTOKEN_STR[] =
     "LCOMMENT",
     "RCOMMENT"
 };
-static const map<string, PToken> ReservedWords = 
+static map<string, PToken> ReservedWords = 
         {
             //{"a", 1},
             {"AND", PToken::AND},
@@ -246,7 +246,7 @@ static const map<string, PToken> ReservedWords =
             {"WITH", PToken::WITH},
             {"XOR", PToken::XOR},
         };
-        static map<string, PToken> Symbols =
+static map<string, PToken> Symbols =
         {
             {"PLUSOP", PToken::PLUSOP},
             {"MINUSOP", PToken::MINUSOP},

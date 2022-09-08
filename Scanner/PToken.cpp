@@ -302,24 +302,61 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
     Token *token = new Token(currentCh);
     switch (currentCh)
     {
-        case ';' : token->datatype = PToken::SEMICOLOR;  break;
         case '+' : 
         {
-            cout << "CASE IS TRUE" << endl;
-            token->datatype = PToken::PLUSOP;
-            cout << Token::toString(token) << endl;
+            token->datatype = Symbols["PLUSOP"];
             break;
         }
-        
-        case '-' : token->datatype = PToken::MINUSOP;      break;
-        case '*' : token->datatype = PToken::MULTOP;       break;
-        case '/' : token->datatype = PToken::DIVOP;      break;
-        case '=' : token->datatype = PToken::EQUAL;     break;
-        case '<' : token->datatype = PToken::LT;        break;
-        case '(' : token->datatype = PToken::LPAREN;     break;
-        case ')' : token->datatype = PToken::RPAREN;     break;
-        case '>' : token->datatype = PToken::GT;    break;
-    
+        case '-' : 
+        {
+            token->datatype = Symbols["MINUSOP"];
+            break;
+        }
+        case '*' : 
+        {
+            token->datatype = Symbols["MULTOP"];       
+            break;
+        }
+        case '/' : 
+        {
+            token->datatype = Symbols["DIVOP"];      
+            break;
+        }
+        case '=' : 
+        {
+            token->datatype = Symbols["EQUAL"];     
+            break;
+        }
+        case '<' : 
+        {
+            token->datatype = Symbols["LT"];        
+            break;
+        }
+        case '(' : 
+        {
+            token->datatype = Symbols["LPAREN"];     
+            break;
+        }
+        case ')' : 
+        {
+            token->datatype = Symbols["RPAREN"];     
+            break;
+        }
+        case '>' : 
+        {
+            token->datatype = Symbols["GT"];    
+            break;
+        }
+        case ';' : 
+        {
+            token->datatype = Symbols["SEMICOLOR"];  
+            break;
+        }
+        case EOF :
+        {
+            token->datatype = Symbols["EOF"];
+            break;
+        }
     default:
         break;
     }
@@ -329,21 +366,8 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         token -> datatext += ch;
         if(ch == '=')
         {
-            token->datatype = Symbols[token->datatext]; //datatype = ASSIGN
+            token->datatype = Symbols["ASSIGN"]; //datatype = ASSIGN
         }
-    }
-    else if(Symbols.find(token -> datatext) != Symbols.end())
-    {
-        token->datatype = Symbols[token->datatext];
-    }
-    else if (currentCh == EOF)
-    {
-        token->datatype = Symbols["EOF"];
-    }
-    else
-    {
-        token->datatype = Symbols["INVALID"];
-        return token;
     }
 
     switch (token -> datatype)
@@ -352,14 +376,9 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         {
             char ch = file -> nextChar();
             token -> datatext += ch;
-            cout << "CURRENTLY HERE" << endl;
             if(ch == '=')
             {
-                token->datatype = Symbols[token->datatext]; //datatype = PLUSEQUAL
-                if(token->datatype == PToken::PLUSEQUAL)
-                {
-                    cout << "works fine" << endl;
-                }
+                token->datatype = Symbols["PLUSEQUAL"]; //datatype = PLUSEQUAL
             }
             break;
         }
@@ -370,7 +389,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols[token->datatext]; //datatype = MINUSEQUAL
+                token->datatype = Symbols["MINUSEQUAL"]; //datatype = MINUSEQUAL
             }
             break;
         }
@@ -381,11 +400,11 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols[token->datatext]; //datatype = MULTEQUAL
+                token->datatype = Symbols["MULTEQUAL"]; //datatype = MULTEQUAL
             }
             else if(ch == ')')
             {
-                token->datatype = Symbols[token->datatext]; //datatype = RCOMMENT
+                token->datatype = Symbols["RCOMMENT"]; //datatype = RCOMMENT
             }
             break;
         }
@@ -396,7 +415,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols[token->datatext]; //datatype = DIVEQUAL
+                token->datatype = Symbols["DIVEQUAL"]; //datatype = DIVEQUAL
             }
             break;
         }
@@ -406,11 +425,11 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols[token->datatext]; //datatype = LTEQ
+                token->datatype = Symbols["LTEQ"]; //datatype = LTEQ
             }
             else if(ch == '>')
             {
-                token->datatype = Symbols[token->datatext]; //datatype = NE
+                token->datatype = Symbols["NE"]; //datatype = NE
             }
             break;
         }
@@ -420,7 +439,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols[token->datatext]; //datatype = GTEQ
+                token->datatype = Symbols["GTEQ"]; //datatype = GTEQ
             }
             break;
         }
@@ -430,12 +449,16 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '*')
             {
-                token->datatype = Symbols[token->datatext]; //datatype = LCOMMENT
+                token->datatype = Symbols["LCOMMENT"]; //datatype = LCOMMENT
             }
             break;
         }
         default:
             break;
+    }
+    if(Symbols.find(PTOKEN_STR[(int) token -> datatype]) == Symbols.end())
+    {
+        token->datatype = Symbols["INVALID"];
     }
     return token;
     
