@@ -26,14 +26,17 @@ char FileReader::getCurrentChar()
 char FileReader::nextChar()
 {
     currentCh = file.get();
+    //End Of File token at the end of the file
     if(file.eof())
     {
         currentCh = EOF;
     }
+    //move to the next line
     else if (currentCh == '\n')
     {
         line++;
     }
+    //Error handling
     else if(file.fail())
     {
         cout << "Something went wrong with  " << fileName << endl;
