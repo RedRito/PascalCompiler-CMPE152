@@ -10,9 +10,9 @@ Scanner::Scanner(FileReader *file)
 
 Token *Scanner::nextToken()
 {
-    char ch = file -> getCurrentChar();
+    char ch = file -> nextChar();
     cout << ch << endl;
-    while(ch == ' ')
+    while(isspace(ch))
     {
         ch = file -> nextChar();
     }
