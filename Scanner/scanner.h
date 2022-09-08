@@ -24,8 +24,6 @@ class Scanner
     Scanner(FileReader *file);
     private:
     FileReader *file;
-    //skips the whitespace characters
-    void skipWhiteSpace();
 };
 
 
