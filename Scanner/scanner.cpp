@@ -2,7 +2,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 Scanner::Scanner(FileReader *file)
 {
@@ -12,23 +11,28 @@ Scanner::Scanner(FileReader *file)
 
 Token *Scanner::nextToken()
 {
-    char ch = file -> nextChar();
+    char ch = file -> getCurrentChar();
+    //Increment ch
     while(isspace(ch))
     {
         ch = file -> nextChar();
     }
+    //Ch is a reserved word
     if (isalpha(ch))
     {
         return Token::ReservedWord(ch, file);
     }      
+    //Ch is a number
     else if (isdigit(ch)) 
     {
         return Token::Number(ch, file);
     }
+    //Ch is a string
     else if (ch == '\'')
     {
         return Token::String(ch, file);
     }  
+    //Ch is a symbol
     else                  
         return Token::SpecialSymbols(ch, file);
 }
@@ -103,6 +107,7 @@ void Scanner::printTokens()
         
         token = nextToken();
     }
+    cout << token -> toString(token) << endl;
 }
 
 void Scanner::printToFile(string filename)
@@ -182,6 +187,7 @@ void Scanner::printToFile(string filename)
         
         token = nextToken();
     }
+    printFile << token -> toString(token) << endl;
     printFile.close();
 
 }

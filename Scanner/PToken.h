@@ -7,6 +7,7 @@
 #include "FileReader.h"
 using namespace std;
 
+//List of TOKENS / STATES
 enum class PToken
 {
     INVALID,
@@ -103,7 +104,7 @@ enum class PToken
     DOT_DOT,
     PERIOD,
 };
-
+//STRING OF ALL TOKENS
 static const string PTOKEN_STR[] =
 {
     "INVALID",
@@ -196,6 +197,9 @@ static const string PTOKEN_STR[] =
     "DOT_DOT",
     "PERIOD",
 };
+/*
+    state table of reserved words
+*/
 static map<string, PToken> ReservedWords = 
         {
             //{"a", 1},
@@ -255,6 +259,9 @@ static map<string, PToken> ReservedWords =
             {"WITH", PToken::WITH},
             {"XOR", PToken::XOR},
         };
+/*
+    state table of special symbols
+*/
 static map<string, PToken> Symbols =
         {
             {"PLUSOP", PToken::PLUSOP},
@@ -293,32 +300,56 @@ class Token
     private:
         
     public:
-        static void initMaps();
-    /*
-        static map<string, PToken> ReservedWords;
-        static map<string, PToken> Symbols;
-    */
-            
-        
         PToken datatype;    //what's the token's datatype
         string datatext;    //the token's text
         int linenum;        //the current line number
         /*
             The value of the token if it exists.
+            int tokenValueInt the token's int value
+            double tokenValueReal the token's real value
+            string tokenValueString the token's string value
+            bool tokenValueBoolean the token's boolean value
         */
         int tokenValueInt;
         double tokenValueReal;
         string tokenValueString;
         bool tokenValueBoolean;
-
-        Token(char currentCh); //constructor
-        //part of the class thus should be static
+        //constructor
+        Token(char currentCh); 
+        //
+        /*
+            Checks the current ch and determines if it is a reserved word, else it is a identifier.
+            returns token of determined word.
+        */
         static Token *ReservedWord(char currentCh, FileReader * file);
+        /*
+            Checks the current ch and determines if it is a reserved word, else it is a identifier.
+            returns token of determined word.
+        */
         static Token *Number(char currentCh, FileReader * file);
+        /*
+            Checks the current ch and determines if it is a reserved word, else it is a identifier.
+            returns token of determined word.
+        */
         static Token *String(char currentCh, FileReader * file);
+        /*
+            Checks the current ch and determines if it is a reserved word, else it is a identifier.
+            returns token of determined word.
+        */
         static Token *SpecialSymbols(char currentCh, FileReader * file);
+        /*
+            a string msg of the given token and a msg
+            returns string of error msg
+        */
         static string Error(Token *token, string msg);
+        /*
+            a string of the given token and a msg
+            returns string of token
+        */
         static string toString(Token *token);
+        /*
+            returns uppercase of given string.
+        */
         static string strToUpper (string str);
 
 

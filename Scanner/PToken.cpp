@@ -2,14 +2,12 @@
 #include <string>
 #include "PToken.h"
 #include <algorithm>
-using namespace std;
 
 string Token::strToUpper(string str)
 {
-    string upper_case(str);
-    transform(upper_case.begin(), upper_case.end(),
-              upper_case.begin(), ::toupper);
-    return upper_case;
+    string givenstr(str);
+    transform(givenstr.begin(), givenstr.end(), givenstr.begin(), ::toupper);
+    return givenstr;
 }
 Token *Token::ReservedWord(char currentCh, FileReader * file)
 {
@@ -21,12 +19,12 @@ Token *Token::ReservedWord(char currentCh, FileReader * file)
         token->datatype = PToken::INVALID;
         Error(token, "Identifier");
     }
-    for (char ch = file->nextChar(); isalnum(ch); ch = file->nextChar()) //ISSUE, CONSUMES THE LAST Character after the reserved word / identifier
+    for (char ch = file->nextChar(); isalnum(ch); ch = file->nextChar()) //Grabs the word. If it doesnt have an alphanumeric value it is a symbol.
     { 
         token->datatext += ch;
     }
 
-    string upper = strToUpper(token->datatext);
+    string upper = strToUpper(token->datatext); //toupper() to avoid a reserved word = identifier.
 
     if (ReservedWords.find(upper) != ReservedWords.end())
     {
@@ -147,9 +145,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
 {
     Token *token = new Token(currentCh);
     token ->linenum = file ->getLine();
-    //cout << "CURRENT CHAR IN SPECIAL SYMBOLS" << endl;
-    //cout << currentCh;
-    switch (currentCh)
+    switch (currentCh)  //Check currentch if it is a valid symbol
     {
         case '+' : 
         {
@@ -250,15 +246,19 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         break;
     }
 
-    switch (token -> datatype)
+    switch (token -> datatype)  //check previous state, if the currentch + nextch is an acceptable token, change state
     {
         case PToken::PLUSOP :
         {
             char ch = file -> nextChar();
-            token -> datatext += ch;
             if(ch == '=')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["PLUSEQUAL"]; //datatype = PLUSEQUAL
+            }
+            else
+            {
+                return token;
             }
             break;
         }
@@ -266,10 +266,14 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         case PToken::MINUSOP :
         {
             char ch = file -> nextChar();
-            token -> datatext += ch;
             if(ch == '=')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["MINUSEQUAL"]; //datatype = MINUSEQUAL
+            }
+            else
+            {
+                return token;
             }
             break;
         }
@@ -277,14 +281,19 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         case PToken::MULTOP :
         {
             char ch = file -> nextChar();
-            token -> datatext += ch;
             if(ch == '=')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["MULTEQUAL"]; //datatype = MULTEQUAL
             }
             else if(ch == ')')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["RCOMMENT"]; //datatype = RCOMMENT
+            }
+            else
+            {
+                return token;
             }
             break;
         }
@@ -292,33 +301,42 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         case PToken::DIVOP :
         {
             char ch = file -> nextChar();
-            token -> datatext += ch;
             if(ch == '=')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["DIVEQUAL"]; //datatype = DIVEQUAL
+            }
+            else
+            {
+                return token;
             }
             break;
         }
         case PToken::LT :
         {
             char ch = file -> nextChar();
-            token -> datatext += ch;
             if(ch == '=')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["LTEQ"]; //datatype = LTEQ
             }
             else if(ch == '>')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["NE"]; //datatype = NE
+            }
+            else
+            {
+                return token;
             }
             break;
         }
         case PToken::GT :
         {
             char ch = file -> nextChar();
-            token -> datatext += ch;
             if(ch == '=')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["GTEQ"]; //datatype = GTEQ
             }
             break;
@@ -326,40 +344,55 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         case PToken::LPAREN :
         {
             char ch = file -> nextChar();
-            token -> datatext += ch;
             if(ch == '*')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["LCOMMENT"]; //datatype = LCOMMENT
+            }
+            else
+            {
+                return token;
             }
             break;
         }
         case PToken::COLON :
         {
             char ch = file -> nextChar();
-            token -> datatext += ch;
             if(ch == '=')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["ASSIGN"]; //datatype = ASSIGN
+            }
+            else
+            {
+                return token;
             }
             break;
         }
         case PToken::PERIOD :
         {
             char ch = file -> nextChar();
-            token -> datatext += ch;
             if(ch == '.')
             {
+                token -> datatext += ch;
                 token->datatype = Symbols["DOT_DOT"]; //datatype = DOT_DOT
+            }
+            else
+            {
+                return token;
             }
             break;
         }
         default:
             break;
     }
+    //if symbol token does not exist
     if(Symbols.find(PTOKEN_STR[(int) token -> datatype]) == Symbols.end())
     {
         token->datatype = Symbols["INVALID"];
     }
+    //consume character
+    file->nextChar();
     return token;
     
 }

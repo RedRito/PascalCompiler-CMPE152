@@ -1,6 +1,5 @@
 #include "FileReader.h"
 #include <string>
-using namespace std;
 
 FileReader::FileReader(string fileName)
 {
@@ -8,9 +7,10 @@ FileReader::FileReader(string fileName)
     file.open(fileName);
     if (file.fail())
     {
-        cout << " COULD NOT OPEN THE FILE " << fileName << endl;
+       std::cout << " COULD NOT OPEN THE FILE " << fileName << endl;
         exit(1);
     }
+    currentCh = nextChar();
 }
 
 int FileReader::getLine()
@@ -24,19 +24,22 @@ char FileReader::getCurrentChar()
 }
 
 char FileReader::nextChar()
-{
-    currentCh = file.get();
+{   
+    file.get(currentCh);
+    //End Of File Token
     if(file.eof())
     {
         currentCh = EOF;
     }
+    //Go to next line
     else if (currentCh == '\n')
     {
         line++;
     }
+    //Error Handling
     else if(file.fail())
     {
-        cout << "Something went wrong with  " << fileName << endl;
+        std::cout << "Something went wrong with  " << fileName << endl;
     }
     return currentCh;
 }
