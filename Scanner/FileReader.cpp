@@ -13,16 +13,19 @@ FileReader::FileReader(string fileName)
     }
 }
 
+// Get the current line 
 int FileReader::getLine()
 {
     return line;
 }
 
+// Get the current character
 char FileReader::getCurrentChar()
 {
     return currentCh;
 }
 
+// Read and return next input character
 char FileReader::nextChar()
 {
     currentCh = file.get();
