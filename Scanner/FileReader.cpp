@@ -26,14 +26,17 @@ char FileReader::getCurrentChar()
 char FileReader::nextChar()
 {   
     file.get(currentCh);
+    //End Of File Token
     if(file.eof())
     {
         currentCh = EOF;
     }
+    //Go to next line
     else if (currentCh == '\n')
     {
         line++;
     }
+    //Error Handling
     else if(file.fail())
     {
         std::cout << "Something went wrong with  " << fileName << endl;
