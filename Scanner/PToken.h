@@ -307,6 +307,7 @@ class Token
         static Token *SpecialSymbols(char currentCh, FileReader * file);
         static void Error(Token *token, string msg);
         static string toString(Token *token);
+        static string strToUpper (string str);
 
 
 };
