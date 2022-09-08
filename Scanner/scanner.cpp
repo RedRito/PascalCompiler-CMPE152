@@ -103,6 +103,10 @@ void Scanner::printTokens()
                 break;
             }
         }
+        if(token->datatype == PToken::INVALID)
+        {
+            cout << token -> Error(token, "token");
+        }
         cout << token -> toString(token) << endl;
         
         token = nextToken();
@@ -187,7 +191,6 @@ void Scanner::printToFile(string filename)
         
         token = nextToken();
     }
-    printFile << token -> toString(token) << endl;
     printFile.close();
 
 }
