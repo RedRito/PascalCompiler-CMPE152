@@ -5,10 +5,9 @@
 
 string Token::strToUpper(string str)
 {
-    string upper_case(str);
-    transform(upper_case.begin(), upper_case.end(),
-              upper_case.begin(), ::toupper);
-    return upper_case;
+    string givenstr(str);
+    transform(givenstr.begin(), givenstr.end(), givenstr.begin(), ::toupper);
+    return givenstr;
 }
 Token *Token::ReservedWord(char currentCh, FileReader * file)
 {
@@ -20,7 +19,7 @@ Token *Token::ReservedWord(char currentCh, FileReader * file)
         token->datatype = PToken::INVALID;
         Error(token, "Identifier");
     }
-    for (char ch = file->nextChar(); isalnum(ch); ch = file->nextChar()) //ISSUE, CONSUMES THE LAST Character after the reserved word / identifier
+    for (char ch = file->nextChar(); isalnum(ch); ch = file->nextChar())
     { 
         token->datatext += ch;
     }

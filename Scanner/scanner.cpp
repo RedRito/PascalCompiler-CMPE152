@@ -182,6 +182,7 @@ void Scanner::printToFile(string filename)
         
         token = nextToken();
     }
+    printFile << token -> toString(token) << endl;
     printFile.close();
 
 }
