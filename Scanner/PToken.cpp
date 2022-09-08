@@ -272,17 +272,129 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
     }
 }
 */
+string Token::strToUpper(string str)
+{
+    string upper_case(str);
+    transform(upper_case.begin(), upper_case.end(),
+              upper_case.begin(), ::toupper);
+    return upper_case;
+}
+
+
 Token *Token::ReservedWord(char currentCh, FileReader * file)
 {
+    Token *token = new Token(currentCh);
+    token->linenum = file->getLine();
 
+    for (char ch = file->nextChar(); isalnum(ch); ch = file->nextChar())
+    {
+        token->datatext += ch;
+    }
+
+    string upper = strToUpper(token->datatext);
+
+    if (ReservedWords.find(upper) != ReservedWords.end())
+    {
+        token->datatype = ReservedWords[upper];
+    }
+    else
+    {
+        token->datatype = PToken::IDENTIFIER;
+    }
+
+    return token;
 }
+
 Token *Token::Number(char currentCh, FileReader * file)
 {
-    
+    Token *token = new Token(currentCh);
+    token->linenum = file->getLine();
+    int pointCount = 0;
+
+    // Loop to get the rest of the characters of the number token.
+    // Append digits to the token.
+    for (char ch = file->nextChar();
+         isdigit(ch) || (ch == '.');
+         ch = file->nextChar())
+    {
+        if (ch == '.') pointCount++;
+        token->datatext += ch;
+    }
+
+    // Integer constant.
+    if (pointCount == 0)
+    {
+        token->datatype    = PToken::INTEGER;
+        token->tokenValueInt = stol(token->datatext);
+        token->tokenValueReal = token->tokenValueInt;  // allow using integer value as double
+    }
+
+    // Real constant.
+    else if (pointCount == 1)
+    {
+        token->datatype    = PToken::REAL;
+        token->tokenValueReal = stod(token->datatext);
+    }
+
+    else
+    {
+        token->datatype = PToken::INVALID;
+        Error(token, "Invalid number");
+    }
+
+    return token;
 }
 Token *Token::String(char currentCh, FileReader * file)
 {
-    
+    Token *token = new Token(currentCh);  
+    token->linenum = file->getLine();
+    int length = 0;                       
+
+    bool done = false;
+    char ch = file->nextChar();
+    do
+    {
+        // Append characters to the string until ' or EOF.
+        while ((ch != '\'') && (ch != EOF))
+        {
+            token->datatext += ch;
+            length++;
+            ch = file->nextChar();  // consume the character
+        }
+
+        // End of file. An unclosed string.
+        if (ch == EOF)
+        {
+            Error(token, "String not closed");
+            done = true;
+        }
+
+        // Got a ' so it can be the closing ', or a ''
+        else
+        {
+            ch = file->nextChar();  // consume the '
+
+            // That was the closing '. Close the string.
+            if (ch != '\'')
+            {
+                token->datatext += '\'';
+                done = true;
+            }
+
+            // It's '' so append ' to the string.
+            else
+            {
+                token->datatext += '\'';
+                length++;
+                ch = file->nextChar();  // consume second '
+            }
+        }
+    } while (!done);
+
+    // Don't include the leading and trailing '.
+    token->tokenValueString = token->datatext.substr(1, token->datatext.length() - 2);
+
+    return token;
 }
 
 Token::Token(char currentChar)
