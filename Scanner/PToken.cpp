@@ -268,7 +268,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
 
         case EOF : token->type = END_OF_FILE; break;
 
-        default: token->type = TokenType::ERROR;
+        default: token->type = PToken::ERROR;
     }
 }
 */
@@ -298,32 +298,53 @@ Token::Token(char currentChar)
 }
 Token *Token::SpecialSymbols(char currentCh, FileReader * file)
 {
-    
+    cout << "current char is " << currentCh << endl;
     Token *token = new Token(currentCh);
-    token -> datatext += currentCh;
+    switch (currentCh)
+    {
+        case ';' : token->datatype = PToken::SEMICOLOR;  break;
+        case '+' : 
+        {
+            cout << "CASE IS TRUE" << endl;
+            token->datatype = PToken::PLUSOP;
+            cout << Token::toString(token) << endl;
+            break;
+        }
+        
+        case '-' : token->datatype = PToken::MINUSOP;      break;
+        case '*' : token->datatype = PToken::MULTOP;       break;
+        case '/' : token->datatype = PToken::DIVOP;      break;
+        case '=' : token->datatype = PToken::EQUAL;     break;
+        case '<' : token->datatype = PToken::LT;        break;
+        case '(' : token->datatype = PToken::LPAREN;     break;
+        case ')' : token->datatype = PToken::RPAREN;     break;
+        case '>' : token->datatype = PToken::GT;    break;
+    
+    default:
+        break;
+    }
     if (currentCh == ':')
     {
         char ch = file -> nextChar();
         token -> datatext += ch;
         if(ch == '=')
         {
-            token->datatype = Symbols.at(token->datatext); //datatype = ASSIGN
+            token->datatype = Symbols[token->datatext]; //datatype = ASSIGN
         }
     }
     else if(Symbols.find(token -> datatext) != Symbols.end())
     {
-        token->datatype = Symbols.at(token->datatext);
+        token->datatype = Symbols[token->datatext];
     }
     else if (currentCh == EOF)
     {
-        token->datatype = Symbols.at("EOF");
+        token->datatype = Symbols["EOF"];
     }
     else
     {
-        token->datatype = Symbols.at("INVALID");
+        token->datatype = Symbols["INVALID"];
+        return token;
     }
-
-
 
     switch (token -> datatype)
     {
@@ -331,9 +352,10 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         {
             char ch = file -> nextChar();
             token -> datatext += ch;
+            cout << "CURRENTLY HERE" << endl;
             if(ch == '=')
             {
-                token->datatype = Symbols.at(token->datatext); //datatype = PLUSEQUAL
+                token->datatype = Symbols[token->datatext]; //datatype = PLUSEQUAL
                 if(token->datatype == PToken::PLUSEQUAL)
                 {
                     cout << "works fine" << endl;
@@ -348,7 +370,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols.at(token->datatext); //datatype = MINUSEQUAL
+                token->datatype = Symbols[token->datatext]; //datatype = MINUSEQUAL
             }
             break;
         }
@@ -359,11 +381,11 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols.at(token->datatext); //datatype = MULTEQUAL
+                token->datatype = Symbols[token->datatext]; //datatype = MULTEQUAL
             }
             else if(ch == ')')
             {
-                token->datatype = Symbols.at(token->datatext); //datatype = RCOMMENT
+                token->datatype = Symbols[token->datatext]; //datatype = RCOMMENT
             }
             break;
         }
@@ -374,7 +396,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols.at(token->datatext); //datatype = DIVEQUAL
+                token->datatype = Symbols[token->datatext]; //datatype = DIVEQUAL
             }
             break;
         }
@@ -384,11 +406,11 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols.at(token->datatext); //datatype = LTEQ
+                token->datatype = Symbols[token->datatext]; //datatype = LTEQ
             }
             else if(ch == '>')
             {
-                token->datatype = Symbols.at(token->datatext); //datatype = NE
+                token->datatype = Symbols[token->datatext]; //datatype = NE
             }
             break;
         }
@@ -398,7 +420,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '=')
             {
-                token->datatype = Symbols.at(token->datatext); //datatype = GTEQ
+                token->datatype = Symbols[token->datatext]; //datatype = GTEQ
             }
             break;
         }
@@ -408,7 +430,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
             token -> datatext += ch;
             if(ch == '*')
             {
-                token->datatype = Symbols.at(token->datatext); //datatype = LCOMMENT
+                token->datatype = Symbols[token->datatext]; //datatype = LCOMMENT
             }
             break;
         }

@@ -11,6 +11,7 @@ Scanner::Scanner(FileReader *file)
 Token *Scanner::nextToken()
 {
     char ch = file -> getCurrentChar();
+    cout << ch << endl;
     while(ch == ' ')
     {
         ch = file -> nextChar();
@@ -28,6 +29,9 @@ Token *Scanner::nextToken()
 void Scanner::printTokens()
 {
     Token *token = nextToken();
+    token = nextToken();
+    //cout << Token::toString(token) << endl;
+    /*
     stack <PToken> symbolStack;
     while(token -> datatype != PToken::END_OF_FILE)
     {
@@ -86,4 +90,5 @@ void Scanner::printTokens()
         
         token = nextToken();
     }
+    */
 }

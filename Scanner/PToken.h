@@ -246,7 +246,7 @@ static const map<string, PToken> ReservedWords =
             {"WITH", PToken::WITH},
             {"XOR", PToken::XOR},
         };
-        static const map<string, PToken> Symbols =
+        static map<string, PToken> Symbols =
         {
             {"PLUSOP", PToken::PLUSOP},
             {"MINUSOP", PToken::MINUSOP},

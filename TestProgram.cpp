@@ -24,5 +24,7 @@ int main(int argc, char *argv[])
     cout << "END OF FILE" << endl;
     */
    Scanner *test = new Scanner(file);
+   Token *token = test -> nextToken();
+   cout << Token::toString(token) << endl;
 
 }
