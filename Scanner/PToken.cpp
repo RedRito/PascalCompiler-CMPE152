@@ -4,6 +4,7 @@
 #include <algorithm>
 using namespace std;
 
+// Return strings with all uppercase letters
 string Token::strToUpper(string str)
 {
     string upper_case(str);
@@ -11,6 +12,8 @@ string Token::strToUpper(string str)
               upper_case.begin(), ::toupper);
     return upper_case;
 }
+
+
 Token *Token::ReservedWord(char currentCh, FileReader * file)
 {
     Token *token = new Token(currentCh);
@@ -21,13 +24,16 @@ Token *Token::ReservedWord(char currentCh, FileReader * file)
         token->datatype = PToken::INVALID;
         Error(token, "Identifier");
     }
+    
+    // Loop to get the remaining characters of the word
     for (char ch = file->nextChar(); isalnum(ch); ch = file->nextChar()) //ISSUE, CONSUMES THE LAST Character after the reserved word / identifier
     { 
         token->datatext += ch;
     }
 
     string upper = strToUpper(token->datatext);
-
+    
+    // Check if it is reserved words or identifiers
     if (ReservedWords.find(upper) != ReservedWords.end())
     {
         token->datatype = ReservedWords[upper];
@@ -46,8 +52,7 @@ Token *Token::Number(char currentCh, FileReader * file)
     token->linenum = file->getLine();
     int pointCount = 0;
 
-    // Loop to get the rest of the characters of the number token.
-    // Append digits to the token.
+    //Loop to get the remaining characters of number
     for (char ch = file->nextChar();
          isdigit(ch) || (ch == '.');
          ch = file->nextChar())
@@ -55,16 +60,14 @@ Token *Token::Number(char currentCh, FileReader * file)
         if (ch == '.') pointCount++;
         token->datatext += ch;
     }
-
-    // Integer constant.
+ 
     if (pointCount == 0)
     {
         token->datatype    = PToken::INTEGER;
         token->tokenValueInt = stol(token->datatext);
-        token->tokenValueReal = token->tokenValueInt;  // allow using integer value as double
+        token->tokenValueReal = token->tokenValueInt; 
     }
-
-    // Real constant.
+  
     else if (pointCount == 1)
     {
         token->datatype    = PToken::REAL;
