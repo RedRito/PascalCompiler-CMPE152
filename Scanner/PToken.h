@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include "FileReader.cpp"
+#include "FileReader.h"
 using namespace std;
 
 enum class PToken
@@ -18,6 +18,7 @@ enum class PToken
     BEGIN,
     BREAK,
     CASE,
+    CHARACTER,
     CONST,
     CONSTRUCTOR,
     CONTINUE,
@@ -98,6 +99,9 @@ enum class PToken
     RBRACE,
     LCOMMENT,
     RCOMMENT,
+    COLON,
+    DOT_DOT,
+    PERIOD,
 };
 
 static const string PTOKEN_STR[] =
@@ -110,6 +114,7 @@ static const string PTOKEN_STR[] =
     "BEGIN",
     "BREAK",
     "CASE",
+    "CHARACTER",
     "CONST",
     "CONSTRUCTOR",
     "CONTINUE",
@@ -186,18 +191,114 @@ static const string PTOKEN_STR[] =
     "LBRACE",
     "RBRACE",
     "LCOMMENT",
-    "RCOMMENT"
+    "RCOMMENT",
+    "COLON",
+    "DOT_DOT",
+    "PERIOD",
 };
-
+static map<string, PToken> ReservedWords = 
+        {
+            //{"a", 1},
+            {"AND", PToken::AND},
+            {"ARRAY", PToken::ARRAY},
+            {"ASM", PToken::ASM},
+            {"BEGIN", PToken::BEGIN},
+            {"BREAK", PToken::BREAK},
+            {"CASE", PToken::CASE},
+            {"CHARACTER", PToken::CHARACTER},
+            {"CONST", PToken::CONST},
+            {"CONSTRUCTOR", PToken::CONSTRUCTOR},
+            {"CONTINUE", PToken::CONTINUE},
+            {"DESTRUCTOR", PToken::DESTRUCTOR},
+            {"DIV", PToken::DIV},
+            {"DO", PToken::DO},
+            {"DOWNTO", PToken::DOWNTO},
+            {"ELSE", PToken::ELSE},
+            {"END", PToken::END},
+            {"FALSE", PToken::FALSE},
+            {"FILE", PToken::FILE},
+            {"FOR", PToken::FOR},
+            {"FUNCTION", PToken::FUNCTION},
+            {"GOTO", PToken::GOTO},
+            {"IF", PToken::IF},
+            {"IMPLEMENTATION", PToken::IMPLEMENTATION},
+            {"IN", PToken::IN},
+            {"INLINE", PToken::INLINE},
+            {"INTERFACE", PToken::INTERFACE},
+            {"LABEL", PToken::LABEL},
+            {"MOD", PToken::MOD},
+            {"NIL", PToken::NIL},
+            {"NOT", PToken::NOT},
+            {"OBJECT", PToken::OBJECT},
+            {"OF", PToken::OF},
+            {"ON", PToken::ON},
+            {"OPERATOR", PToken::OPERATOR},
+            {"OR", PToken::OR},
+            {"PACKED", PToken::PACKED},
+            {"PROCEDURE", PToken::PROCEDURE},
+            {"PROGRAM", PToken::PROGRAM},
+            {"RECORD", PToken::RECORD},
+            {"REPEAT", PToken::REPEAT},
+            {"SET", PToken::SET},
+            {"SHL", PToken::SHL},
+            {"SHR", PToken::SHR},
+            {"STRING", PToken::STRING},
+            {"THEN", PToken::THEN},
+            {"TO", PToken::TO},
+            {"TRUE", PToken::TRUE},
+            {"TYPE", PToken::TYPE},
+            {"UNIT", PToken::UNIT},
+            {"UNTIL", PToken::UNTIL},
+            {"USES", PToken::USES},
+            {"VAR", PToken::VAR},
+            {"WHILE", PToken::WHILE},
+            {"WITH", PToken::WITH},
+            {"XOR", PToken::XOR},
+        };
+static map<string, PToken> Symbols =
+        {
+            {"PLUSOP", PToken::PLUSOP},
+            {"MINUSOP", PToken::MINUSOP},
+            {"MULTOP", PToken::MULTOP},
+            {"DIVOP", PToken::DIVOP},
+            {"ASSIGN", PToken::ASSIGN},
+            {"EQUAL", PToken::EQUAL},
+            {"NE", PToken::NE},
+            {"LTEQ", PToken::LTEQ},
+            {"GTEQ", PToken::GTEQ},
+            {"LT", PToken::LT},
+            {"GT", PToken::GT},
+            {"PLUSEQUAL", PToken::PLUSEQUAL},
+            {"MINUSEQUAL", PToken::MINUSEQUAL},
+            {"MULTEQUAL", PToken::MULTEQUAL},
+            {"DIVEQUAL", PToken::DIVEQUAL},
+            {"CARAT", PToken::CARAT},
+            {"SEMICOLOR", PToken::SEMICOLOR},
+            {"COMMA", PToken::COMMA},
+            {"LPAREN", PToken::LPAREN},
+            {"RPAREN", PToken::RPAREN},
+            {"LBRACKET", PToken::LBRACKET},
+            {"RBRACKET", PToken::RBRACKET},
+            {"LBRACE", PToken::LBRACE},
+            {"RBRACE", PToken::RBRACE},
+            {"LCOMMENT", PToken::LCOMMENT},
+            {"RCOMMENT", PToken::RCOMMENT},
+            {"COLON", PToken::COLON},
+            {"DOT_DOT", PToken::DOT_DOT},
+            {"PERIOD", PToken::PERIOD},
+        };
 
 class Token
 {
     private:
-        static map<string, PToken> ReservedWords;
-        static map<string, PToken> Symbols;
         
     public:
         static void initMaps();
+    /*
+        static map<string, PToken> ReservedWords;
+        static map<string, PToken> Symbols;
+    */
+            
         
         PToken datatype;    //what's the token's datatype
         string datatext;    //the token's text
@@ -216,8 +317,9 @@ class Token
         static Token *Number(char currentCh, FileReader * file);
         static Token *String(char currentCh, FileReader * file);
         static Token *SpecialSymbols(char currentCh, FileReader * file);
-        static void   Error(Token *token, string msg);
+        static string Error(Token *token, string msg);
         static string toString(Token *token);
+        static string strToUpper (string str);
 
 
 };

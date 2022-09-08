@@ -1,215 +1,377 @@
-//Initialize reserved words map:
-map<string, Token> Token::ReservedWord;
-void Token::initMaps()
-{
-    ReservedWord["AND"] = PToken::AND;
-    ReservedWord["ARRAY"] = PToken::ARRAY;
-    ReservedWord["ASM"] = PToken::ASM;
-    ReservedWord["BEGIN"] = PToken::BEGIN;
-    ReservedWord["BREAK"] = PToken::BREAK;
-    ReservedWord["CASE"] = PToken::CASE;
-    ReservedWord["CONST"] = PToken::CONST;
-    ReservedWord["CONSTRUCTOR"] = PToken::CONSTRUCTOR;
-    ReservedWord["CONTINUE"] = PToken::CONTINUE;
-    ReservedWord["DESTRUCTOR"] = PToken::DESTRUCTOR;
-    ReservedWord["DIV"] = PToken::DIV;
-    ReservedWord["DO"] = PToken::DO;
-    ReservedWord["DOWNTO"] = PToken::DOWNTO;
-    ReservedWord["ELSE"] = PToken::ELSE;
-    ReservedWord["END"] = PToken::END;
-    ReservedWord["FALSE"] = PToken::FALSE;
-    ReservedWord["FILE"] = PToken::FILE;
-    ReservedWord["FOR"] = PToken::FOR;
-    ReservedWord["FUNCTION"] = PToken::FUNCTION;
-    ReservedWord["GOTO"] = PToken::GOTO;
-    ReservedWord["IF"] = PToken::IF;
-    ReservedWord["IMPLEMENTATION"] = PToken::IMPLEMENTATION;
-    ReservedWord["IN"] = PToken::IN;
-    ReservedWord["INLINE"] = PToken::INLINE;
-    ReservedWord["INTERFACE"] = PToken::INTERFACE;
-    ReservedWord["LABEL"] = PToken::LABEL;
-    ReservedWord["MOD"] = PToken::MOD;
-    ReservedWord["NIL"] = PToken::NIL;
-    ReservedWord["NOT"] = PToken::NOT;
-    ReservedWord["OBJECT"] = PToken::OBJECT;
-    ReservedWord["OF"] = PToken::OF;
-    ReservedWord["ON"] = PToken::ON;
-    ReservedWord["OPERATOR"] = PToken::OPERATOR;
-    ReservedWord["OR"] = PToken::OR;
-    ReservedWord["PACKED"] = PToken::PACKED;
-    ReservedWord["PROCEDURE"] = PToken::PROCEDURE;
-    ReservedWord["PROGRAM"] = PToken::PROGRAM;
-    ReservedWord["RECORD"] = PToken::RECORD;
-    ReservedWord["REPEAT"] = PToken::REPEAT;
-    ReservedWord["SET"] = PToken::SET;
-    ReservedWord["SHL"] = PToken::SHL;
-    ReservedWord["SHR"] = PToken::SHR;
-    ReservedWord["STRING"] = PToken::STRING;
-    ReservedWord["THEN"] = PToken::THEN;
-    ReservedWord["TO"] = PToken::TO;
-    ReservedWord["TRUE"] = PToken::TRUE;
-    ReservedWord["TYPE"] = PToken::TYPE;
-    ReservedWord["UNIT"] = PToken::UNIT;
-    ReservedWord["UNTIL"] = PToken::UNTIL;
-    ReservedWord["USES"] = PToken::USES;
-    ReservedWord["VAR"] = PToken::VAR;
-    ReservedWord["WHILE"] = PToken::WHILE;
-    ReservedWord["WITH"] = PToken::WITH;
-    ReservedWord["XOR"] = PToken::XOR;
-}
-//Initialize symbols map:
-map<string, Token> Token::Symbols;
-void Token::initMaps()
-{
-    Symbols["PLUSOP"] = PToken::PLUSOP;
-    Symbols["MINUSOP"] = PToken::MINUSOP;
-    Symbols["MULTOP"] = PToken::MULTOP;
-    Symbols["DIVOP"] = PToken::DIVOP;
-    Symbols["ASSIGN"] = PToken::ASSIGN;
-    Symbols["EQUAL"] = PToken::EQUAL;
-    Symbols["NE"] = PToken::NE;
-    Symbols["LTEQ"] = PToken::LTEQ;
-    Symbols["GTEQ"] = PToken::GTEQ;
-    Symbols["LT"] = PToken::LT;
-    Symbols["GT"] = PToken::GT;
-    Symbols["PLUSEQUAL"] = PToken::PLUSEQUAL;
-    Symbols["MINUSEQUAL"] = PToken::MINUSEQUAL;
-    Symbols["MULTEQUAL"] = PToken::MULTEQUAL;
-    Symbols["DIVEQUAL"] = PToken::DIVEQUAL;
-    Symbols["CARAT"] = PToken::CARAT;
-    Symbols["SEMICOLOR"] = PToken::SEMICOLOR;
-    Symbols["COMMA"] = PToken::COMMA;
-    Symbols["LPAREN"] = PToken::LPAREN;
-    Symbols["RPAREN"] = PToken::RPAREN;
-    Symbols["LBRACKET"] = PToken::LBRACKET;
-    Symbols["RBRACKET"] = PToken::RBRACKET;
-    Symbols["LBRACE"] = PToken::LBRACE;
-    Symbols["RBRACE"] = PToken::RBRACE;
-    Symbols["LCOMMENT"] = PToken::LCOMMENT;
-    Symbols["RCOMMENT"] = PToken::RCOMMENT;
-}
+#include <iostream>
+#include <string>
+#include "PToken.h"
+#include <algorithm>
+using namespace std;
 
-Token *Token::Word(char firstChar, Source *source)
+string Token::strToUpper(string str)
 {
-    Token *token = new Token(firstChar);
-    token->lineNumber = source->lineNumber();
+    string upper_case(str);
+    transform(upper_case.begin(), upper_case.end(),
+              upper_case.begin(), ::toupper);
+    return upper_case;
+}
+Token *Token::ReservedWord(char currentCh, FileReader * file)
+{
+    Token *token = new Token(currentCh);
+    token->linenum = file->getLine();
 
-    // Loop to get the rest of the characters of the word token.
-    // Append letters and digits to the token.
-    for (char ch = source->nextChar(); isalnum(ch); ch = source->nextChar())
+    if(isdigit(token -> datatext[0]))
     {
-        token->text += ch;
+        token->datatype = PToken::INVALID;
+        Error(token, "Identifier");
+    }
+    for (char ch = file->nextChar(); isalnum(ch); ch = file->nextChar()) //ISSUE, CONSUMES THE LAST Character after the reserved word / identifier
+    { 
+        token->datatext += ch;
     }
 
-    // Is it a reserved word or an identifier?
-    string upper = toUpperCase(token->text);
-    if (Token::reservedWords.find(upper) != Token::reservedWords.end())
+    string upper = strToUpper(token->datatext);
+
+    if (ReservedWords.find(upper) != ReservedWords.end())
     {
-        token->type = Token::reservedWords[upper];
+        token->datatype = ReservedWords[upper];
     }
     else
     {
-        token->type = TokenType::IDENTIFIER;
+        token->datatype = PToken::IDENTIFIER;
     }
 
     return token;
 }
 
-Token *Token::Number(char firstChar, Source *source)
+Token *Token::Number(char currentCh, FileReader * file)
 {
-    Token *token = new Token(firstChar);
-    token->lineNumber = source->lineNumber();
+    Token *token = new Token(currentCh);
+    token->linenum = file->getLine();
     int pointCount = 0;
 
     // Loop to get the rest of the characters of the number token.
     // Append digits to the token.
-    for (char ch = source->nextChar();
+    for (char ch = file->nextChar();
          isdigit(ch) || (ch == '.');
-         ch = source->nextChar())
+         ch = file->nextChar())
     {
         if (ch == '.') pointCount++;
-        token->text += ch;
+        token->datatext += ch;
     }
 
     // Integer constant.
     if (pointCount == 0)
     {
-        token->type    = TokenType::INTEGER;
-        token->value.L = stol(token->text);
-        token->value.D = token->value.L;  // allow using integer value as double
+        token->datatype    = PToken::INTEGER;
+        token->tokenValueInt = stol(token->datatext);
+        token->tokenValueReal = token->tokenValueInt;  // allow using integer value as double
     }
 
     // Real constant.
     else if (pointCount == 1)
     {
-        token->type    = TokenType::REAL;
-        token->value.D = stod(token->text);
+        token->datatype    = PToken::REAL;
+        token->tokenValueReal = stod(token->datatext);
     }
 
     else
     {
-        token->type = TokenType::ERROR;
-        tokenError(token, "Invalid number");
+        token->datatype = PToken::INVALID;
     }
 
     return token;
 }
-
-Token *Token::CharacterOrString(char firstChar, Source *source)
+Token *Token::String(char currentCh, FileReader * file)
 {
-    Token *token = new Token(firstChar);  // the leading '
-    token->lineNumber = source->lineNumber();
-    int length = 0;                       // string length
+    Token *token = new Token(currentCh);  
+    token->linenum = file->getLine();
+    int length = 0;                       
 
-    // Loop to append the rest of the characters of the string,
-    // up to but not including the closing quote.
     bool done = false;
-    char ch = source->nextChar();
+    char ch = file->nextChar();
     do
     {
         // Append characters to the string until ' or EOF.
         while ((ch != '\'') && (ch != EOF))
         {
-            token->text += ch;
+            token->datatext += ch;
             length++;
-            ch = source->nextChar();  // consume the character
+            ch = file->nextChar();  // consume the character
         }
 
         // End of file. An unclosed string.
         if (ch == EOF)
         {
-            tokenError(token, "String not closed");
+            Error(token, "String not closed");
             done = true;
         }
 
         // Got a ' so it can be the closing ', or a ''
         else
         {
-            ch = source->nextChar();  // consume the '
+            ch = file->nextChar();  // consume the '
 
             // That was the closing '. Close the string.
             if (ch != '\'')
             {
-                token->text += '\'';
+                token->datatext += '\'';
                 done = true;
             }
 
             // It's '' so append ' to the string.
             else
             {
-                token->text += '\'';
+                token->datatext += '\'';
                 length++;
-                ch = source->nextChar();  // consume second '
+                ch = file->nextChar();  // consume second '
             }
         }
     } while (!done);
-
-    // It's a character token if the string length is 1.
-    // Otherwise, it's a string token.
-    token->type = length == 1 ? TokenType::CHARACTER : TokenType::STRING;
-
+    token->datatype = (token->datatext.length() == 3) ? ReservedWords["CHARACTER"] : ReservedWords["STRING"];
     // Don't include the leading and trailing '.
-    token->value.S = token->text.substr(1, token->text.length() - 2);
+    token->tokenValueString = token->datatext.substr(1, token->datatext.length() - 2);
 
     return token;
 }
+
+
+Token::Token(char currentChar)
+{
+    linenum = 0;
+    datatype = PToken::INVALID;
+    datatext = "";
+    tokenValueInt = 0;
+    tokenValueReal = 0.0;
+    tokenValueString = "";
+    tokenValueBoolean = false;
+    datatext += currentChar;
+}
+Token *Token::SpecialSymbols(char currentCh, FileReader * file)
+{
+    Token *token = new Token(currentCh);
+    token ->linenum = file ->getLine();
+    //cout << "CURRENT CHAR IN SPECIAL SYMBOLS" << endl;
+    //cout << currentCh;
+    switch (currentCh)
+    {
+        case '+' : 
+        {
+            token->datatype = Symbols["PLUSOP"];
+            break;
+        }
+        case '-' : 
+        {
+            token->datatype = Symbols["MINUSOP"];
+            break;
+        }
+        case '*' : 
+        {
+            token->datatype = Symbols["MULTOP"];       
+            break;
+        }
+        case '/' : 
+        {
+            token->datatype = Symbols["DIVOP"];      
+            break;
+        }
+        case '=' : 
+        {
+            token->datatype = Symbols["EQUAL"];     
+            break;
+        }
+        case '<' : 
+        {
+            token->datatype = Symbols["LT"];        
+            break;
+        }
+        case '>' : 
+        {
+            token->datatype = Symbols["GT"];    
+            break;
+        }
+        case '^' :
+        {
+            token->datatype = Symbols["CARAT"];
+            break;
+        }
+        case ';' : 
+        {
+            token->datatype = Symbols["SEMICOLOR"];  
+            break;
+        }
+        case ',' : 
+        {
+            token->datatype = Symbols["COMMA"];  
+            break;
+        }
+        case '(' : 
+        {
+            token->datatype = Symbols["LPAREN"];     
+            break;
+        }
+        case ')' : 
+        {
+            token->datatype = Symbols["RPAREN"];     
+            break;
+        }
+        case '[' : 
+        {
+            token->datatype = Symbols["LBRACKET"];     
+            break;
+        }
+        case ']' : 
+        {
+            token->datatype = Symbols["RBRACKET"];     
+            break;
+        }
+        case '{' : 
+        {
+            token->datatype = Symbols["LBRACE"];     
+            break;
+        }
+        case '}' : 
+        {
+            token->datatype = Symbols["RBRACE"];     
+            break;
+        }
+        case ':' :
+        {
+            token->datatype = Symbols["COLON"];
+            break;
+        }
+        case '.' :
+        {
+            token->datatype = Symbols["PERIOD"];
+            break;
+        }
+        case EOF :
+        {
+            token->datatype = Symbols["EOF"];
+            break;
+        }
+    default:
+        break;
+    }
+
+    switch (token -> datatype)
+    {
+        case PToken::PLUSOP :
+        {
+            char ch = file -> nextChar();
+            token -> datatext += ch;
+            if(ch == '=')
+            {
+                token->datatype = Symbols["PLUSEQUAL"]; //datatype = PLUSEQUAL
+            }
+            break;
+        }
+            
+        case PToken::MINUSOP :
+        {
+            char ch = file -> nextChar();
+            token -> datatext += ch;
+            if(ch == '=')
+            {
+                token->datatype = Symbols["MINUSEQUAL"]; //datatype = MINUSEQUAL
+            }
+            break;
+        }
+            
+        case PToken::MULTOP :
+        {
+            char ch = file -> nextChar();
+            token -> datatext += ch;
+            if(ch == '=')
+            {
+                token->datatype = Symbols["MULTEQUAL"]; //datatype = MULTEQUAL
+            }
+            else if(ch == ')')
+            {
+                token->datatype = Symbols["RCOMMENT"]; //datatype = RCOMMENT
+            }
+            break;
+        }
+            break;
+        case PToken::DIVOP :
+        {
+            char ch = file -> nextChar();
+            token -> datatext += ch;
+            if(ch == '=')
+            {
+                token->datatype = Symbols["DIVEQUAL"]; //datatype = DIVEQUAL
+            }
+            break;
+        }
+        case PToken::LT :
+        {
+            char ch = file -> nextChar();
+            token -> datatext += ch;
+            if(ch == '=')
+            {
+                token->datatype = Symbols["LTEQ"]; //datatype = LTEQ
+            }
+            else if(ch == '>')
+            {
+                token->datatype = Symbols["NE"]; //datatype = NE
+            }
+            break;
+        }
+        case PToken::GT :
+        {
+            char ch = file -> nextChar();
+            token -> datatext += ch;
+            if(ch == '=')
+            {
+                token->datatype = Symbols["GTEQ"]; //datatype = GTEQ
+            }
+            break;
+        }
+        case PToken::LPAREN :
+        {
+            char ch = file -> nextChar();
+            token -> datatext += ch;
+            if(ch == '*')
+            {
+                token->datatype = Symbols["LCOMMENT"]; //datatype = LCOMMENT
+            }
+            break;
+        }
+        case PToken::COLON :
+        {
+            char ch = file -> nextChar();
+            token -> datatext += ch;
+            if(ch == '=')
+            {
+                token->datatype = Symbols["ASSIGN"]; //datatype = ASSIGN
+            }
+            break;
+        }
+        case PToken::PERIOD :
+        {
+            char ch = file -> nextChar();
+            token -> datatext += ch;
+            if(ch == '.')
+            {
+                token->datatype = Symbols["DOT_DOT"]; //datatype = DOT_DOT
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    if(Symbols.find(PTOKEN_STR[(int) token -> datatype]) == Symbols.end())
+    {
+        token->datatype = Symbols["INVALID"];
+    }
+    return token;
+    
+}
+
+
+string Token::toString(Token *token)
+{
+    return PTOKEN_STR[(int) token -> datatype] + " : " + token -> datatext;
+}
+
+string Token::Error(Token *token, string msg)
+{
+    return "TOKEN ERROR at " + to_string(token -> linenum) + ": " + "Invalid " + msg + " at " + token->datatext + '\n';
+}
+
