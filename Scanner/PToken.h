@@ -199,7 +199,7 @@ class Token
         static map<string, PToken> ReservedWords;
         static map<string, PToken> Symbols;
     */
-            static const map<string, Ptoken> ReWords = 
+            static const map<string, PToken> ReWords = 
         {
             //{"a", 1},
             {"AND", PToken::AND},
@@ -257,7 +257,7 @@ class Token
             {"WITH", PToken::WITH},
             {"XOR", PToken::XOR},
         };
-        static const map<string, Ptoken> Syms =
+        static const map<string, PToken> Syms =
         {
             {"PLUSOP", PToken::PLUSOP},
             {"MINUSOP", PToken::MINUSOP},
