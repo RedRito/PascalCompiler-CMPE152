@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "PToken.h"
+#include <algorithm>
 using namespace std;
 //map<string, PToken> Symbols;
 //map<string, Token> ReservedWords;
