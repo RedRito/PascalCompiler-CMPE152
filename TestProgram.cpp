@@ -14,10 +14,12 @@ int main(int argc, char *argv[])
     string fileName = argv[1];
     FileReader *file = new FileReader(fileName);
     
-    char currentCh = file -> getCurrentChar();
-    
-   Scanner *test = new Scanner(file);
-   test ->printTokens();
-   //test ->printToFile("masterTestCaseOutput.txt");
+    Scanner *test = new Scanner(file);
+    test ->printTokens();
+    //test ->printToFile("masterTestCaseOutput.txt");
+    //Testing Team 7's group test input file.
+    FileReader *groupFile = new FileReader("test_in.txt");
+    Scanner *groupTest = new Scanner(groupFile);
+    groupTest ->printToFile("test-out.txt");
 
 }

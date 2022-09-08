@@ -1,0 +1,18 @@
+Group Assginment 
+break bReak BReAK brEAk bReAk break
+
+'Good morning'
+'Have, a, nice, day'
+'a' 'B' ''
+
++ - * / := = <> <= >= < >
+{ } [ ] ( ) ^ /= 
+
+>=<=+-*/
+
+10 15 220
+
+0.15 2.34 1.2.3
+
+GOODBYE!!
+	
