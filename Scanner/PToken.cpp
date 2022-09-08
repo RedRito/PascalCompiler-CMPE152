@@ -19,12 +19,12 @@ Token *Token::ReservedWord(char currentCh, FileReader * file)
         token->datatype = PToken::INVALID;
         Error(token, "Identifier");
     }
-    for (char ch = file->nextChar(); isalnum(ch); ch = file->nextChar())
+    for (char ch = file->nextChar(); isalnum(ch); ch = file->nextChar()) //Grabs the word. If it doesnt have an alphanumeric value it is a symbol.
     { 
         token->datatext += ch;
     }
 
-    string upper = strToUpper(token->datatext);
+    string upper = strToUpper(token->datatext); //toupper() to avoid a reserved word = identifier.
 
     if (ReservedWords.find(upper) != ReservedWords.end())
     {
@@ -145,7 +145,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
 {
     Token *token = new Token(currentCh);
     token ->linenum = file ->getLine();
-    switch (currentCh)
+    switch (currentCh)  //Check currentch if it is a valid symbol
     {
         case '+' : 
         {
@@ -246,7 +246,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         break;
     }
 
-    switch (token -> datatype)
+    switch (token -> datatype)  //check previous state, if the currentch + nextch is an acceptable token, change state
     {
         case PToken::PLUSOP :
         {
@@ -386,10 +386,12 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         default:
             break;
     }
+    //if symbol token does not exist
     if(Symbols.find(PTOKEN_STR[(int) token -> datatype]) == Symbols.end())
     {
         token->datatype = Symbols["INVALID"];
     }
+    //consume character
     file->nextChar();
     return token;
     
