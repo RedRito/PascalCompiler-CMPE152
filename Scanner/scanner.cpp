@@ -103,13 +103,13 @@ void Scanner::printTokens()
                 break;
             }
         }
-        if(token->datatype == PToken::INVALID)
-        {
-            cout << token -> Error(token, "token");
-        }
         cout << token -> toString(token) << endl;
         
         token = nextToken();
+    }
+    if(token->datatype == PToken::INVALID)
+    {
+        cout << token -> Error(token, "token");
     }
     cout << token -> toString(token) << endl;
 }
