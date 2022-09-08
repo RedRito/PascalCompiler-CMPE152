@@ -13,18 +13,11 @@ int main(int argc, char *argv[])
     }
     string fileName = argv[1];
     FileReader *file = new FileReader(fileName);
-    /*
+    
     char currentCh = file -> getCurrentChar();
-    while(currentCh != EOF)
-    {
-        currentCh = file -> nextChar();
-        cout << currentCh;
-    }
-    cout << endl;
-    cout << "END OF FILE" << endl;
-    */
+    
    Scanner *test = new Scanner(file);
-   //test ->printTokens();
-   test ->printToFile("masterTestCaseOutput.txt");
+   test ->printTokens();
+   //test ->printToFile("masterTestCaseOutput.txt");
 
 }

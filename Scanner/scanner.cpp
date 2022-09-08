@@ -2,7 +2,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 Scanner::Scanner(FileReader *file)
 {
@@ -12,7 +11,7 @@ Scanner::Scanner(FileReader *file)
 
 Token *Scanner::nextToken()
 {
-    char ch = file -> nextChar();
+    char ch = file -> getCurrentChar();
     while(isspace(ch))
     {
         ch = file -> nextChar();
@@ -103,6 +102,7 @@ void Scanner::printTokens()
         
         token = nextToken();
     }
+    cout << token -> toString(token) << endl;
 }
 
 void Scanner::printToFile(string filename)
