@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <string>
+#include <cctype>
+#include <ctype.h>
 #include <map>
 #include "FileReader.h"
 using namespace std;
