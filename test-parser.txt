@@ -1,0 +1,49 @@
+<PROGRAM ParserTest>
+    <COMPOUND line 2>
+        <ASSIGN>
+            <VARIABLE x />
+            <INTEGER_CONSTANT 10 />
+        </ASSIGN>
+        <LOOP>
+            <TEST>
+                <LT>
+                    <VARIABLE x />
+                    <INTEGER_CONSTANT 20 />
+                </LT>
+            </TEST>
+            <COMPOUND line 2>
+                <WRITELN line 3>
+                    <VARIABLE x />
+                </WRITELN>
+            </COMPOUND>
+            <ASSIGN>
+                <VARIABLE x />
+                <SUBTRACT>
+                    <VARIABLE x />
+                    <INTEGER_CONSTANT 5 />
+                </SUBTRACT>
+            </ASSIGN>
+        </LOOP>
+    </COMPOUND>
+    <WRITELN line 6>
+    <COMPOUND line 7>
+        <ASSIGN>
+            <VARIABLE y />
+            <INTEGER_CONSTANT 2 />
+        </ASSIGN>
+        <LOOP>
+            <TEST>
+                <EQ>
+                    <VARIABLE y />
+                    <INTEGER_CONSTANT 2 />
+                </EQ>
+            </TEST>
+            <COMPOUND line 7>
+                <WRITELN line 8>
+                    <VARIABLE y />
+                </WRITELN>
+            </COMPOUND>
+        </LOOP>
+    </COMPOUND>
+    </WRITELN>
+</PROGRAM>
