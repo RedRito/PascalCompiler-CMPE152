@@ -5,31 +5,31 @@
 #include <vector>
 #include <map>
 
-namespace intermediate { namespace type {
+namespace intermediate { namespace type {       //type namespace whtih Typespec class
     class Typespec;
 }};
 
-namespace intermediate { namespace symtab {
+namespace intermediate { namespace symtab {     //symtab namespace with everything else
 
     using namespace std;
-    using intermediate::type::Typespec;
+    using intermediate::type::Typespec;         //adding in Typespec class from namespace type
 
-    class Symtab;
+    class Symtab;                               //Symbol table class
 
-    enum class identifier
+    enum class identifier                       //Class for different identifier types.
     {
         CONSTANT, ENUMERATION_CONSTANT, TYPE, VARIABLE, RECORD_FIELD,
         VALUE_PARAMETER, REFERENCE_PARAMETER, PROGRAM_PARAMETER,
         PROGRAM, PROCEDURE, FUNCTION, UNDEFINED
     };// identifier
 
-    static const string identifier_str[] =
+    static const string identifier_str[] =      //string for identifier class
     {
         "constant","enumeration constant","type","variable","record field","value parameter","reference parameter","program parameter",
         "PROGRAM","PROCEDURE","FUNCTION","undefined"
     };// identifier string
 
-    static map<string, identifier> SymIdenti =
+    static map<string, identifier> SymIdenti =  //throw them into map
     {
         {"constant", identifier::CONSTANT},
         {"enumeration constant", identifier::ENUMERATION_CONSTANT},
@@ -45,7 +45,7 @@ namespace intermediate { namespace symtab {
         {"undefined", identifier::UNDEFINED}
     };// map
 
-    class Entry
+    class Entry                     //Class for Symbol Table Entries
     {
         private:
             string symName;         //identifier name
@@ -53,16 +53,16 @@ namespace intermediate { namespace symtab {
             int symInt;             //...
             bool symBoolean;        //...
             identifier kind;        //what kind of identifier
-            vector<int> lineNum;    // source line number.
+            vector<int> lineNum;    //source line number.
             Typespec *typespec;     //type specification
             Symtab *symtab;         //parent symbol table
             /*
             EntryInfo info;     //entry information
             */
         public:
-            //constructor
+            //Constructor
+            //Needs symbol name, type, and parent table.
             Entry(const string symName, const identifier kind, Symtab *symtab)
-            //: symName(symName), identi(identi), symtab(symtab), typespec(nullptr)
             {
                 switch (kind)
                 {
@@ -71,7 +71,7 @@ namespace intermediate { namespace symtab {
                     case identifier::VARIABLE:
                     case identifier::RECORD_FIELD:
                     case identifier::VALUE_PARAMETER:
-                    //info.data.value = nullptr;
+
                     default: break;
                 }
             }
@@ -93,7 +93,7 @@ namespace intermediate { namespace symtab {
             {
                 return symName;
             }
-            double getReal() const //DO THE GETTER AND SETTER FOR ALL PRIVATE VALUE TYPES
+            double getReal() const 
             {
                 return symReal;
             }
