@@ -3,20 +3,20 @@
 
 #include <string>
 #include <map>
-#include "newSymtabEntry.h"
+#include "SymtabEntry.h"
 
-namespace intermediate{ namespace symtab {
+namespace intermediate{ namespace symtab {                  //Using necessarry namespaces.
     using namespace intermediate;
     using namespace std;
-    #define UNNAMED_PREFIX string("_unnamed_")
-    #define UNNAMED_PREFIX_LENGTH UNNAMED_PREFIX.length()
-    class SymTable
+    #define UNNAMED_PREFIX string("_unnamed_")              //String name for all unnamed types,
+    #define UNNAMED_PREFIX_LENGTH UNNAMED_PREFIX.length()   //and length.
+    class SymTable                                          //Class for Symbol Table
     {
         private:
-            static map<string, Entry *> SymContent;
-            int nestLV;
-            Entry *owner;
-            static int unnamedCount;
+            static map<string, Entry *> SymContent;         //map for table
+            int nestLV;                                     //nesting level
+            Entry *owner;                                   //Owner of Table
+            static int unnamedCount;                        //Counter for unnamed types
         public:
             //Constructor
             SymTable(const int nestLV)
@@ -31,6 +31,7 @@ namespace intermediate{ namespace symtab {
             }
 
             //making entry to table
+            //need symbol name, type, and parent table.
             Entry *enter(const string name, identifier kind, Symtab *symtab)
             {
                 Entry *anEntry = new Entry(name, kind, symtab);
@@ -38,24 +39,24 @@ namespace intermediate{ namespace symtab {
                 return anEntry;
             }
 
-            //Looking up symTable for existing symbol
+            //Looking up symTable for existing symbol by name.
             Entry *lookup(const string symName)
             {
-                if(SymContent.find(symName) != SymContent.end())
+                if(SymContent.find(symName) != SymContent.end())    //if name founded before end of table
                 {
-                    return SymContent[symName];
+                    return SymContent[symName];                     //return name
                 }
                 else
                 {
-                    return nullptr;
+                    return nullptr;                                 //else null
                 }
                 //return (SymContent.find(symName) != SymContent.end()) ? SymContent[symName] :nullptr;
             }
 
             //Generate unnamed type
-            static string gernerateUnNamed()
+            static string generateUnNamed()
             {
-                unnamedCount++;
+                unnamedCount++;                                     //increment counter
                 return UNNAMED_PREFIX + to_string(unnamedCount);
             }
 
@@ -86,15 +87,16 @@ namespace intermediate{ namespace symtab {
             {
                 this->owner = owner;
             }
-            void resetVar(identifier kind)
+
+            //Changing the types of all elements in table to kind.
+            void resetKind(identifier kind)
             {
                 vector<Entry *> list;
                 map<string, Entry *>::iterator it;
-
                 for(it = SymContent.begin(); it != SymContent.end(); it++)
                 {
                     Entry *anEntry = it->second;
-                    if(anEntry->getIdenti() == VARIABLE)
+                    if(anEntry->getIdenti() == VARIABLE)                    //VARIABLE not read
                     {
                         anEntry->setIdenti(kind);
                     }
