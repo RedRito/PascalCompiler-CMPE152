@@ -5,9 +5,13 @@
 #include <map>
 #include "SymtabEntry.h"
 
-namespace intermediate{ namespace symtab {                  //Using necessarry namespaces.
+using namespace std;
+
+/*
+namespace intermediate{ namespace symtab {                  //Taking this out.
     using namespace intermediate;
     using namespace std;
+*/
     #define UNNAMED_PREFIX string("_unnamed_")              //String name for all unnamed types,
     #define UNNAMED_PREFIX_LENGTH UNNAMED_PREFIX.length()   //and length.
     class SymTable                                          //Class for Symbol Table
@@ -96,7 +100,7 @@ namespace intermediate{ namespace symtab {                  //Using necessarry n
                 for(it = SymContent.begin(); it != SymContent.end(); it++)
                 {
                     Entry *anEntry = it->second;
-                    if(anEntry->getIdenti() == identifier::VARIABLE)
+                    if(anEntry->getIdenti() == identifier::VARIABLE)                    //VARIABLE not read
                     {
                         anEntry->setIdenti(kind);
                     }
@@ -105,6 +109,7 @@ namespace intermediate{ namespace symtab {                  //Using necessarry n
 
 
     };//SymTable
-}}//intermediate
+    
+//}}//intermediate NOT in use anymore.
 
 #endif
