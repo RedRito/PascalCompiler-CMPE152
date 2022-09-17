@@ -5,14 +5,24 @@
 #include <vector>
 #include <map>
 
+using namespace std;
+/*
+    Taking all the namespace stuff out.
+*/
+/*
 namespace intermediate { namespace type {       //type namespace whtih Typespec class
     class Typespec;
 }};
+*/
 
+/*
 namespace intermediate { namespace symtab {     //symtab namespace with everything else
 
     using namespace std;
     using intermediate::type::Typespec;         //adding in Typespec class from namespace type
+*/
+
+    class Typespec;                             //Typespec class
 
     class Symtab;                               //Symbol table class
 
@@ -149,6 +159,7 @@ namespace intermediate { namespace symtab {     //symtab namespace with everythi
                 lineNum.push_back(num);
             }
     };// Entry
-}}// intermediate::symtab
+    
+//}}// intermediate::symtab NOT in use anymore.
 
 #endif
