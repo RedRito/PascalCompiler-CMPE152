@@ -88,6 +88,91 @@ ParserNode *Parser::parseStringConstant()
     return realConst;
 }
 
+/*
+    Parser::parseIntegerConstant()
+*/
+ParserNode *Parser::parseIntegerConstant()
+{
+    ParserNode *realConst = new ParserNode (NodeType::INTEGER_CONSTANT);
+    realConst -> TokenValue -> tokenValueInt = readToken -> tokenValueInt;
+    realConst -> TokenValue -> tokenValueReal = readToken -> tokenValueReal;
+    realConst -> TokenValue -> tokenValueString = readToken -> tokenValueString;
+    realConst -> TokenValue -> tokenValueBoolean = readToken -> tokenValueBoolean;
+
+    readToken = scanner->nextToken();
+    return realConst;
+}
+
+ParserNode *Parser::parseTerm()
+{
+    ParserNode *currTerm = parseFactor();
+    while(termOperators.find(currentToken->type) != termOperators.end())
+    {
+        if(ParserNode *opNode = currentToken->type == STAR)
+        {
+            new ParserNode(NodeType::MULTIPLY);
+        }
+        else
+        {
+            new ParserNode(NodeType::DIVIDE);
+        }
+        currentToken = scanner->nextToken();   //consume the operator
+        opNode->adopt(currTerm);
+        opNode->adopt(parseFactor());
+        termNode = opNode;
+    }
+    return currTerm;
+}
+
+ParserNode *Parser::parseFactor()
+{
+    if(currentToken->type == NodeType::IDENTIFIER)
+    {
+        return parseVariable();
+    }
+    else if(currentToken->type == NodeType::INTEGER)
+    {
+        return parseIntegerConstant();
+    }
+    else if(currentToken->type == NodeType::REAL)
+    {
+        return parseRealConstant();
+    }
+    else if(currentToken->type == NodeType::LPAREN)
+    {
+        currentToken->type = scanner->nextToken();
+        //ParserNode *exprNode = parseExpression();     //add in after parseExpression is written!
+        if(currentToken->type == NodeType::RPAREN)
+        {
+            currentToken = scanner->nextToken();
+        }
+        else
+        {
+            printSyntax("Expecting )");
+        }
+        //return exprNode;                        //add in after parseExpression is written!
+    }
+    else
+    {
+        printSyntax("Unexpected token");
+    }
+    return nullptr;
+}
+
+ParserNode *Parser::parseVariable()
+{
+    string varName = currentToken->text;
+    Entry *varID = symtab->lookup(toLowerCase(varName));    //needs to test lookup func
+    if(varID == nullptr)
+    {
+        printSematic("Undeclared identifier");
+    }
+    ParserNode *tempNode = new ParserNode(NodeType::VARIABLE);
+    tempNode->text = varName;
+    currentToken = scanner->nextToken();
+    return tempNode;
+}
+
 void Parser::printSyntax(string msg)
 {
     cout << "Syntax error at line " << linenum << " " << msg << " " << readToken -> toString();
