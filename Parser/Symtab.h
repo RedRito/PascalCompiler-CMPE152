@@ -96,7 +96,7 @@ namespace intermediate{ namespace symtab {                  //Using necessarry n
                 for(it = SymContent.begin(); it != SymContent.end(); it++)
                 {
                     Entry *anEntry = it->second;
-                    if(anEntry->getIdenti() == VARIABLE)                    //VARIABLE not read
+                    if(anEntry->getIdenti() == identifier::VARIABLE)
                     {
                         anEntry->setIdenti(kind);
                     }
