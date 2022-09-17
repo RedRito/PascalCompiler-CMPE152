@@ -39,13 +39,18 @@ class Parser
 
     ParserNode *parseRealConstant();
     ParserNode *parseStringConstant();
-
+    ParserNode *parseIntegerConstant();
+    
+    ParserNode *parseTerm();
+    ParserNode *parseFactor();
+    ParserNode *parseVariable();
+    
     void parseAllStatements(ParserNode *parent, PToken tokenType);
     void parseAllWrite(ParserNode *currentNode);
     void printSyntax(string msg);
     void printSematic(string msg);
 
-
+    
 
 
 
