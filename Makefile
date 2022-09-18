@@ -1,8 +1,10 @@
 CC = g++
 CFLAGS = -Wall -g
 
-main: TestProgram.o scanner.o PToken.o FileReader.o
-	g++ TestProgram.o scanner.o PToken.o FileReader.o -o main
+main: TestProgram.o scanner.o PToken.o FileReader.o Parser.o
+	g++ TestProgram.o scanner.o PToken.o FileReader.o Parser.o -o main
+Parser: Parser/Parser.cpp Parser/Parser.h
+	g++ -c Parser/Parser.cpp 
 TestProgram.o: TestProgram.cpp
 	g++ -c TestProgram.cpp
 scanner.o: Scanner/scanner.cpp  Scanner/scanner.h
