@@ -41,6 +41,11 @@ class Parser
     ParserNode *parseStringConstant();
     ParserNode *parseIntegerConstant();
     
+    ParserNode *parseWhile();
+    ParserNode *parseFor();
+    ParserNode *parseIf();
+    ParserNode *parseCase();
+    
     ParserNode *parseTerm();
     ParserNode *parseFactor();
     ParserNode *parseVariable();
