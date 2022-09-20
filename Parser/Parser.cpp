@@ -415,21 +415,29 @@ ParserNode *Parser::parseFor()
 
 ParserNode *Parser::parseIf()
 {
+    // Create IF node
     Parser *ifNode = new Parser(Nodetype::IF);
+    // Consume IF
     readToken = scanner->nextToken();  
-
+    //IF adopts the expression subtree as its first child
     ifNode->adopt(parseExpression());
 
-    if (readToken->datatype != THEN) syntaxError("Look for THEN");
+    if (readToken->datatype != PToken::THEN) 
+        syntaxError("Look for THEN");
     else
     {
+        // Consume THEN
         readToken = scanner->nextToken();  
     }
 
+    //IF adopts THEN as its second child
     ifNode->adopt(parseStatement());
 
-    if (readToken->datatype == ELSE)
+    //if ELSE appears as a reserved word
+    //IF adopts ELSE as its third child
+    if (readToken->datatype == PToken::ELSE)
     {
+        // Consume ELSE
         readToken = scanner->nextToken();  
         ifNode->adopt(parseStatement());
     }
@@ -439,59 +447,70 @@ ParserNode *Parser::parseIf()
 
 ParserNode *Parser::parseCase()
 {
-    Parser *switchNode = new Parser(SWITCH);
+    // Create SWITCH node
+    Parser *switchNode = new Parser(NodeType::SWITCH);
+    // Consume SWITCH
     readToken = scanner->nextToken();  
 
+    //SWITCH adopts the expression subtree
     Parser *expr = parseExpression();
     switchNode->adopt(expr);
 
-    if (readToken->datatype == OF)
+    if (readToken->datatype == PToken::OF)
     {
+        // Consume OF
         readToken = scanner->nextToken();  
     }
     else syntaxError("Look for OF");
 
-    while (   (readToken->datatype == INTEGER) || (readToken->datatype == PLUS) || (readToken->type == MINUS))
+    while (   (readToken->datatype == PToken::INTEGER) 
+    || (readToken->datatype == PToken::PLUSOP) || (readToken->datatype == PToken::MINUSOP))
     {
-        Parser *branch = new Parser(SELECT_BRANCH);
-        Parser *constant = new Parser(SELECT_CONSTANTS);
+        // SWITCH adopts SELECT_BRANCH
+        // SELECT_BRANCH adopts SELECT_CONSTANTS
+        Parser *branch = new Parser(NodeType::SELECT_BRANCH);
+        Parser *constant = new Parser(NodeType::SELECT_CONSTANTS);
         switchNode->adopt(branch);
         branch->adopt(constant);
 
         do
         {
             bool negate = false;
-            if ((readToken->datatype == PLUS) || (readToken->datatype == MINUS))
+            if ((readToken->datatype == PToken::PLUSOP) || (readToken->datatype == PToken::MINUSOP))
             {
-                negate = readToken->datatype == MINUS;
+                negate = readToken->datatype == PToken::MINUSOP;
+                // Consume plus or minus
                 readToken = scanner->nextToken();  
             }
 
-            Parser *realConstant = parseIntegerConstant();
-            if (negate) realConstant-> TokenValue = -(realConstant-> tokenValueInt);
-            realConstant->adopt(realConstant);
+            Parser *constantNode = parseIntegerConstant();
+            if (negate) constantNode-> TokenValue = -(constantNode-> tokenValueInt);
+            constant->adopt(constantNode);
 
-            if (readToken->datatype == COMMA)
+            if (readToken->datatype == PToken::COMMA)
             {
+                // Consume comma
                 readToken = scanner->nextToken(); 
             }
-        } while (readToken->datatype != COLON);
-
+        } while (readToken->datatype != PToken::COLON);
+        // Consume :
         readToken = scanner->nextToken();  
 
         branch->adopt(parseStatement());
 
-        if (readToken->datatype == SEMICOLON)
+        if (readToken->datatype == PToken::SEMICOLON)
         {
             do
             {
+                // Consume semicolon
                 readToken = scanner->nextToken();  
-            } while (readToken->datatype == SEMICOLON);
+            } while (readToken->datatype == PToken::SEMICOLON);
         }
     }
 
-    if (readToken->datatype == END)
+    if (readToken->datatype == PToken::END)
     {
+        // Consume END
         readToken = scanner->nextToken();  
     }
     else if (statementStarters.find(readToken->datatype) != statementStarters.end())
@@ -501,6 +520,7 @@ ParserNode *Parser::parseCase()
 
     return switchNode;
 }
+
 
 
 
