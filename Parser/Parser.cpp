@@ -229,7 +229,7 @@ void Parser::printSyntax(string msg)
 {
     cout << "Syntax error at line " << linenum << " " << msg << " " << readToken -> toString();
     errNum ++;
-    while (statementFollowers.find(currentToken->type) == statementFollowers.end())
+    while (statementFollowers.find(currentToken->datatype) == statementFollowers.end())
     {
         readToken = scanner->nextToken();
     }
@@ -445,7 +445,7 @@ ParserNode *Parser::parseCase()
     Parser *expr = parseExpression();
     switchNode->adopt(expr);
 
-    if (readToken->type == OF)
+    if (readToken->datatype == OF)
     {
         readToken = scanner->nextToken();  
     }
@@ -463,7 +463,7 @@ ParserNode *Parser::parseCase()
             bool negate = false;
             if ((readToken->datatype == PLUS) || (readToken->datatype == MINUS))
             {
-                negate = readToken->type == MINUS;
+                negate = readToken->datatype == MINUS;
                 readToken = scanner->nextToken();  
             }
 
