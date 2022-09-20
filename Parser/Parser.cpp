@@ -55,6 +55,58 @@ int Parser::getErrNum()
 ParserNode * Parser::parseTheProgram()
 {
     //do main parse here
+    ParserNode *program = new Node(NodeType::PROGRAM);
+    readToken = scanner->nextToken();
+
+    //if first token == program, read the next token
+    if(readToken->datatype == PToken::PROGRAM)
+    {
+        readToken = scanner->nextToken();
+    }
+    else
+    {
+        printSyntax("Missing PROGRAM");
+    }
+
+    //if next token is identifier, it is the name of the program
+    if(readToken->datatype == PToken::IDENTIFIER)
+    {
+        string programName = readToken->datatext;
+        //enter a entry into the symbol table of the ParserNode
+        //Symtab -> tabEntry(programName);
+        program->text = programName;
+        //read next token
+        readToken = scanner->nextToken();
+    }
+    else
+    {
+        printSyntax("Expecting PROGRAM Identifier");
+    }
+    //after PROGRAM proName; there is a semicolon, consume it
+    if(readToken->datatype == PToken::SEMICOLOR)
+    {
+        readToken = scanner->nextToken();
+    }
+    else
+    {
+        printSyntax("Missing ; ");
+    }
+
+    //Usually we would check for VAR, USES,procedure, method, and whatnot. however, since we are not handling decaration and types
+    //we do not need to worry about those
+    //Simply look for the BEGIN
+    if(readToken->datatype == PToken::BEGIN)
+    {
+        program->adopt(parseCompoundStatement());
+        //now should be end of the program check for the period "."
+        if(readToken->datatype == PToken::SEMICOLOR)
+        {
+            printSyntax("Expecting '.' ");
+        }
+    }
+    else printSyntax("MISSING BEGIN");
+
+    return program;
 }
 
 
