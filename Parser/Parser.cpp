@@ -158,9 +158,9 @@ ParserNode *Parser::parseIntegerConstant()
 ParserNode *Parser::parseTerm()
 {
     ParserNode *currTerm = parseFactor();
-    while(termOperators.find(currentToken->datatype) != termOperators.end())
+    while(termOperators.find(currentToken->type) != termOperators.end())
     {
-        if(ParserNode *opNode = currentToken->datatype == STAR)
+        if(ParserNode *opNode = currentToken->type == STAR)
         {
             new ParserNode(NodeType::MULTIPLY);
         }
@@ -169,6 +169,13 @@ ParserNode *Parser::parseTerm()
             new ParserNode(NodeType::DIVIDE);
         }
         currentToken = scanner->nextToken();   //consume the operator
+        //for my understanding
+        // currterm = a factor
+        // opnode = a term operator
+        //so tree becomes
+        //      operator
+        //factor1       factor2
+        //the current term becomes operator and it is the base of the tree
         opNode->adopt(currTerm);
         opNode->adopt(parseFactor());
         termNode = opNode;
@@ -178,23 +185,23 @@ ParserNode *Parser::parseTerm()
 
 ParserNode *Parser::parseFactor()
 {
-    if(currentToken->datatype == NodeType::IDENTIFIER)
+    if(currentToken->type == NodeType::IDENTIFIER)
     {
         return parseVariable();
     }
-    else if(currentToken->datatype == NodeType::INTEGER)
+    else if(currentToken->type == NodeType::INTEGER)
     {
         return parseIntegerConstant();
     }
-    else if(currentToken->datatype == NodeType::REAL)
+    else if(currentToken->type == NodeType::REAL)
     {
         return parseRealConstant();
     }
-    else if(currentToken->datatype == NodeType::LPAREN)
+    else if(currentToken->type == NodeType::LPAREN)
     {
-        currentToken->datatype = scanner->nextToken();
+        currentToken->type = scanner->nextToken();
         //ParserNode *exprNode = parseExpression();     //add in after parseExpression is written!
-        if(currentToken->datatype == NodeType::RPAREN)
+        if(currentToken->type == NodeType::RPAREN)
         {
             currentToken = scanner->nextToken();
         }
@@ -229,7 +236,7 @@ void Parser::printSyntax(string msg)
 {
     cout << "Syntax error at line " << linenum << " " << msg << " " << readToken -> toString();
     errNum ++;
-    while (statementFollowers.find(currentToken->datatype) == statementFollowers.end())
+    while (statementFollowers.find(currentToken->type) == statementFollowers.end())
     {
         readToken = scanner->nextToken();
     }
@@ -336,81 +343,130 @@ void Parser::parseAllWrite(ParserNode *currentNode)
 
 
 }
+// Parser *test = new Parser(TEST);
+    // Parser *notNode = new Parser(Nodetype::NOT);
+    // loop -> adopt(test);
+    // test -> adopt(notNode);
 
+    // notNode -> adopt (parseExpression());
+
+    // if (readToken -> type != DO)
+    // syntaxError ("Look for DO");
+    // else 
+    // {
+    //     readToken = scanner -> nextToken();
+    // }
+    // loop -> adopt(parseStatement);
 ParserNode *Parser::parseWhile()
 {
-    Parser *loop = new Parser(LOOP);
+    ParserNode *loop = new ParserNode(NodeType::WHILE);
+    //consume while
     readToken = scanner -> nextToken();
-
-    Parser *test = new Parser(TEST);
-    Parser *notNode = new Parser(Nodetype::NOT);
-    loop -> adopt(test);
-    test -> adopt(notNode);
-
-    notNode -> adopt (parseExpression());
-
-    if (readToken -> datatype != DO)
-    syntaxError ("Look for DO");
-    else 
+    //the next token is the condition
+    //test node tests the expression
+    ParserNode *testCodition = new ParserNode(NodeType::TEST);
+    //parse the expression in between while and do
+    parseAllStatements(loop, PToken::DO);
+    //loop node first child should now be the condidion
+    //current token is now DO //if not throw an error
+    if(readToken->datatype == PToken::DO)
     {
-        readToken = scanner -> nextToken();
+        linenum = readToken->linenum;
+        testCodition->linenum = linenum;
+        readToken = scanner->nextToken(); //consumes DO
+        //parse what comes after the DO,
+        //dont have to worry about the BEGIN, END parseing the expression will solve that issue
+        //test adopts the entire loop expression
+        testCodition->adopt(parseExpression());
+        //while loop adopts the expression as its second child.
+        loop->adopt(testCodition);
     }
-    loop -> adopt(parseStatement);
+    else printSyntax("Expected DO");
     return loop;
 }
+// Parser *compound = new Parser(COMPOUND);
+    // readToken = scanner -> nextToken();
 
+    // Parser *assign = parseAssignmentStatement();
+    // compound -> adopt(assign);
+
+    // Parser *control = assign ->children[0];
+
+    // Parser *loop = new Parser(LOOP);
+    // compound -> adopt(loop);
+
+    // Parser *test = new Parser(TEST);
+    // loop -> adopt(test);
+
+    // bool countUp = true;
+    // if (readToken -> type == TO)
+    // {
+    //     readToken = scanner -> nextToken();
+    // }
+    // else if (readToken -> type == DOWNTO)
+    // {
+    //     countUp = false;
+    //     readToken = scanner -> nextToken();
+    // }
+    // else syntaxError("Look for TO or DOWNTO");
+
+    // Parser *compare = countUp ? new Parser(GT) : new Parser(LT);
+    // test -> adopt(compare);
+    // compare -> adopt(parseExpression());
+
+    // if (readToken -> type == DO)
+    // {
+    //     readToken = scanner -> nextToken();
+    // }
+    // else syntaxError("Look for DO");
+
+    // loop -> adopt(parseStatement());
+
+    // assign = new Parser(ASSIGN);
+    // loop->adopt(assign);
+    // assign->adopt(control->copy());
+    // Parser *op = countUp ? new Parser(ADD) : new Parser(SUBTRACT);
+    // assign->adopt(op);
+    // // op->adopt(control->copy());
+    // // Parser *one = new Parser(INTEGER_CONSTANT);
+    // // one -> tokenValueInt = 1;
+    // // op->adopt(one);
+
+    // return compound;
 ParserNode *Parser::parseFor()
 {
-    Parser *compound = new Parser(COMPOUND);
+    //create a node for the FOR loop
+    ParserNode *forLoop = new ParserNode(NodeType::FOR);
+    //read consume the FOR
     readToken = scanner -> nextToken();
-
-    Parser *assign = parseAssignmentStatement();
-    compound -> adopt(assign);
-
-    Parser *control = assign ->children[0];
-
-    Parser *loop = new Parser(LOOP);
-    compound -> adopt(loop);
-
-    Parser *test = new Parser(TEST);
-    loop -> adopt(test);
-
-    bool countUp = true;
-    if (readToken -> datatype == TO)
+    //parse the inital assignment 
+    forLoop->adopt(parseAssignmentStatement());
+    //now read token should be at to or DOWNTO
+    if(readToken->datatype == PToken::TO || readToken->datatype == PToken::DOWNTO)
     {
-        readToken = scanner -> nextToken();
+        readToken = scanner->nextToken(); //consumes TO or DOWNTO
+        //now we need to parse the final value, which is a SMALLINT according to other compilers
+        //Thus we need to check if the token is a value, which can be either a plain integer or a identifer that is a value
+        if(readToken ->datatype == PToken::IDENTIFIER)
+        {
+            forLoop->adopt(parseVariable());
+        }
+        else if(readToken ->datatype == PToken::INTEGER)
+        {
+            forLoop->adopt(parseIntegerConstant());
+        }
+        else printSyntax("EXPECTED INTEGER");
     }
-    else if (readToken -> datatype == DOWNTO)
+    //now current token should be DO
+    if(readToken->datatype == PToken::DO)
     {
-        countUp = false;
-        readToken = scanner -> nextToken();
+        readToken = scanner->nextToken();   //CONSUME DO
     }
-    else syntaxError("Look for TO or DOWNTO");
-
-    Parser *compare = countUp ? new Parser(GT) : new Parser(LT);
-    test -> adopt(compare);
-    compare -> adopt(parseExpression());
-
-    if (readToken -> datatype == DO)
-    {
-        readToken = scanner -> nextToken();
-    }
-    else syntaxError("Look for DO");
-
-    loop -> adopt(parseStatement());
-
-    assign = new Parser(ASSIGN);
-    loop->adopt(assign);
-    assign->adopt(control->copy());
-    Parser *op = countUp ? new Parser(ADD) : new Parser(SUBTRACT);
-    assign->adopt(op);
-    op->adopt(control->copy());
-    Parser *one = new Parser(INTEGER_CONSTANT);
-    one -> tokenValueInt = 1;
-    op->adopt(one);
-
-    return compound;
-
+    else printSyntax("Expected DO");
+    //now parse the body of the for loop which is a statment or a group of statements
+    //adopt that statement as the loops third child.
+    forLoop->adopt(parseStatement());
+    return forLoop;
 }
 
 ParserNode *Parser::parseIf()
@@ -420,7 +476,7 @@ ParserNode *Parser::parseIf()
 
     ifNode->adopt(parseExpression());
 
-    if (readToken->datatype != THEN) syntaxError("Look for THEN");
+    if (readToken->type != THEN) syntaxError("Look for THEN");
     else
     {
         readToken = scanner->nextToken();  
@@ -428,7 +484,7 @@ ParserNode *Parser::parseIf()
 
     ifNode->adopt(parseStatement());
 
-    if (readToken->datatype == ELSE)
+    if (readToken->type == ELSE)
     {
         readToken = scanner->nextToken();  
         ifNode->adopt(parseStatement());
@@ -445,13 +501,14 @@ ParserNode *Parser::parseCase()
     Parser *expr = parseExpression();
     switchNode->adopt(expr);
 
-    if (readToken->datatype == OF)
+    if (readToken->type == OF)
     {
         readToken = scanner->nextToken();  
     }
     else syntaxError("Look for OF");
 
-    while (   (readToken->datatype == INTEGER) || (readToken->datatype == PLUS) || (readToken->type == MINUS))
+    while (   (readToken->type == INTEGER)
+           || (readToken->type == PLUS) || (readToken->type == MINUS))
     {
         Parser *branch = new Parser(SELECT_BRANCH);
         Parser *constant = new Parser(SELECT_CONSTANTS);
@@ -461,9 +518,9 @@ ParserNode *Parser::parseCase()
         do
         {
             bool negate = false;
-            if ((readToken->datatype == PLUS) || (readToken->datatype == MINUS))
+            if ((readToken->type == PLUS) || (readToken->type == MINUS))
             {
-                negate = readToken->datatype == MINUS;
+                negate = readToken->type == MINUS;
                 readToken = scanner->nextToken();  
             }
 
@@ -471,30 +528,30 @@ ParserNode *Parser::parseCase()
             if (negate) realConstant-> TokenValue = -(realConstant-> tokenValueInt);
             realConstant->adopt(realConstant);
 
-            if (readToken->datatype == COMMA)
+            if (readToken->type == COMMA)
             {
                 readToken = scanner->nextToken(); 
             }
-        } while (readToken->datatype != COLON);
+        } while (readToken->type != COLON);
 
         readToken = scanner->nextToken();  
 
         branch->adopt(parseStatement());
 
-        if (readToken->datatype == SEMICOLON)
+        if (readToken->type == SEMICOLON)
         {
             do
             {
                 readToken = scanner->nextToken();  
-            } while (readToken->datatype == SEMICOLON);
+            } while (readToken->type == SEMICOLON);
         }
     }
 
-    if (readToken->datatype == END)
+    if (readToken->type == END)
     {
         readToken = scanner->nextToken();  
     }
-    else if (statementStarters.find(readToken->datatype) != statementStarters.end())
+    else if (statementStarters.find(readToken->type) != statementStarters.end())
     {
         syntaxError("Missing END");
     }
