@@ -35,6 +35,22 @@ class Parser
     static set<PToken> factorOperators;            // unique map of factor operators    //variable/identifer, number, string, NOT -> factor, ( -> expression -> )
     //Note, idk if you need to check for followers of relational, expression, term, and factor operators, will find out later
 
+    
+    
+    //Initialized Set of Pascal Statements
+    static set<PToken> EmptyStatement;              //Statements with NO action     //
+    static set<PToken> AssignmentStatement;         //Made up of LHS & RHS, seperated by assignment operator    // :=
+    static set<PToken> ProcedureStatement;          //For executing procedures      //Parameter passed to Formal Parameter
+    static set<PToken> GotoStatement;               //
+    static set<PToken> CompoundStatement;           //
+    static set<PToken> IfStatement;                 //
+    static set<PToken> CaseStatement;               //
+    static set<PToken> RepeatStatement;             //
+    static set<PToken> WhileStatement;              //
+    static set<PToken> ForStatement;                //
+    static set<PToken> WithStatement;               //
+    static set<PToken> ProcedureMethodCall;         //
+    
 
 
     ParserNode *parseRealConstant();
