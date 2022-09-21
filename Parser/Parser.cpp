@@ -547,37 +547,18 @@ void Parser::parseAllWrite(ParserNode *currentNode)
 
     if(hasWriteArgument)
     {
-        if(readToken->datatype == PToken::COLON)    //if it is a colon
+        //while there are comma's parse the expression
+        while(readToken->datatype == PToken::COMMA)
         {
             readToken = scanner -> nextToken(); //eat the ,
-
-            if(readToken -> datatype == PToken::INTEGER)
+            //the next token is either a string or expression, parse it and add it to the parent's child.
+            if(readToken->datatype == PToken::STRING)
             {
-                currentNode -> adopt(parseIntegerConstant());
-
-                if(readToken ->datatype == PToken::COLON)
-                {
-                    readToken = scanner ->nextToken(); //consume "","" again
-                    
-                    if(readToken -> datatype == PToken::INTEGER)
-                    {
-                        currentNode -> adopt(parseIntegerConstant());
-                    }
-                    else
-                    {
-                        printSyntax("Invalid decimal count");
-                    }
-                    
-                }
-
+                currentNode->adopt(parseStringConstant()); 
             }
-            else
-            {
-                printSyntax("Invalid width");
-            }
+            else currentNode->adopt(parseExpression()); //parse what comes after the comma
         }
     }
-
     if(readToken ->datatype == PToken::RPAREN)
     {
         readToken = scanner ->nextToken(); //eat the right parenthesis
@@ -592,78 +573,65 @@ void Parser::parseAllWrite(ParserNode *currentNode)
 
 ParserNode *Parser::parseWhile()
 {
-    Parser *loop = new Parser(LOOP);
+    ParserNode *loop = new ParserNode(NodeType::WHILE);
+    //consume while
     readToken = scanner -> nextToken();
-
-    Parser *test = new Parser(TEST);
-    Parser *notNode = new Parser(Nodetype::NOT);
-    loop -> adopt(test);
-    test -> adopt(notNode);
-
-    notNode -> adopt (parseExpression());
-
-    if (readToken -> datatype != DO)
-    syntaxError ("Look for DO");
-    else 
+    //the next token is the condition
+    //test node tests the expression
+    ParserNode *testCodition = new ParserNode(NodeType::TEST);
+    //parse the expression in between while and do
+    parseAllStatements(loop, PToken::DO);
+    //loop node first child should now be the condidion
+    //current token is now DO //if not throw an error
+    if(readToken->datatype == PToken::DO)
     {
-        readToken = scanner -> nextToken();
+        linenum = readToken->linenum;
+        testCodition->linenum = linenum;
+        readToken = scanner->nextToken(); //consumes DO
+        //parse what comes after the DO,
+        //dont have to worry about the BEGIN, END parseing the expression will solve that issue
+        //test adopts the entire loop expression
+        testCodition->adopt(parseExpression());
+        //while loop adopts the expression as its second child.
+        loop->adopt(testCodition);
     }
-    loop -> adopt(parseStatement);
+    else printSyntax("Expected DO");
     return loop;
 }
-
 ParserNode *Parser::parseFor()
 {
-    Parser *compound = new Parser(COMPOUND);
+    //create a node for the FOR loop
+    ParserNode *forLoop = new ParserNode(NodeType::FOR);
+    //read consume the FOR
     readToken = scanner -> nextToken();
-
-    Parser *assign = parseAssignmentStatement();
-    compound -> adopt(assign);
-
-    Parser *control = assign ->children[0];
-
-    Parser *loop = new Parser(LOOP);
-    compound -> adopt(loop);
-
-    Parser *test = new Parser(TEST);
-    loop -> adopt(test);
-
-    bool countUp = true;
-    if (readToken -> datatype == TO)
+    //parse the inital assignment 
+    forLoop->adopt(parseAssignmentStatement());
+    //now read token should be at to or DOWNTO
+    if(readToken->datatype == PToken::TO || readToken->datatype == PToken::DOWNTO)
     {
-        readToken = scanner -> nextToken();
+        readToken = scanner->nextToken(); //consumes TO or DOWNTO
+        //now we need to parse the final value, which is a SMALLINT according to other compilers
+        //Thus we need to check if the token is a value, which can be either a plain integer or a identifer that is a value
+        if(readToken ->datatype == PToken::IDENTIFIER)
+        {
+            forLoop->adopt(parseVariable());
+        }
+        else if(readToken ->datatype == PToken::INTEGER)
+        {
+            forLoop->adopt(parseIntegerConstant());
+        }
+        else printSyntax("EXPECTED INTEGER");
     }
-    else if (readToken -> datatype == DOWNTO)
+    //now current token should be DO
+    if(readToken->datatype == PToken::DO)
     {
-        countUp = false;
-        readToken = scanner -> nextToken();
+        readToken = scanner->nextToken();   //CONSUME DO
     }
-    else syntaxError("Look for TO or DOWNTO");
-
-    Parser *compare = countUp ? new Parser(GT) : new Parser(LT);
-    test -> adopt(compare);
-    compare -> adopt(parseExpression());
-
-    if (readToken -> datatype == DO)
-    {
-        readToken = scanner -> nextToken();
-    }
-    else syntaxError("Look for DO");
-
-    loop -> adopt(parseStatement());
-
-    assign = new Parser(ASSIGN);
-    loop->adopt(assign);
-    assign->adopt(control->copy());
-    Parser *op = countUp ? new Parser(ADD) : new Parser(SUBTRACT);
-    assign->adopt(op);
-    op->adopt(control->copy());
-    Parser *one = new Parser(INTEGER_CONSTANT);
-    one -> tokenValueInt = 1;
-    op->adopt(one);
-
-    return compound;
-
+    else printSyntax("Expected DO");
+    //now parse the body of the for loop which is a statment or a group of statements
+    //adopt that statement as the loops third child.
+    forLoop->adopt(parseStatement());
+    return forLoop;
 }
 
 ParserNode *Parser::parseIf()
