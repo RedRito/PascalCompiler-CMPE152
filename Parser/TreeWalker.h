@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "Node.h"
+#include "ParserNode.h"
 
 namespace intermediate {
 
