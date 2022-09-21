@@ -20,7 +20,7 @@ static const set<PToken> statementStarters          // what starts a statement  
 };
 static const set<PToken> statementFollowers;        // what follows a statement  //semicolon, end, until, EOF,
 {
-        PToken::semicolon, PToken::END, PToken::END_OF_FILE, PToken::UNTIL
+        PToken::SEMICOLON, PToken::END, PToken::END_OF_FILE, PToken::UNTIL
 };
 static const set<PToken> relationalOperators;        // relational operators          // = <> < <= > >=
 static const set<PToken> simpleExpressionOperators;  // simple expression operators   // + - OR
