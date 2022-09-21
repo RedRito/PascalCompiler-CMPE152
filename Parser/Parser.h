@@ -37,7 +37,7 @@ class Parser
 
     
     
-    //Initialized Set of Pascal Statements
+    //Initializing Set of Pascal Statements
     static set<PToken> EmptyStatement;              //Statements with NO action     //
     static set<PToken> AssignmentStatement;         //Made up of LHS & RHS, seperated by assignment operator    // :=
     static set<PToken> ProcedureStatement;          //For executing procedures      //Parameter passed to Formal Parameter
