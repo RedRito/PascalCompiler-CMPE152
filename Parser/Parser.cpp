@@ -93,7 +93,17 @@ ParserNode * Parser::parseTheProgram()
     }
     if(readToken->datatype == PToken::VAR)
     {
-        program->adopt(parseVarDeclarations());
+        //program->adopt(parseVarDeclarations());
+        ParserNode *var = new ParserNode(NodeType::VAR)
+        readToken = scanner->nextToken(); //consume var, we wont be doing declarations yet.
+        if(readToken->datatype != PToken::IDENTIFIER)
+        {
+            printSyntax("Expected Identifier");
+        }
+        else
+        {
+            parseAllStatements(var, PToken::BEGIN); //parse all the things between VAR and BEGIN which should
+        }
     }
 
     //Usually we would check for VAR, USES,procedure, method, and whatnot. however, since we are not handling decaration and types
