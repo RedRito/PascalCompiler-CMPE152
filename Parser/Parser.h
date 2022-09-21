@@ -13,8 +13,15 @@
 using namespace std;
 
 
-static const set<PToken> statementStarters{PToken::BEGIN, PToken::IDENTIFIER}; // what starts a statement   //begin, identifier, all the looping starters, while, repeat, do, write, writeln, case, for, with, goto, if,
+static const set<PToken> statementStarters          // what starts a statement   //begin, identifier, all the looping starters, while, repeat, do, write, writeln, case, for, with, goto, if,
+{
+        PToken::BEGIN, PToken:: IDENTIFIER, PToken::WHILE, PToken::WHILE, PToken::REPEAT, PToken::DO,
+        PToken::CASE, PToken::FOR, PToken::WITH, PToken::GOTO, PToken::IF, PToken::PROCEDURE
+};
 static const set<PToken> statementFollowers;        // what follows a statement  //semicolon, end, until, EOF,
+{
+        PToken::SEMICOLOR, PToken::END, PToken::END_OF_FILE, PToken::UNTIL
+};
 static const set<PToken> relationalOperators;        // relational operators          // = <> < <= > >=
 static const set<PToken> simpleExpressionOperators;  // simple expression operators   // + - OR
 static const set<PToken> termOperators;              // term operators                // * / DIV MOD AND
