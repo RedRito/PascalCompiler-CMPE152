@@ -1,47 +1,12 @@
 #include "../Scanner/PToken.h"
 #include "Parser.h"
+#include <algorithm>
 
-//Pascal statement syntax
-/*
-    compound statment and assignment statment
-    a compound statment contains a begin, statmentList, and end;
-    a statment contains itself and may contain a semicolon
-    an assignment statment contains a variable/identifier, " := " assign token, and an expression
-*/
-
-//Pascal expressions
-/*
-    simple expression, PLUSOP or MINUSOP a term, OPTIONALLY (with PLUSOP, MINUSOP, OROP, and a TERM)
-    a expression is 2 simple expressions together with a relational operator = <> < <= > >=
-
-
-    A TERM
-    contains a factor, or optionally
-        MULTOP, DIVOP, DIV, MOD, ANDOP
-        as well as any number of factors
-
-    A FACTOR
-    contains a variable, xor a number, or a string, or a NOT followed by a factor, or a LEFTPAREN, expression, RIGHTPAREN.  
-*/
-
-
-//types of statements cont.
-/*
-    compoundStatments
-    assignmentStatement
-    WHILE statment
-    Repeat statement        syntax = REPEAT -> statementlist -> UNTIL -> expression
-    for statment    
-    if statement
-    case statement
-
-*/
-
-Parser::Parser(Scanner *scanner, SymbolTable symtab)    //will cause issues cause not completed symbol table
+Parser::Parser(Scanner *scanner, Symtab *symtab)    //will cause issues cause not completed symbol table
 {
     linenum = 1;
     this -> scanner = scanner;
-    //this -> symtab = symtab;
+    this -> symtab = symtab;
     readToken = nullptr;
     errNum = 0;
 }
@@ -51,11 +16,17 @@ int Parser::getErrNum()
     return errNum;
 }
 
-
+string Parser::toLowerCase(string text)
+{
+    string lower_case(text);
+    transform(lower_case.begin(), lower_case.end(),
+              lower_case.begin(), ::tolower);
+    return lower_case;
+}
 ParserNode * Parser::parseTheProgram()
 {
     //do main parse here
-    ParserNode *program = new Node(NodeType::PROGRAM);
+    ParserNode *program = new ParserNode(NodeType::PROGRAM);
     readToken = scanner->nextToken();
 
     //if first token == program, read the next token
@@ -73,8 +44,8 @@ ParserNode * Parser::parseTheProgram()
     {
         string programName = readToken->datatext;
         //enter a entry into the symbol table of the ParserNode
-        //Symtab -> tabEntry(programName);
-        program->text = programName;
+        symtab -> entry(programName);
+        program->datatext = programName;
         //read next token
         readToken = scanner->nextToken();
     }
@@ -83,7 +54,7 @@ ParserNode * Parser::parseTheProgram()
         printSyntax("Expecting PROGRAM Identifier");
     }
     //after PROGRAM proName; there is a semicolon, consume it
-    if(readToken->datatype == PToken::SEMICOLOR)
+    if(readToken->datatype == PToken::SEMICOLON)
     {
         readToken = scanner->nextToken();
     }
@@ -91,10 +62,10 @@ ParserNode * Parser::parseTheProgram()
     {
         printSyntax("Missing ; ");
     }
+    //if there is var list, parse and adopt it
     if(readToken->datatype == PToken::VAR)
     {
-        //program->adopt(parseVarDeclarations());
-        ParserNode *var = new ParserNode(NodeType::VAR)
+        ParserNode *var = new ParserNode(NodeType::VAR);
         readToken = scanner->nextToken(); //consume var, we wont be doing declarations yet.
         if(readToken->datatype != PToken::IDENTIFIER)
         {
@@ -102,19 +73,15 @@ ParserNode * Parser::parseTheProgram()
         }
         else
         {
-            parseDeclarationBlock(var, PToken::BEGIN); //parse all the things between VAR and BEGIN which should
+            parseDeclarationBlock(var); //parse all the things between VAR and BEGIN which should
             program->adopt(var);
         }
     }
-
-    //Usually we would check for VAR, USES,procedure, method, and whatnot. however, since we are not handling decaration and types
-    //we do not need to worry about those
-    //Simply look for the BEGIN
     if(readToken->datatype == PToken::BEGIN)
     {
         program->adopt(parseCompoundStatement());
         //now should be end of the program check for the period "."
-        if(readToken->datatype == PToken::SEMICOLOR)
+        if(readToken->datatype == PToken::SEMICOLON)
         {
             printSyntax("Expecting '.' ");
         }
@@ -125,14 +92,14 @@ ParserNode * Parser::parseTheProgram()
 }
 
 
-ParserNode *Parser::parseDeclarationBlock(ParserNode* parent)
+void *Parser::parseDeclarationBlock(ParserNode* parent)
 {
     while(readToken->datatype != PToken::BEGIN && readToken->datatype != PToken::END_OF_FILE && readToken->datatype == PToken::IDENTIFIER)
     {
         ParserNode* declare = new ParserNode(NodeType::VAR_DECLARATION);
         ParserNode* leftSide = new ParserNode(NodeType::VARIABLE);
         string variableName = readToken->datatext;
-        SymtableEntry *varId = symtab->enter(toLowerCase(variableName));
+        SymtabEntry *varId = symtab->entry(toLowerCase(variableName));
         leftSide->datatext = variableName;
         leftSide->entry = varId;
         declare->adopt(leftSide);
@@ -146,18 +113,18 @@ ParserNode *Parser::parseDeclarationBlock(ParserNode* parent)
         }
         else printSyntax("Missing : ");
         
-        ParserNode *rightSide = new Parser(NodeType::INTEGER);
+        ParserNode *rightSide = new ParserNode(NodeType::INTEGER);
         declare->adopt(rightSide);
         
         parent->adopt(declare);
         //now read token should be a semicolon
-        if(readToken->datatype == PToken::SEMICOLOR)
+        if(readToken->datatype == PToken::SEMICOLON)
         {
             readToken = scanner->nextToken(); //consume semicolon
         }
         else printSyntax("Missing ;");
     }
-    else printSyntax("missing identifier");
+    if(readToken->datatype != PToken::IDENTIFIER) printSyntax("missing identifier");
 }
 
 
@@ -177,8 +144,8 @@ ParserNode *Parser::parseStatement()
         case PToken::CASE :       statement = parseCase();                break;
         case PToken::WRITE :      statement = parseWriteStatement();      break;
         case PToken::WRITELN :    statement = parseWritelnStatement();    break;
-        case PToken::SEMICOLOR :  statement = nullptr; break;  // empty statement
-        default : syntaxError("Unexpected token");
+        case PToken::SEMICOLON :  statement = nullptr; break;  // empty statement
+        default : printSyntax("Unexpected token");
     }
 
     if(statement != nullptr)
@@ -191,16 +158,16 @@ ParserNode *Parser::parseStatement()
 ParserNode *Parser::parseCompoundStatement()
 {
     ParserNode *compoundNode = new ParserNode(NodeType::COMPOUND);
-    compoundNode->lineNumber = currentToken->lineNumber;
+    compoundNode->linenum = readToken->linenum;
 
     readToken = scanner->nextToken();  // consume BEGIN
     parseAllStatements(compoundNode, PToken::END);
 
-    if (readToken->type == PToken::END)
+    if (readToken->datatype == PToken::END)
     {
         readToken = scanner->nextToken();  // consume END
     }
-    else syntaxError("Expecting END");
+    else printSyntax("Expecting END");
 
     return compoundNode;
 }
@@ -215,19 +182,19 @@ ParserNode *Parser::parseAssignmentStatement()
     // The assignment Node *adopts the variable Node *as its first child.
     ParserNode *lhsNode = new ParserNode(NodeType::VARIABLE);
     string variableName = readToken->datatext;
-    SymtabEntry *variableId = symtab->enter(toLowerCase(variableName));
+    SymtabEntry *variableId = symtab->entry(toLowerCase(variableName));
 
-    lhsNode->text  = variableName;
+    lhsNode->datatext  = variableName;
     lhsNode->entry = variableId;
     assignmentNode->adopt(lhsNode);
 
     readToken = scanner->nextToken();  // consume the LHS variable;
 
-    if (readToken->type == PToken::ASSIGN)
+    if (readToken->datatype == PToken::ASSIGN)
     {
         readToken = scanner->nextToken();  // consume :=
     }
-    else syntaxError("Missing :=");
+    else printSyntax("Missing :=");
 
     // The assignment Node *adopts the expression Node *as its second child.
     ParserNode*rhsNode = parseExpression();
@@ -246,14 +213,14 @@ ParserNode *Parser::parseRepeatStatement()
     ParserNode *loopNode = new ParserNode(NodeType::LOOP);
     readToken = scanner->nextToken();  // consume REPEAT
 
-    parseStatementList(loopNode, PToken::UNTIL);
+    parseAllStatements(loopNode, PToken::UNTIL);
 
-    if (currentToken->type == PToken::UNTIL)
+    if (readToken->datatype == PToken::UNTIL)
     {
         // Create a TEST node-> It adopts the test expression node->
         ParserNode *testNode = new ParserNode(NodeType::TEST);
-        linenum = currentToken->lineNumber;
-        testNode->lineNumber = linenum;
+        linenum = readToken->linenum;
+        testNode->linenum = linenum;
         readToken = scanner->nextToken();  // consume UNTIL
 
         testNode->adopt(parseExpression());
@@ -261,7 +228,7 @@ ParserNode *Parser::parseRepeatStatement()
         // The LOOP Node *adopts the TEST Node *as its final child.
         loopNode->adopt(testNode);
     }
-    else syntaxError("Expecting UNTIL");
+    else printSyntax("Expecting UNTIL");
 
     return loopNode;
 }
@@ -275,9 +242,9 @@ ParserNode* Parser::parseWriteStatement()
     readToken = scanner->nextToken();  // consume WRITE
 
     parseAllWrite(writeNode);
-    if (writeNode->children.size() == 0)
+    if (writeNode->childrenList.size() == 0)
     {
-        syntaxError("Invalid WRITE statement");
+        printSyntax("Invalid WRITE statement");
     }
     return writeNode;
 }
@@ -290,7 +257,7 @@ ParserNode *Parser::parseWritelnStatement()
     ParserNode *writelnNode = new ParserNode(NodeType::WRITELN);
     readToken = scanner->nextToken();  // consume WRITELN
 
-    if (currentToken->type == PToken::LPAREN) parseAllWrite(writelnNode);
+    if (readToken->datatype == PToken::LPAREN) parseAllWrite(writelnNode);
     return writelnNode;
 }
 
@@ -313,7 +280,7 @@ ParserNode *Parser::parseExpression()
             case PToken::GT: opnode = new ParserNode(NodeType::GT); break;
             case PToken::GTEQ: opnode = new ParserNode(NodeType::GTEQ); break;
             
-            default: syntaxError("Unexpected token");
+            default: printSyntax("Unexpected token");
         }
 
         //ParserNode *opNode = tokenType == PToken::EQUAL ? new ParserNode(NodeType::EQ): tokenType == PToken::LT ? new ParserNode(NodeType::LT): nullptr;
@@ -325,8 +292,8 @@ ParserNode *Parser::parseExpression()
         // as its second child. Then it becomes the expression's root node->
         if (opnode != nullptr)
         {
-            opNode->adopt(exprNode);
-            opNode->adopt(parseSimpleExpression());
+            opnode->adopt(exprNode);
+            opnode->adopt(parseSimpleExpression());
             exprNode = opnode;
         }
     }
@@ -343,8 +310,7 @@ ParserNode *Parser::parseSimpleExpression()
 
     // Keep parsing more terms as long as the current token
     // is a + or - operator.
-    while (simpleExpressionOperators.find(readToken->datatype) !=
-                                                simpleExpressionOperators.end())
+    while (simpleExpressionOperators.find(readToken->datatype) != simpleExpressionOperators.end())
     {
         ParserNode *opNode;
         //ParserNode *opNode = readToken->datatype == PToken::PLUSOP ? new ParserNode(NodeType::ADD): new ParserNode(NodeType::SUBTRACT);
@@ -354,7 +320,7 @@ ParserNode *Parser::parseSimpleExpression()
             case PToken::MINUSOP: opNode = new ParserNode(NodeType::SUBTRACT); break;
             case PToken::OR: opNode = new ParserNode(NodeType::OR); break;
             
-            default: syntaxError("Unexpected token");;
+            default: printSyntax("Unexpected token");;
         }
         readToken = scanner->nextToken();  // consume the operator
 
@@ -428,7 +394,7 @@ ParserNode *Parser::parseTerm()
             case PToken::DIVOP: opNode = new ParserNode(NodeType::FLOAT_DIVIDE); break;
             case PToken::AND: opNode = new ParserNode(NodeType::AND); break;
             
-            default: syntaxError("Unexpected token");;
+            default: printSyntax("Unexpected token");;
         }
         // if(ParserNode *opNode = currentToken->datatype == STAR)
         // {
@@ -462,7 +428,7 @@ ParserNode *Parser::parseFactor()
     }
     else if(readToken->datatype == PToken::LPAREN)
     {
-        readToken->datatype = scanner->nextToken();
+        readToken = scanner->nextToken();
         ParserNode *exprNode = parseExpression();     //add in after parseExpression is written!
         if(readToken->datatype == PToken::RPAREN)
         {
@@ -488,32 +454,32 @@ ParserNode *Parser::parseFactor()
 ParserNode *Parser::parseNOT()
 {
     //current token should be NOT operator
-    ParserNode *not = new ParserNode(NodeType::NOT);
+    ParserNode *notNode = new ParserNode(NodeType::NOT);
     readToken = scanner->nextToken(); //consume NOT;
     //not adopts the factor as its first child
-    not->adopt(parseFactor());
-    return not;
+    notNode->adopt(parseFactor());
+    return notNode;
 }
 
 ParserNode *Parser::parseVariable()
 {
-    string varName = currentToken->text;
-    Entry *varID = symtab->lookup(toLowerCase(varName));    //needs to test lookup func
+    string varName = readToken->datatext;
+    SymtabEntry *varID = symtab->lookup(toLowerCase(varName));    //needs to test lookup func
     if(varID == nullptr)
     {
         printSematic("Undeclared identifier");
     }
     ParserNode *tempNode = new ParserNode(NodeType::VARIABLE);
-    tempNode->text = varName;
-    currentToken = scanner->nextToken();
+    tempNode->datatext = varName;
+    readToken = scanner->nextToken();
     return tempNode;
 }
 
 void Parser::printSyntax(string msg)
 {
-    cout << "Syntax error at line " << linenum << " " << msg << " " << readToken -> toString();
+    cout << "Syntax error at line " << linenum << " " << msg << " " << readToken -> toString(readToken);
     errNum ++;
-    while (statementFollowers.find(currentToken->datatype) == statementFollowers.end())
+    while (statementFollowers.find(readToken->datatype) == statementFollowers.end())
     {
         readToken = scanner->nextToken();
     }
@@ -521,7 +487,7 @@ void Parser::printSyntax(string msg)
 
 void Parser::printSematic(string msg)
 {
-    cout << "Sematic error at line " << linenum << " " << msg << " " << readToken -> toString();
+    cout << "Sematic error at line " << linenum << " " << msg << " " << readToken -> toString(readToken);
     errNum++;
 }
 
@@ -537,7 +503,7 @@ void Parser::parseAllStatements(ParserNode *parent, PToken tokenType)
             parent -> adopt(node);
         }
 
-        if(readToken -> datatype == PToken::SEMICOLOR)
+        if(readToken -> datatype == PToken::SEMICOLON)
         {
             readToken = scanner ->nextToken();
         }
@@ -668,14 +634,14 @@ ParserNode *Parser::parseFor()
 ParserNode *Parser::parseIf()
 {
     // Create IF node
-    Parser *ifNode = new Parser(Nodetype::IF);
+    ParserNode *ifNode = new ParserNode(NodeType::IF);
     // Consume IF
     readToken = scanner->nextToken();  
     //IF adopts the expression subtree as its first child
     ifNode->adopt(parseExpression());
 
     if (readToken->datatype != PToken::THEN) 
-        syntaxError("Look for THEN");
+        printSyntax("Look for THEN");
     else
     {
         // Consume THEN
@@ -700,12 +666,12 @@ ParserNode *Parser::parseIf()
 ParserNode *Parser::parseCase()
 {
     // Create SWITCH node
-    Parser *switchNode = new Parser(NodeType::SWITCH);
+    ParserNode *switchNode = new ParserNode(NodeType::SWITCH);
     // Consume SWITCH
     readToken = scanner->nextToken();  
 
     //SWITCH adopts the expression subtree
-    Parser *expr = parseExpression();
+    ParserNode *expr = parseExpression();
     switchNode->adopt(expr);
 
     if (readToken->datatype == PToken::OF)
@@ -713,15 +679,15 @@ ParserNode *Parser::parseCase()
         // Consume OF
         readToken = scanner->nextToken();  
     }
-    else syntaxError("Look for OF");
+    else printSyntax("Look for OF");
 
     while (   (readToken->datatype == PToken::INTEGER) 
     || (readToken->datatype == PToken::PLUSOP) || (readToken->datatype == PToken::MINUSOP))
     {
         // SWITCH adopts SELECT_BRANCH
         // SELECT_BRANCH adopts SELECT_CONSTANTS
-        Parser *branch = new Parser(NodeType::SELECT_BRANCH);
-        Parser *constant = new Parser(NodeType::SELECT_CONSTANTS);
+        ParserNode *branch = new ParserNode(NodeType::SELECT_BRANCH);
+        ParserNode *constant = new ParserNode(NodeType::SELECT_CONSTANTS);
         switchNode->adopt(branch);
         branch->adopt(constant);
 
@@ -735,8 +701,8 @@ ParserNode *Parser::parseCase()
                 readToken = scanner->nextToken();  
             }
 
-            Parser *constantNode = parseIntegerConstant();
-            if (negate) constantNode-> TokenValue = -(constantNode-> tokenValueInt);
+            ParserNode *constantNode = parseIntegerConstant();
+            if (negate) constantNode-> TokenValue->tokenValueInt = -(constantNode-> TokenValue -> tokenValueInt);
             constant->adopt(constantNode);
 
             if (readToken->datatype == PToken::COMMA)
@@ -767,7 +733,7 @@ ParserNode *Parser::parseCase()
     }
     else if (statementStarters.find(readToken->datatype) != statementStarters.end())
     {
-        syntaxError("Missing END");
+        printSyntax("Missing END");
     }
 
     return switchNode;

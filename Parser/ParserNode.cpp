@@ -5,7 +5,7 @@ ParserNode::ParserNode(NodeType type)
 {
     this -> type = type;
     linenum = 0;
-    //entry = NULLPTR
+    entry = nullptr;
 }
 
 void ParserNode::adopt(ParserNode *childNode)

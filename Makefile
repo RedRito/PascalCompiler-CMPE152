@@ -1,10 +1,12 @@
 CC = g++
 CFLAGS = -Wall -g
 
-main: TestProgram.o scanner.o PToken.o FileReader.o Parser.o
-	g++ TestProgram.o scanner.o PToken.o FileReader.o Parser.o -o main
-Parser: Parser/Parser.cpp Parser/Parser.h
+main: TestProgram.o scanner.o PToken.o FileReader.o Parser.o TreeWalker.o ParserNode.o
+	g++ TestProgram.o scanner.o PToken.o FileReader.o Parser.o ParserNode.o TreeWalker.o -o main
+Parser.o: Parser/Parser.cpp Parser/Parser.h ParserNode.o
 	g++ -c Parser/Parser.cpp 
+ParserNode.o: Parser/ParserNode.cpp Parser/ParserNode.h	Parser/Symtab.h Parser/SymtabEntry.h
+	g++ -c Parser/ParserNode.cpp
 TestProgram.o: TestProgram.cpp
 	g++ -c TestProgram.cpp
 scanner.o: Scanner/scanner.cpp  Scanner/scanner.h
@@ -13,6 +15,7 @@ PToken.o: Scanner/PToken.cpp Scanner/PToken.h
 	g++ -c Scanner/PToken.cpp
 FileReader.o: Scanner/FileReader.cpp Scanner/FileReader.h
 	g++ -c Scanner/FileReader.cpp
-
+TreeWalker.o: Parser/TreeWalker.cpp Parser/TreeWalker.h
+	g++ -c Parser/TreeWalker.cpp
 clean:
 	rm *.o main

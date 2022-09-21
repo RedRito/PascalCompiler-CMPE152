@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "../Scanner/PToken.h"
-
+#include "SymtabEntry.h"
 using namespace std; //lazy
 //NOTE: NEED MORE/ NOT ENOUGH AT ALL
 enum class NodeType //Type of tree nodes in parser tree, pulled form slides
@@ -15,20 +15,32 @@ enum class NodeType //Type of tree nodes in parser tree, pulled form slides
     ASSIGN,
     WHILE, 
     LOOP, 
-    TEST, 
+    TEST,
+    FOR,
+    IF,
+    SWITCH,
+    VAR,
+    VAR_DECLARATION,
+    INTEGER, 
     WRITE, 
     WRITELN,
     ADD, 
-    SUBTRACT, 
+    SUBTRACT,
+    OR, 
     MULTIPLY, 
     DIVIDE,
     NEGATE,
-    FLOAT_DIVIDE, 
+    FLOAT_DIVIDE,
+    AND, 
+    NOT,
     SELECT_BRANCH,
     SELECT_CONSTANTS,
     EQ, 
     LT,
     GT,
+    NE,
+    LTEQ,
+    GTEQ,
     VARIABLE, 
     INTEGER_CONSTANT, 
     REAL_CONSTANT, 
@@ -43,19 +55,31 @@ static const string NODE_TYPE_STRINGS[] =
     "ASSIGN",
     "WHILE", 
     "LOOP", 
-    "TEST", 
+    "TEST",
+    "FOR",
+    "IF",
+    "SWITCH",
+    "VAR",
+    "VAR_DECLARATION",
+    "INTEGER",   
     "WRITE", 
     "WRITELN",
     "ADD", 
-    "SUBTRACT", 
+    "SUBTRACT",
+    "OR", 
     "MULTIPLY", 
     "DIVIDE", 
     "FLOAT_DIVIDE",
+    "AND",
+    "NOT",
     "SELECT_BRANCH",
     "SELECT_CONSTANTS",
     "EQ", 
     "LT",
     "GT",
+    "NE",
+    "LTEQ",
+    "GTEQ",
     "VARIABLE", 
     "INTEGER_CONSTANT", 
     "REAL_CONSTANT", 
@@ -66,11 +90,11 @@ static const string NODE_TYPE_STRINGS[] =
 
 class ParserNode
 {
-    private:
+    public:
         NodeType type;
         int linenum;
         string datatext;
-        //Symtab *tableEntry;
+        SymtabEntry *entry;
         //values of the node
         Token *TokenValue;
         //list of node children
@@ -79,7 +103,7 @@ class ParserNode
         ParserNode(NodeType type);
         //adopt another ParserNode as its first child
         void adopt(ParserNode *childNode);
-    public:
+    private:
         
 };
 
