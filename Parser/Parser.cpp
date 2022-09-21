@@ -42,7 +42,7 @@ Parser::Parser(Scanner *scanner, SymbolTable symtab)    //will cause issues caus
     linenum = 1;
     this -> scanner = scanner;
     //this -> symtab = symtab;
-    currentToken = nullptr;
+    readToken = nullptr;
     errNum = 0;
 }
 
@@ -346,9 +346,16 @@ ParserNode *Parser::parseSimpleExpression()
     while (simpleExpressionOperators.find(readToken->datatype) !=
                                                 simpleExpressionOperators.end())
     {
-        ParserNode *opNode = readToken->datatype == PToken::PLUSOP ? new ParserNode(NodeType::ADD)
-                                                : new ParserNode(NodeType::SUBTRACT);
-
+        ParserNode *opNode;
+        //ParserNode *opNode = readToken->datatype == PToken::PLUSOP ? new ParserNode(NodeType::ADD): new ParserNode(NodeType::SUBTRACT);
+        switch (readToken->datatype)
+        {
+            case PToken::PLUSOP: opNode = new ParserNode(NodeType::ADD); break;
+            case PToken::MINUSOP: opNode = new ParserNode(NodeType::SUBTRACT); break;
+            case PToken::OR: opNode = new ParserNode(NodeType::OR); break;
+            
+            default: syntaxError("Unexpected token");;
+        }
         readToken = scanner->nextToken();  // consume the operator
 
         // The add or subtract Node *adopts the first term Node *as its
@@ -411,57 +418,81 @@ ParserNode *Parser::parseIntegerConstant()
 ParserNode *Parser::parseTerm()
 {
     ParserNode *currTerm = parseFactor();
-    while(termOperators.find(currentToken->datatype) != termOperators.end())
+    while(termOperators.find(readToken->datatype) != termOperators.end())
     {
-        if(ParserNode *opNode = currentToken->datatype == STAR)
+        ParserNode *opNode;
+        switch (readToken->datatype)
         {
-            new ParserNode(NodeType::MULTIPLY);
+            case PToken::MULTOP: opNode = new ParserNode(NodeType::MULTIPLY); break;
+            case PToken::DIV: opNode = new ParserNode(NodeType::DIVIDE); break;
+            case PToken::DIVOP: opNode = new ParserNode(NodeType::FLOAT_DIVIDE); break;
+            case PToken::AND: opNode = new ParserNode(NodeType::AND); break;
+            
+            default: syntaxError("Unexpected token");;
         }
-        else
-        {
-            new ParserNode(NodeType::DIVIDE);
-        }
-        currentToken = scanner->nextToken();   //consume the operator
+        // if(ParserNode *opNode = currentToken->datatype == STAR)
+        // {
+        //     new ParserNode(NodeType::MULTIPLY);
+        // }
+        // else
+        // {
+        //     new ParserNode(NodeType::DIVIDE);
+        // }
+        readToken= scanner->nextToken();   //consume the operator
         opNode->adopt(currTerm);
         opNode->adopt(parseFactor());
-        termNode = opNode;
+        currTerm = opNode;
     }
     return currTerm;
 }
 
 ParserNode *Parser::parseFactor()
 {
-    if(currentToken->datatype == NodeType::IDENTIFIER)
+    if(readToken->datatype == PToken::IDENTIFIER)
     {
         return parseVariable();
     }
-    else if(currentToken->datatype == NodeType::INTEGER)
+    else if(readToken->datatype == PToken::INTEGER)
     {
         return parseIntegerConstant();
     }
-    else if(currentToken->datatype == NodeType::REAL)
+    else if(readToken->datatype == PToken::REAL)
     {
         return parseRealConstant();
     }
-    else if(currentToken->datatype == NodeType::LPAREN)
+    else if(readToken->datatype == PToken::LPAREN)
     {
-        currentToken->datatype = scanner->nextToken();
-        //ParserNode *exprNode = parseExpression();     //add in after parseExpression is written!
-        if(currentToken->datatype == NodeType::RPAREN)
+        readToken->datatype = scanner->nextToken();
+        ParserNode *exprNode = parseExpression();     //add in after parseExpression is written!
+        if(readToken->datatype == PToken::RPAREN)
         {
-            currentToken = scanner->nextToken();
+            readToken = scanner->nextToken();
         }
         else
         {
             printSyntax("Expecting )");
         }
-        //return exprNode;                        //add in after parseExpression is written!
+        return exprNode;                        //add in after parseExpression is written!
+    }
+    else if(readToken ->datatype == PToken::NOT)
+    {
+        return parseNOT();
     }
     else
     {
         printSyntax("Unexpected token");
     }
     return nullptr;
+}
+
+ParserNode *Parser::parseNOT()
+{
+    //current token should be NOT operator
+    ParserNode *not = new ParserNode(NodeType::NOT);
+    readToken = scanner->nextToken(); //consume NOT;
+    //not adopts the factor as its first child
+    not->adopt(parseFactor());
+    return not;
 }
 
 ParserNode *Parser::parseVariable()

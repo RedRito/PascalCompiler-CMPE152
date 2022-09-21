@@ -66,6 +66,7 @@ class Parser
     ParserNode *parseTerm();                //NOT DONE
     ParserNode *parseFactor();              //NOT DONE
     ParserNode *parseVariable();            //DONE
+    ParserNode *parseNOT();                 //DONE
 
     ParserNode *parseRealConstant();       //done
     ParserNode *parseStringConstant();     //done
