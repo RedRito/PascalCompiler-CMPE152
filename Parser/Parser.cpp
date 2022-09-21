@@ -51,6 +51,84 @@ int Parser::getErrNum()
     return errNum;
 }
 
+ParserNode *Parser::parseStatement()
+{
+    Node *stmtNode = nullptr;
+    int savedLineNumber = currentToken->lineNumber;
+    lineNumber = savedLineNumber;
+
+    switch (currentToken->type)
+    {
+        case IDENTIFIER : stmtNode = parseAssignmentStatement(); break;
+        case BEGIN :      stmtNode = parseCompoundStatement();   break;
+        case REPEAT :     stmtNode = parseRepeatStatement();     break;
+        case WHILE :      stmtNode = parseWhileStatement();      break;
+        case FOR :        stmtNode = parseForStatement();        break;
+        case IF :         stmtNode = parseIfStatement();         break;
+        case CASE :       stmtNode = parseCaseStatement();       break;
+        case WRITE :      stmtNode = parseWriteStatement();      break;
+        case WRITELN :    stmtNode = parseWritelnStatement();    break;
+        case SEMICOLON :  stmtNode = nullptr; break;  // empty statement
+
+        default : syntaxError("Unexpected token");
+    }
+
+    if (stmtNode != nullptr) stmtNode->lineNumber = savedLineNumber;
+    return stmtNode;
+}
+
+ParserNode *Parser::parseAssignmentStatement()
+{
+    Node *assignmentNode = new Node(ASSIGN);
+    string variableName = currentToken->text;
+    SymtabEntry *variableId = symtab->lookup(toLowerCase(variableName));
+    if (variableId == nullptr) variableId = symtab->enter(variableName);
+    Node *lhsNode  = new Node(VARIABLE);
+    lhsNode->text  = variableName;
+    lhsNode->entry = variableId;
+    assignmentNode->adopt(lhsNode);
+    currentToken = scanner->nextToken();
+    if (currentToken->type == COLON_EQUALS)
+    {
+        currentToken = scanner->nextToken();
+    }
+    else syntaxError("Missing :=");
+    Node *rhsNode = parseExpression();
+    assignmentNode->adopt(rhsNode);
+    return assignmentNode;
+}
+
+ParserNode *Parser::parseCompoundStatement()
+{
+    Node *compoundNode = new Node(COMPOUND);
+    compoundNode->lineNumber = currentToken->lineNumber;
+    currentToken = scanner->nextToken();
+    parseStatementList(compoundNode, END);
+    if (currentToken->type == END)
+    {
+        currentToken = scanner->nextToken();
+    }
+    else syntaxError("Expecting END");
+    return compoundNode;
+}
+
+ParserNode *Parser::parseRepeatStatement()
+{
+    Node *loopNode = new Node(LOOP);
+    currentToken = scanner->nextToken();
+    parseStatementList(loopNode, UNTIL);
+    if (currentToken->type == UNTIL)
+    {
+        Node *testNode = new Node(TEST);
+        lineNumber = currentToken->lineNumber;
+        testNode->lineNumber = lineNumber;
+        currentToken = scanner->nextToken();
+        testNode->adopt(parseExpression());
+        loopNode->adopt(testNode);
+    }
+    else syntaxError("Expecting UNTIL");
+    return loopNode;
+}
 
 ParserNode * Parser::parseTheProgram()
 {
