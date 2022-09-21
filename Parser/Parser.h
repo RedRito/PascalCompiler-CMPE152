@@ -26,8 +26,25 @@ class Parser
     int errNum;             //current number of err
     //visit http://www.irietools.com/iriepascal/progref350.html //for how pascal statements are done, pls add them to the statement hash set.
     static set<PToken> statementStarters;          // what starts a statement   //begin, identifier, all the looping starters, while, repeat, do, write, writeln, case, for, with, goto, if,
+    
+    statementStarters.insert(PToken::BEGIN);
+    statementStarters.insert(PToken::IDENTIFIER);
+    statementStarters.insert(PToken::WHILE);
+    statementStarters.insert(PToken::REPEAT);
+    statementStarters.insert(PToken::DO);
+    statementStarters.insert(PToken::CASE);
+    statementStarters.insert(PToken::FOR);
+    statementStarters.insert(PToken::WITH);
+    statementStarters.insert(PToken::GOTO);
+    statementStarters.insert(PToken::IF);
+    statementStarters.insert(PToken::PROCEDURE);    //Add more if needed.
+    
     static set<PToken> statementFollowers;         // what follows a statement  //semicolon, end, until, EOF,
     
+    statementFollowers.insert(PToken::SEMICOLOR);
+    statementFollowers.insert(PToken::END);
+    statementFollowers.insert(PToken::END_OF_FILE);
+    statementFollowers.insert(PToken::UNTIL);       //Add more if needed.
     
     static set<PToken> relationalOperators;        // relational operators          // = <> < <= > >=
     static set<PToken> simpleExpressionOperators;  // simple expression operators   // + - OR
@@ -35,11 +52,6 @@ class Parser
     static set<PToken> factorOperators;            // unique map of factor operators    //variable/identifer, number, string, NOT -> factor, ( -> expression -> )
     //Note, idk if you need to check for followers of relational, expression, term, and factor operators, will find out later
 
-    
-    
-    //Initializing Set of Pascal Statements
-    //was wrong, changing
-    
 
 
     ParserNode *parseRealConstant();
