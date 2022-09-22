@@ -1,19 +1,26 @@
-PROGRAM Test;
-VAR
-   x : REAL;
-   i : INTEGER;
-   j : INTEGER;
-BEGIN
-    x := 12.449;
-    i := 10;
-    j := -300;
-    WRITE('This is some text');   
-    WRITELN('Unformatted integer ',i);
-    WRITELN('Unformatted integer computation ',i*i);
-    WRITELN('formatted integer',i:4);
-    WRITELN('formatted integer',j:4);
-    WRITELN('Unformatted real ',x);
-    WRITE('Formatted real');
-    WRITE(x:8:2);
-    WRITELN('all in one line');
-END.
+program master;
+
+begin
+	i := 1;
+	while not i<5 do
+	begin
+		write('i = ');
+		writeln(i);
+		i:=i+1;
+	end;
+	writeln;
+	i := 1;
+	while i<=5 do
+	begin
+		j := 10;
+		while j <= 30 do
+		begin
+			write('i = ');
+			write(i);
+			write(', j = ');
+			writeln(j);
+			j := j + 10;
+		end;
+	i:=i + 1
+	end
+end.

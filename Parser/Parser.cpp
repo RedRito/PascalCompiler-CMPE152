@@ -463,9 +463,11 @@ ParserNode *Parser::parseNOT()
 {
     //current token should be NOT operator
     ParserNode *notNode = new ParserNode(NodeType::NOT);
+    linenum = readToken->linenum;
+    notNode->linenum = linenum;
     readToken = scanner->nextToken(); //consume NOT;
     //not adopts the factor as its first child
-    notNode->adopt(parseFactor());
+    notNode->adopt(parseExpression());
     return notNode;
 }
 
@@ -602,20 +604,23 @@ ParserNode *Parser::parseWhile()
     //test node tests the expression
     ParserNode *testCodition = new ParserNode(NodeType::TEST);
     //parse the expression in between while and do
-    parseAllStatements(loop, PToken::DO);
+    testCodition->adopt(parseExpression());
+    linenum = readToken->linenum;
+    testCodition->linenum = linenum;
+    //parseAllStatements(loop, PToken::DO);
     //loop node first child should now be the condidion
     //current token is now DO //if not throw an error
+    cout << "I AM IN WHILE LOOP" << endl;
+    loop->adopt(testCodition);
     if(readToken->datatype == PToken::DO)
     {
-        linenum = readToken->linenum;
-        testCodition->linenum = linenum;
         readToken = scanner->nextToken(); //consumes DO
         //parse what comes after the DO,
         //dont have to worry about the BEGIN, END parseing the expression will solve that issue
         //test adopts the entire loop expression
-        testCodition->adopt(parseExpression());
+        loop->adopt(parseStatement());
         //while loop adopts the expression as its second child.
-        loop->adopt(testCodition);
+        
     }
     else printSyntax("Expected DO");
     return loop;
