@@ -6,19 +6,16 @@
 #include "Parser/TreeWalker.h"
 using namespace std;
 
-int main(int argc, char *argv[])
-{
-    if(argc != 2)
-    {
-        cout << "RUN BY ./main [\"FileName\"]" << endl;
-        exit(1);
-    }
-    string fileName = argv[1];
-    FileReader *file = new FileReader(fileName);
 
-    Scanner *test = new Scanner(file);
-    Symtab *symtab = new Symtab();
-    Parser *parser = new Parser(test, symtab);
+void testScanner(FileReader *file)
+{
+    cout << "TESTING SCANNER" << endl;
+    Scanner *test= new Scanner(file);
+    test->printTokens();
+}
+void testParser(Scanner *scanner, Symtab *symtab)
+{
+    Parser *parser = new Parser(scanner, symtab);
     cout << "Parsing the program" << endl;
     ParserNode *programTree = parser->parseTheProgram();
     int errnum = parser->getErrNum();
@@ -35,5 +32,29 @@ int main(int argc, char *argv[])
         TreeWalker *walker = new TreeWalker();
         walker->print(programTree);
     }
+}
+int main(int argc, char *argv[])
+{
+    if(argc != 3)
+    {
+        cout << "RUN BY ./main -{scan, parse} [\"FileName\"]" << endl;
+        exit(1);
+    }
+    string optarg = argv[1];
+    string fileName = argv[2];
+    FileReader *file = new FileReader(fileName);
+    if(optarg == "-scan")
+    {
+        testScanner(file);
+    }
+    else if(optarg == "-parse")
+    {
+        testParser(new Scanner(file), new Symtab());
 
+    }
+    else
+    {
+        testParser(new Scanner(file), new Symtab());
+    }
+    return 0;
 }

@@ -30,8 +30,8 @@ ParserNode * Parser::parseTheProgram()
     ParserNode *program = new ParserNode(NodeType::PROGRAM);
     
     readToken = scanner->nextToken();
-    cout << "Reading PROGRAM" << endl;
-    cout << readToken ->toString(readToken) << endl;
+    //cout << "Reading PROGRAM" << endl;
+    //cout << readToken ->toString(readToken) << endl;
     //if first token == program, read the next token
     if(readToken->datatype == PToken::PROGRAM)
     {
@@ -79,11 +79,11 @@ ParserNode * Parser::parseTheProgram()
             program->adopt(var);
         }
     }
-    cout << "PARSING BEGIN NOW" << endl;
+    //cout << "PARSING BEGIN NOW" << endl;
     if(readToken->datatype == PToken::BEGIN)
     {
         program->adopt(parseCompoundStatement());
-        cout << "I AM HERE NOW" << endl;
+        //cout << "I AM HERE NOW" << endl;
         //now should be end of the program check for the period "."
         if(readToken->datatype == PToken::SEMICOLON)
         {
@@ -204,7 +204,7 @@ ParserNode *Parser::parseAssignmentStatement()
     }
     else printSyntax("Missing :=");
     // The assignment Node *adopts the expression Node *as its second child.
-    cout << "TOKEN AFTER ASIGN IS " << readToken->toString(readToken) << endl;
+    //cout << "TOKEN AFTER ASIGN IS " << readToken->toString(readToken) << endl;
     ParserNode*rhsNode = parseExpression();
     assignmentNode->adopt(rhsNode);
     return assignmentNode; 
@@ -322,7 +322,7 @@ ParserNode *Parser::parseSimpleExpression()
     {
         ParserNode *opNode;
         //ParserNode *opNode = readToken->datatype == PToken::PLUSOP ? new ParserNode(NodeType::ADD): new ParserNode(NodeType::SUBTRACT);
-        cout << "CURRENT SIMPLE EXPRESS OP IS " << readToken->toString(readToken) << endl;
+        //cout << "CURRENT SIMPLE EXPRESS OP IS " << readToken->toString(readToken) << endl;
         switch (readToken->datatype)
         {
             case PToken::PLUSOP: opNode = new ParserNode(NodeType::ADD); break;
@@ -493,7 +493,7 @@ ParserNode *Parser::parseVariable()
 {
     //cout << "parsing variable " << readToken->toString(readToken) << endl;
     string varName = readToken->datatext;
-    cout << "variable text " << readToken->datatext << endl;
+    //cout << "variable text " << readToken->datatext << endl;
     SymtabEntry *varID = symtab->lookup(toLowerCase(varName));    //needs to test lookup func
     if(varID == nullptr)
     {
@@ -512,9 +512,9 @@ void Parser::printSyntax(string msg)
     errNum ++;
     while (statementFollowers.find(readToken->datatype) == statementFollowers.end())
     {
-        cout << "going to the next token ";
+        //cout << "going to the next token ";
         readToken = scanner->nextToken();
-        cout << readToken->toString(readToken) << endl;
+        //cout << readToken->toString(readToken) << endl;
     }
 }
 
@@ -554,7 +554,7 @@ void Parser::parseAllStatements(ParserNode *parent, PToken tokenType)
             printSyntax("missing a ;");
             break;
         }
-        cout << readToken ->toString(readToken) << endl;
+        //cout << readToken ->toString(readToken) << endl;
 
     }
 }
@@ -628,7 +628,7 @@ ParserNode *Parser::parseWhile()
     //parseAllStatements(loop, PToken::DO);
     //loop node first child should now be the condidion
     //current token is now DO //if not throw an error
-    cout << "I AM IN WHILE LOOP" << endl;
+    //cout << "I AM IN WHILE LOOP" << endl;
     loop->adopt(testCodition);
     if(readToken->datatype == PToken::DO)
     {
