@@ -189,7 +189,7 @@ Token *Token::SpecialSymbols(char currentCh, FileReader * file)
         }
         case ';' : 
         {
-            token->datatype = Symbols["SEMICOLOR"];  
+            token->datatype = Symbols["SEMICOLON"];  
             break;
         }
         case ',' : 

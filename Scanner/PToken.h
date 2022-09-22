@@ -66,7 +66,9 @@ enum class PToken
     USES, 
     VAR, 
     WHILE, 
-    WITH, 
+    WITH,
+    WRITE,
+    WRITELN,
     XOR, 
     //Values
     INTEGER,
@@ -90,7 +92,7 @@ enum class PToken
     MULTEQUAL,
     DIVEQUAL,
     CARAT,
-    SEMICOLOR,
+    SEMICOLON,
     COMMA,
     LPAREN,
     RPAREN,
@@ -163,6 +165,8 @@ static const string PTOKEN_STR[] =
     "VAR",
     "WHILE",
     "WITH",
+    "WRITE",
+    "WRITELN",
     "XOR",
     "INTEGER",
     "REAL",
@@ -183,7 +187,7 @@ static const string PTOKEN_STR[] =
     "MULTEQUAL",
     "DIVEQUAL",
     "CARAT",
-    "SEMICOLOR",
+    "SEMICOLON",
     "COMMA",
     "LPAREN",
     "RPAREN",
@@ -257,6 +261,8 @@ static map<string, PToken> ReservedWords =
             {"VAR", PToken::VAR},
             {"WHILE", PToken::WHILE},
             {"WITH", PToken::WITH},
+            {"WRITE", PToken::WRITE},
+            {"WRITELN", PToken::WRITELN},
             {"XOR", PToken::XOR},
         };
 /*
@@ -280,7 +286,7 @@ static map<string, PToken> Symbols =
             {"MULTEQUAL", PToken::MULTEQUAL},
             {"DIVEQUAL", PToken::DIVEQUAL},
             {"CARAT", PToken::CARAT},
-            {"SEMICOLOR", PToken::SEMICOLOR},
+            {"SEMICOLON", PToken::SEMICOLON},
             {"COMMA", PToken::COMMA},
             {"LPAREN", PToken::LPAREN},
             {"RPAREN", PToken::RPAREN},
@@ -314,6 +320,12 @@ class Token
         double tokenValueReal;
         string tokenValueString;
         bool tokenValueBoolean;
+        
+        int getInt() const {return tokenValueInt;}
+        double getReal() const {return tokenValueReal;}
+        string getString() const {return tokenValueString;}
+        bool getBool() const {return tokenValueBoolean;}
+
         //constructor
         Token(char currentCh); 
         //
