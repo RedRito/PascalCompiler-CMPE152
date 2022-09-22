@@ -41,6 +41,7 @@ static const set<PToken> termOperators              // term operators           
 class Parser
 {
     public:
+    //Constructor
     Parser(Scanner *scanner, Symtab *symtab); //params scanner and symboltable,
     int getErrNum();                //gets number of errors,
     ParserNode *parseTheProgram();  //main parser program, checks for tokens and determines which parse function to call //returns ParserNode

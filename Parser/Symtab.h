@@ -20,6 +20,9 @@ class Symtab
             Table[name] = newEntry;                         //add to Table.
             return newEntry;
         }
+        /*
+            outputs the symbol table entries to stdout
+        */
         void outputSymbolTable()
         {
             for(auto const& x : Table)
@@ -27,6 +30,9 @@ class Symtab
                 cout << "Symtab entry: " << x.first << endl; 
             }
         }
+        /*
+            outputs the symbol table entries to a given file
+        */
         void outputSymbolTableToFile(string fileName)
         {
             ofstream printFile;
