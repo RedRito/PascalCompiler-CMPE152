@@ -4,7 +4,7 @@ A project involving the building of a pascal compiler in c++.
 1. Run "Make"
 
 ## How To Run
-1. ./main "filename"
+1. ./main -{scan, parse, tofile} "filename"
 
 ## Make Commands
 1. make

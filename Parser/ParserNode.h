@@ -7,8 +7,8 @@
 #include "../Scanner/PToken.h"
 #include "SymtabEntry.h"
 using namespace std; //lazy
-//NOTE: NEED MORE/ NOT ENOUGH AT ALL
-enum class NodeType //Type of tree nodes in parser tree, pulled form slides
+
+enum class NodeType //Type of tree nodes in parser tree, pulled form slides and online resources
 {
     PROGRAM, 
     COMPOUND, 
@@ -47,7 +47,7 @@ enum class NodeType //Type of tree nodes in parser tree, pulled form slides
     STRING_CONSTANT,
     BOOLEAN_CONSTANT,
 };
-
+//Strings for printing
 static const string NODE_TYPE_STRINGS[] =
 {
     "PROGRAM", 
@@ -91,12 +91,12 @@ static const string NODE_TYPE_STRINGS[] =
 class ParserNode
 {
     public:
+        //the type of parsernode
         NodeType type;
-        int linenum;
-        string datatext;
+        int linenum;        //the linenumber of the node
+        string datatext;    //the name of the node
         SymtabEntry *entry;
         //values of the node
-        Token *TokenValue;
         double NodeValueReal;
         int NodeValueInt;
         string NodeValueString;

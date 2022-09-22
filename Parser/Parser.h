@@ -12,7 +12,9 @@
 
 using namespace std;
 
-
+/*
+    Sets of hashsets that contain the token's used for statements and expressions.
+*/
 static const set<PToken> statementStarters          // what starts a statement   //begin, identifier, all the looping starters, while, repeat, do, write, writeln, case, for, with, goto, if,
 {
     PToken::BEGIN, PToken:: IDENTIFIER, PToken::WHILE, PToken::WHILE, PToken::REPEAT, PToken::DO,
@@ -35,59 +37,144 @@ static const set<PToken> termOperators              // term operators           
 {
     PToken::AND, PToken::MOD, PToken::DIV, PToken::NOT, PToken::MULTOP, PToken::DIVOP
 };
-static const set<PToken> factorOperators;            // unique map of factor operators    //variable/identifer, number, string, NOT -> factor, ( -> expression -> )
 
 class Parser
 {
     public:
+    //Constructor
     Parser(Scanner *scanner, Symtab *symtab); //params scanner and symboltable,
     int getErrNum();                //gets number of errors,
     ParserNode *parseTheProgram();  //main parser program, checks for tokens and determines which parse function to call //returns ParserNode
-    
+    Symtab *symtab;                 //the main symbol table of the parser
     private:
     Scanner *scanner;       //scanner obj for reading tokens
-    Symtab *symtab;        //Temp comment (waiting on symtab to complete)
+           
     Token *readToken;       //currently read token
     int linenum;            //token's line num
     int errNum;             //current number of err
-    //visit http://www.irietools.com/iriepascal/progref350.html //for how pascal statements are done, pls add them to the statement hash set.
+
+    //visit http://www.irietools.com/iriepascal/progref350.html //for how pascal statements are done.
     
-    void *parseDeclarationBlock(ParserNode *parent);    //NOT DONE BUT IMMA SAY ITS DONE
-    ParserNode *parseStatement();           //done
-    ParserNode *parseCompoundStatement();   //done
-    ParserNode *parseAssignmentStatement(); //done
-    ParserNode *parseRepeatStatement();     //done
-
-    ParserNode *parseWriteStatement();      //done
-    ParserNode *parseWritelnStatement();    //done
-    ParserNode *parseExpression();          //done //please add stuff to nodetype
-    ParserNode *parseSimpleExpression();    //NOT DONE
-
-    ParserNode *parseTerm();                //NOT DONE
-    ParserNode *parseFactor();              //NOT DONE
-    ParserNode *parseVariable();            //DONE
-    ParserNode *parseNOT();                 //DONE
-
-    ParserNode *parseRealConstant();       //done
-    ParserNode *parseStringConstant();     //done
-    ParserNode *parseIntegerConstant();    //done
-
-    ParserNode *parseWhile();              //done
-    ParserNode *parseFor();                 //done
-    ParserNode *parseIf();                  //IDK
-    ParserNode *parseCase();                //IDK
-    
-    void parseAllStatements(ParserNode *parent, PToken tokenType);  //done
-    void parseAllWrite(ParserNode *currentNode);                    //done
-    void printSyntax(string msg);                                   //done
-    void printSematic(string msg);                                  //done
+    void *parseDeclarationBlock(ParserNode *parent);        //parse declarations all as a integer
+    /*
+        parses a compound statement
+        returns the node of statement
+    */  
+    ParserNode *parseStatement();                 
+            
+    /*
+        parses a coumpand statement block
+        returns the node of the compound block
+    */
+    ParserNode *parseCompoundStatement();   
+    /*
+        parses assignment statement
+        returns assignment parsernode
+    */
+    ParserNode *parseAssignmentStatement();
+    /*
+        parses a repeat statement
+        returns a loop / repeat node
+    */
+    ParserNode *parseRepeatStatement();     
+    /*
+        parses a write statment
+        returns a node of write
+    */
+    ParserNode *parseWriteStatement();      
+    /*
+        parses a writeln statment
+        returns a node of writeln
+    */
+    ParserNode *parseWritelnStatement();    
+    /*
+        parses an expression
+        returns an expression node
+    */
+    ParserNode *parseExpression();          
+    /*
+        parses a simple expression
+        returns an simple expression node
+    */
+    ParserNode *parseSimpleExpression();   
+    /*
+        parses a term
+        returns a term node
+    */
+    ParserNode *parseTerm();                
+    /*
+        parses a factor which can be a variable, integer, real, or not, or negative num
+        returns a factor
+    */
+    ParserNode *parseFactor();              
+    /*
+        parses a variable and finds its value on a symbol table
+        returns the variable node
+    */
+    ParserNode *parseVariable();            
+    /*
+        parses a not factor
+        returns the not node
+    */
+    ParserNode *parseNOT();                 
+    /*
+        parses a real constant, it sets the nodes value
+        returns real node
+    */
+    ParserNode *parseRealConstant();      
+    /*
+        parses a string, it sets the nodes string value
+        returns string node
+    */
+    ParserNode *parseStringConstant();     
+    /*
+        parses integer, it sets the nodes int value
+        returns int node  
+    */
+    ParserNode *parseIntegerConstant();    
+    /*
+        parses while loop
+        returns while node.
+    */
+    ParserNode *parseWhile();              
+    /*
+        parses for loop
+        returns for node
+    */
+    ParserNode *parseFor();                 
+    /*
+        parses if condition
+        returns if node
+    */
+    ParserNode *parseIf();                  
+    /*
+        parses a switch case
+        returns case node
+    */
+    ParserNode *parseCase();                
+    /*
+        parses all statements given a starting node and a terminating tokentype
+        returns void
+    */
+    void parseAllStatements(ParserNode *parent, PToken tokenType);  
+    /*
+        parses all write arguments of a write node
+        returns void
+    */
+    void parseAllWrite(ParserNode *currentNode);                    
+    /*
+        print syntax based on current token's values
+    */
+    void printSyntax(string msg);                                   
+    /*
+        prints sematic error based on token's values
+    */
+    void printSematic(string msg);                                  
+    /*
+        converts a string to lowercase
+        returns lowercase of a given string
+    */
     string toLowerCase(string text);
-
-    
-
-
-
-
 };
 
 
