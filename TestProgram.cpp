@@ -1,3 +1,5 @@
+#include <iostream>
+#include <fstream>
 #include <string>
 #include "Scanner/scanner.h"
 #include "Scanner/FileReader.h"
@@ -18,6 +20,7 @@ void testParser(Scanner *scanner, Symtab *symtab)
     Parser *parser = new Parser(scanner, symtab);
     cout << "Parsing the program" << endl;
     ParserNode *programTree = parser->parseTheProgram();
+    
     int errnum = parser->getErrNum();
     if (errnum == 0)
     {
@@ -32,12 +35,48 @@ void testParser(Scanner *scanner, Symtab *symtab)
         TreeWalker *walker = new TreeWalker();
         walker->print(programTree);
     }
+    cout << "printing symtab " << endl;
+    parser->symtab->outputSymbolTable();
 }
+void testParserToFile(Scanner *scanner, Symtab *symtab, string filename)
+{
+    ofstream printFile;
+    printFile.open(filename, std::ios_base::app);
+    if (printFile.fail())
+    {
+        cout << " COULD NOT OPEN THE FILE " << filename << endl;
+        exit(1);
+    }
+
+    Parser *parser = new Parser(scanner, symtab);
+    printFile << "Parsing the program" << endl;
+    ParserNode *programTree = parser->parseTheProgram();
+    
+    int errnum = parser->getErrNum();
+    if (errnum == 0)
+    {
+        printFile << "Parse tree:" << endl << endl;
+        TreeWalker *walker = new TreeWalker();
+        walker->printToFile(programTree,filename);
+        //walker->print(programTree);
+    }
+    else
+    {
+        printFile << endl << "There were " << errnum << " errors." << endl;
+        TreeWalker *walker = new TreeWalker();
+        walker->printToFile(programTree, filename);
+    }
+    printFile << "printing symtab " << endl;
+    parser->symtab->outputSymbolTableToFile(filename);
+    printFile.close();
+}
+
+
 int main(int argc, char *argv[])
 {
     if(argc != 3)
     {
-        cout << "RUN BY ./main -{scan, parse} [\"FileName\"]" << endl;
+        cout << "RUN BY ./main -{scan, parse, file} [\"FileName\"]" << endl;
         exit(1);
     }
     string optarg = argv[1];
@@ -50,11 +89,10 @@ int main(int argc, char *argv[])
     else if(optarg == "-parse")
     {
         testParser(new Scanner(file), new Symtab());
-
     }
-    else
+    else if(optarg == "-file")
     {
-        testParser(new Scanner(file), new Symtab());
+        testParserToFile(new Scanner(file), new Symtab(), "test-out.txt");
     }
     return 0;
 }

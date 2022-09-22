@@ -2,6 +2,8 @@
 #define SYMTAB_H_
 
 #include <map>
+#include <iostream>
+#include <fstream>
 #include "SymtabEntry.h"
 using namespace std;
 
@@ -16,9 +18,31 @@ class Symtab
         {
             SymtabEntry *newEntry = new SymtabEntry(name);  //making new entry class, with name initialized.
             Table[name] = newEntry;                         //add to Table.
-            //return newEntry;
+            return newEntry;
         }
+        void outputSymbolTable()
+        {
+            for(auto const& x : Table)
+            {
+                cout << "Symtab entry: " << x.first << endl; 
+            }
+        }
+        void outputSymbolTableToFile(string fileName)
+        {
+            ofstream printFile;
+            printFile.open(fileName, std::ios_base::app);
+            if (printFile.fail())
+            {
+                cout << " COULD NOT OPEN THE FILE " << fileName << endl;
+                exit(1);
+            }
+            for(auto const& x : Table)
+            {
+                printFile << "Symtab entry: " << x.first << endl; 
+            }
+            printFile.close();
 
+        }
         //Lookup an Entry:
         SymtabEntry *lookup(string name)
         {
