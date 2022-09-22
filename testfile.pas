@@ -1,7 +1,4 @@
 program ParserTest;
-
-var i,j,a,b,c: integer;
-
 begin 
     i:=5;
     j:=10;
@@ -26,19 +23,7 @@ begin
 
     for b:= 1 to 5 do 
     begin   
-        case b of
-            1: begin  
-                c:= b;
-                writeln('c = ', c);
-            end;
-            2: begin
-                c:= b + 1;
-                writeln('c = ', c);
-            end;
-            5: begin
-                c:= b*5;
-                writeln('c = ', c);
-            end;
+        writeln('Value of b is: ', b);
     end;
 end;
 end.
