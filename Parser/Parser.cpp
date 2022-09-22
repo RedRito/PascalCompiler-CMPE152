@@ -93,7 +93,7 @@ ParserNode * Parser::parseTheProgram()
         readToken = scanner->nextToken(); //consume .
     }
     else printSyntax("MISSING BEGIN");
-
+    
     return program;
 }
 
@@ -694,10 +694,9 @@ ParserNode *Parser::parseIf()
     {
         // Consume THEN
         readToken = scanner->nextToken();  
+        //IF adopts THEN as its second child
+        ifNode->adopt(parseStatement());
     }
-
-    //IF adopts THEN as its second child
-    ifNode->adopt(parseStatement());
 
     //if ELSE appears as a reserved word
     //IF adopts ELSE as its third child
