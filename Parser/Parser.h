@@ -13,11 +13,28 @@
 using namespace std;
 
 
-static const set<PToken> statementStarters{PToken::BEGIN, PToken::IDENTIFIER}; // what starts a statement   //begin, identifier, all the looping starters, while, repeat, do, write, writeln, case, for, with, goto, if,
-static const set<PToken> statementFollowers;        // what follows a statement  //semicolon, end, until, EOF,
-static const set<PToken> relationalOperators;        // relational operators          // = <> < <= > >=
-static const set<PToken> simpleExpressionOperators;  // simple expression operators   // + - OR
-static const set<PToken> termOperators;              // term operators                // * / DIV MOD AND
+static const set<PToken> statementStarters          // what starts a statement   //begin, identifier, all the looping starters, while, repeat, do, write, writeln, case, for, with, goto, if,
+{
+    PToken::BEGIN, PToken:: IDENTIFIER, PToken::WHILE, PToken::WHILE, PToken::REPEAT, PToken::DO,
+    PToken::CASE, PToken::FOR, PToken::WITH, PToken::GOTO, PToken::IF, PToken::PROCEDURE
+};
+static const set<PToken> statementFollowers        // what follows a statement  //semicolon, end, until, EOF,
+{
+    PToken::SEMICOLON, PToken::END, PToken::END_OF_FILE, PToken::UNTIL
+};
+static const set<PToken> relationalOperators        // relational operators          // = <> < <= > >=
+{
+    PToken::EQUAL, PToken::NE, PToken::LT, PToken::GT, PToken::LTEQ, PToken::GTEQ
+};
+static const set<PToken> simpleExpressionOperators  // simple expression operators   // + - OR
+{
+    PToken::PLUSOP, PToken::MINUSOP, PToken::OR, PToken::XOR,
+    PToken::PLUSEQUAL, PToken::MINUSEQUAL, PToken::MULTEQUAL, PToken::DIVEQUAL
+};
+static const set<PToken> termOperators              // term operators                // * / DIV MOD AND
+{
+    PToken::AND, PToken::MOD, PToken::DIV, PToken::NOT, PToken::MULTOP, PToken::DIVOP
+};
 static const set<PToken> factorOperators;            // unique map of factor operators    //variable/identifer, number, string, NOT -> factor, ( -> expression -> )
 
 class Parser

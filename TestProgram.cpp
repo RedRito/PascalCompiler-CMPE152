@@ -27,10 +27,13 @@ int main(int argc, char *argv[])
         cout << "Parse tree:" << endl << endl;
         TreeWalker *walker = new TreeWalker();
         walker->print(programTree);
+        //walker->print(programTree);
     }
     else
     {
         cout << endl << "There were " << errnum << " errors." << endl;
+        TreeWalker *walker = new TreeWalker();
+        walker->print(programTree);
     }
 
 }

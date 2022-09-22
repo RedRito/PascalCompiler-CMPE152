@@ -69,6 +69,7 @@ static const string NODE_TYPE_STRINGS[] =
     "OR", 
     "MULTIPLY", 
     "DIVIDE", 
+    "NEGATE",
     "FLOAT_DIVIDE",
     "AND",
     "NOT",
@@ -85,7 +86,6 @@ static const string NODE_TYPE_STRINGS[] =
     "REAL_CONSTANT", 
     "STRING_CONSTANT",
     "BOOLEAN_CONSTANT"
-
 };
 
 class ParserNode
@@ -97,6 +97,10 @@ class ParserNode
         SymtabEntry *entry;
         //values of the node
         Token *TokenValue;
+        double NodeValueReal;
+        int NodeValueInt;
+        string NodeValueString;
+        bool NodeValueBoolean;
         //list of node children
         vector<ParserNode *> childrenList;
         //constructor

@@ -26,9 +26,12 @@ string Parser::toLowerCase(string text)
 ParserNode * Parser::parseTheProgram()
 {
     //do main parse here
+    
     ParserNode *program = new ParserNode(NodeType::PROGRAM);
+    
     readToken = scanner->nextToken();
-
+    cout << "Reading PROGRAM" << endl;
+    cout << readToken ->toString(readToken) << endl;
     //if first token == program, read the next token
     if(readToken->datatype == PToken::PROGRAM)
     {
@@ -38,7 +41,6 @@ ParserNode * Parser::parseTheProgram()
     {
         printSyntax("Missing PROGRAM");
     }
-
     //if next token is identifier, it is the name of the program
     if(readToken->datatype == PToken::IDENTIFIER)
     {
@@ -77,14 +79,18 @@ ParserNode * Parser::parseTheProgram()
             program->adopt(var);
         }
     }
+    cout << "PARSING BEGIN NOW" << endl;
     if(readToken->datatype == PToken::BEGIN)
     {
         program->adopt(parseCompoundStatement());
+        cout << "I AM HERE NOW" << endl;
         //now should be end of the program check for the period "."
         if(readToken->datatype == PToken::SEMICOLON)
         {
             printSyntax("Expecting '.' ");
         }
+        else
+        readToken = scanner->nextToken(); //consume .
     }
     else printSyntax("MISSING BEGIN");
 
@@ -96,6 +102,8 @@ void *Parser::parseDeclarationBlock(ParserNode* parent)
 {
     while(readToken->datatype != PToken::BEGIN && readToken->datatype != PToken::END_OF_FILE && readToken->datatype == PToken::IDENTIFIER)
     {
+        // cout << "PARSING DECLARATION" << endl;
+        // cout << readToken ->toString(readToken) << endl;
         ParserNode* declare = new ParserNode(NodeType::VAR_DECLARATION);
         ParserNode* leftSide = new ParserNode(NodeType::VARIABLE);
         string variableName = readToken->datatext;
@@ -106,7 +114,7 @@ void *Parser::parseDeclarationBlock(ParserNode* parent)
         
         readToken = scanner->nextToken();   //consume variable identifier
         
-
+        //cout << readToken ->toString(readToken) << endl;
         if(readToken->datatype == PToken::COLON)
         {
             readToken = scanner->nextToken(); //consume colon
@@ -114,6 +122,7 @@ void *Parser::parseDeclarationBlock(ParserNode* parent)
         else printSyntax("Missing : ");
         
         ParserNode *rightSide = new ParserNode(NodeType::INTEGER);
+        readToken = scanner->nextToken(); //CONSUME TYPE
         declare->adopt(rightSide);
         
         parent->adopt(declare);
@@ -123,8 +132,9 @@ void *Parser::parseDeclarationBlock(ParserNode* parent)
             readToken = scanner->nextToken(); //consume semicolon
         }
         else printSyntax("Missing ;");
+        //cout << readToken ->toString(readToken) << endl;
     }
-    if(readToken->datatype != PToken::IDENTIFIER) printSyntax("missing identifier");
+    if(readToken->datatype != PToken::IDENTIFIER && readToken->datatype != PToken::BEGIN && readToken->datatype != PToken::END_OF_FILE) printSyntax("missing identifier");
 }
 
 
@@ -159,16 +169,13 @@ ParserNode *Parser::parseCompoundStatement()
 {
     ParserNode *compoundNode = new ParserNode(NodeType::COMPOUND);
     compoundNode->linenum = readToken->linenum;
-
     readToken = scanner->nextToken();  // consume BEGIN
     parseAllStatements(compoundNode, PToken::END);
-
     if (readToken->datatype == PToken::END)
     {
         readToken = scanner->nextToken();  // consume END
     }
     else printSyntax("Expecting END");
-
     return compoundNode;
 }
 
@@ -176,30 +183,30 @@ ParserNode *Parser::parseCompoundStatement()
 ParserNode *Parser::parseAssignmentStatement()
 {
     // The current token should now be the left-hand-side variable name.
-
+    //cout << "PARSING ASSIGNMENT" << endl;
     ParserNode *assignmentNode = new ParserNode(NodeType::ASSIGN);
-
     // The assignment Node *adopts the variable Node *as its first child.
     ParserNode *lhsNode = new ParserNode(NodeType::VARIABLE);
     string variableName = readToken->datatext;
     SymtabEntry *variableId = symtab->entry(toLowerCase(variableName));
-
+    
     lhsNode->datatext  = variableName;
     lhsNode->entry = variableId;
+    lhsNode->linenum = readToken->linenum;
     assignmentNode->adopt(lhsNode);
 
     readToken = scanner->nextToken();  // consume the LHS variable;
-
+    //cout << readToken ->toString(readToken) << endl;
     if (readToken->datatype == PToken::ASSIGN)
     {
         readToken = scanner->nextToken();  // consume :=
+        
     }
     else printSyntax("Missing :=");
-
     // The assignment Node *adopts the expression Node *as its second child.
+    cout << "TOKEN AFTER ASIGN IS " << readToken->toString(readToken) << endl;
     ParserNode*rhsNode = parseExpression();
     assignmentNode->adopt(rhsNode);
-
     return assignmentNode; 
 }
 
@@ -207,6 +214,7 @@ ParserNode *Parser::parseAssignmentStatement()
 
 ParserNode *Parser::parseRepeatStatement()
 {
+    //cout << "PARSING REPEAT" << endl;
     // The current token should now be REPEAT.
 
     // Create a LOOP node->
@@ -342,10 +350,10 @@ ParserNode *Parser::parseSimpleExpression()
 ParserNode *Parser::parseRealConstant()
 {
     ParserNode *realConst = new ParserNode(NodeType::REAL_CONSTANT);
-    realConst -> TokenValue -> tokenValueInt = readToken -> tokenValueInt;
-    realConst -> TokenValue -> tokenValueReal = readToken -> tokenValueReal;
-    realConst -> TokenValue -> tokenValueString = readToken -> tokenValueString;
-    realConst -> TokenValue -> tokenValueBoolean = readToken -> tokenValueBoolean;
+    realConst -> NodeValueInt = readToken -> getInt();
+    realConst -> NodeValueReal = readToken -> getReal();
+    realConst -> NodeValueString = readToken -> getString();
+    realConst -> NodeValueBoolean = readToken -> getBool();
 
     readToken = scanner ->nextToken();
     return realConst;
@@ -356,11 +364,11 @@ ParserNode *Parser::parseRealConstant()
 */
 ParserNode *Parser::parseStringConstant()
 {
-    ParserNode *realConst = new ParserNode(NodeType::REAL_CONSTANT);
-    realConst -> TokenValue -> tokenValueInt = readToken -> tokenValueInt;
-    realConst -> TokenValue -> tokenValueReal = readToken -> tokenValueReal;
-    realConst -> TokenValue -> tokenValueString = readToken -> tokenValueString;
-    realConst -> TokenValue -> tokenValueBoolean = readToken -> tokenValueBoolean;
+    ParserNode *realConst = new ParserNode(NodeType::STRING_CONSTANT);
+    realConst -> NodeValueInt = readToken -> getInt();
+    realConst -> NodeValueReal = readToken -> getReal();
+    realConst -> NodeValueString = readToken -> getString();
+    realConst -> NodeValueBoolean = readToken -> getBool();
 
     readToken = scanner ->nextToken();
     return realConst;
@@ -372,10 +380,10 @@ ParserNode *Parser::parseStringConstant()
 ParserNode *Parser::parseIntegerConstant()
 {
     ParserNode *realConst = new ParserNode (NodeType::INTEGER_CONSTANT);
-    realConst -> TokenValue -> tokenValueInt = readToken -> tokenValueInt;
-    realConst -> TokenValue -> tokenValueReal = readToken -> tokenValueReal;
-    realConst -> TokenValue -> tokenValueString = readToken -> tokenValueString;
-    realConst -> TokenValue -> tokenValueBoolean = readToken -> tokenValueBoolean;
+    realConst -> NodeValueInt = readToken -> getInt();
+    realConst -> NodeValueReal = readToken -> getReal();
+    realConst -> NodeValueString = readToken -> getString();
+    realConst -> NodeValueBoolean = readToken -> getBool();
 
     readToken = scanner->nextToken();
     return realConst;
@@ -394,7 +402,7 @@ ParserNode *Parser::parseTerm()
             case PToken::DIVOP: opNode = new ParserNode(NodeType::FLOAT_DIVIDE); break;
             case PToken::AND: opNode = new ParserNode(NodeType::AND); break;
             
-            default: printSyntax("Unexpected token");;
+            default: printSyntax("Unexpected token");
         }
         // if(ParserNode *opNode = currentToken->datatype == STAR)
         // {
@@ -463,7 +471,9 @@ ParserNode *Parser::parseNOT()
 
 ParserNode *Parser::parseVariable()
 {
+    //cout << "parsing variable " << readToken->toString(readToken) << endl;
     string varName = readToken->datatext;
+    cout << "variable text " << readToken->datatext << endl;
     SymtabEntry *varID = symtab->lookup(toLowerCase(varName));    //needs to test lookup func
     if(varID == nullptr)
     {
@@ -472,16 +482,19 @@ ParserNode *Parser::parseVariable()
     ParserNode *tempNode = new ParserNode(NodeType::VARIABLE);
     tempNode->datatext = varName;
     readToken = scanner->nextToken();
+    //cout << "after variable next token is " << readToken->toString(readToken) << endl;
     return tempNode;
 }
 
 void Parser::printSyntax(string msg)
 {
-    cout << "Syntax error at line " << linenum << " " << msg << " " << readToken -> toString(readToken);
+    cout << "Syntax error at line " << linenum << " " << msg << " " << readToken -> toString(readToken) << endl;
     errNum ++;
     while (statementFollowers.find(readToken->datatype) == statementFollowers.end())
     {
+        cout << "going to the next token ";
         readToken = scanner->nextToken();
+        cout << readToken->toString(readToken) << endl;
     }
 }
 
@@ -495,9 +508,12 @@ void Parser::parseAllStatements(ParserNode *parent, PToken tokenType)
 {
     //parse all statments in statment list
     //while not end of file and not 
+    //cout << "PARSING ALL STATEMENTS" << endl;
     while( (readToken -> datatype != PToken::END_OF_FILE) && (readToken -> datatype != tokenType))
     {
+        
         ParserNode *node = parseStatement();
+        //cout << readToken ->toString(readToken) << endl;
         if(node != nullptr)
         {
             parent -> adopt(node);
@@ -505,18 +521,27 @@ void Parser::parseAllStatements(ParserNode *parent, PToken tokenType)
 
         if(readToken -> datatype == PToken::SEMICOLON)
         {
-            readToken = scanner ->nextToken();
+            while(readToken ->datatype == PToken::SEMICOLON)
+            {
+                readToken = scanner ->nextToken();
+                //cout << "CONSUMING SEMICOLON" << endl;
+                //cout << "next token after semicolon is " << readToken->toString(readToken) << endl;
+            }
         }
-        else if(statementStarters.find(readToken->datatype) != statementStarters.end())
+        else if(statementStarters.find(readToken->datatype) == statementStarters.end())
         {
+            //cout << "NO STATEMENT STARTER FOUND " << endl;
             printSyntax("missing a ;");
+            break;
         }
+        cout << readToken ->toString(readToken) << endl;
 
     }
 }
 //ex. Writeln('this is a writeln statement and this is the integer ', num);
 void Parser::parseAllWrite(ParserNode *currentNode)
 {
+    //cout << "PARSING ALL WRITE" << endl;
     bool hasWriteArgument = false;
     if(readToken -> datatype == PToken::LPAREN)
     {
@@ -532,7 +557,7 @@ void Parser::parseAllWrite(ParserNode *currentNode)
         currentNode -> adopt(parseVariable());
         hasWriteArgument = true;
     }
-    else if(readToken ->datatype == PToken::STRING)
+    else if(readToken ->datatype == PToken::STRING || readToken->datatype == PToken::CHARACTER)
     {
         currentNode -> adopt(parseStringConstant());
         hasWriteArgument = true;
@@ -702,7 +727,7 @@ ParserNode *Parser::parseCase()
             }
 
             ParserNode *constantNode = parseIntegerConstant();
-            if (negate) constantNode-> TokenValue->tokenValueInt = -(constantNode-> TokenValue -> tokenValueInt);
+            if (negate) constantNode-> NodeValueInt = -(constantNode-> NodeValueInt);
             constant->adopt(constantNode);
 
             if (readToken->datatype == PToken::COMMA)

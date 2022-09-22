@@ -261,6 +261,8 @@ static map<string, PToken> ReservedWords =
             {"VAR", PToken::VAR},
             {"WHILE", PToken::WHILE},
             {"WITH", PToken::WITH},
+            {"WRITE", PToken::WRITE},
+            {"WRITELN", PToken::WRITELN},
             {"XOR", PToken::XOR},
         };
 /*
@@ -318,6 +320,12 @@ class Token
         double tokenValueReal;
         string tokenValueString;
         bool tokenValueBoolean;
+        
+        int getInt() const {return tokenValueInt;}
+        double getReal() const {return tokenValueReal;}
+        string getString() const {return tokenValueString;}
+        bool getBool() const {return tokenValueBoolean;}
+
         //constructor
         Token(char currentCh); 
         //

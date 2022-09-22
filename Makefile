@@ -15,7 +15,7 @@ PToken.o: Scanner/PToken.cpp Scanner/PToken.h
 	g++ -c Scanner/PToken.cpp
 FileReader.o: Scanner/FileReader.cpp Scanner/FileReader.h
 	g++ -c Scanner/FileReader.cpp
-TreeWalker.o: Parser/TreeWalker.cpp Parser/TreeWalker.h
+TreeWalker.o: Parser/TreeWalker.cpp Parser/TreeWalker.h Parser/ParserNode.h Parser/ParserNode.cpp
 	g++ -c Parser/TreeWalker.cpp
 clean:
 	rm *.o main
