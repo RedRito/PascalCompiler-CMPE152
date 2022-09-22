@@ -322,6 +322,7 @@ ParserNode *Parser::parseSimpleExpression()
     {
         ParserNode *opNode;
         //ParserNode *opNode = readToken->datatype == PToken::PLUSOP ? new ParserNode(NodeType::ADD): new ParserNode(NodeType::SUBTRACT);
+        cout << "CURRENT SIMPLE EXPRESS OP IS " << readToken->toString(readToken) << endl;
         switch (readToken->datatype)
         {
             case PToken::PLUSOP: opNode = new ParserNode(NodeType::ADD); break;
@@ -451,6 +452,23 @@ ParserNode *Parser::parseFactor()
     else if(readToken ->datatype == PToken::NOT)
     {
         return parseNOT();
+    }
+    else if(readToken->datatype == PToken::MINUSOP)
+    {
+        //parsing a negative num
+        ParserNode *negativeNum = new ParserNode(NodeType::NEGATE);
+        readToken = scanner->nextToken(); //consume the negative op
+        if(readToken -> datatype == PToken::INTEGER)
+        {
+            negativeNum->adopt(parseIntegerConstant());
+            return negativeNum;
+        }
+        else if(readToken->datatype == PToken::REAL)
+        {
+            negativeNum->adopt(parseRealConstant());
+            return negativeNum;
+        }
+        else printSyntax("UNEXPECTED MINUS");
     }
     else
     {
