@@ -1,7 +1,7 @@
 # PascalCompiler-CMPE152
-    Pascal compiler built with C++ and ANTLR4.
+Pascal compiler built with C++ and ANTLR4.
 ## Installation
-1. Make sure to have Antlr4 installed. Follow this repo: https://github.com/chriscons8/Compiler-Design.git to help with installation
+1. Make sure to have Antlr4 installed. Follow this [repo](https://github.com/chriscons8/Compiler-Design.git): https://github.com/chriscons8/Compiler-Design.git to help with installation
 2. In your home directory, copy files or clone files.
 
 ## How To Run
