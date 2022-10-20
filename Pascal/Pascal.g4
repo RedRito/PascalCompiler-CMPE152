@@ -1,41 +1,27 @@
 grammar Pascal;
 
-
-
 program
-   : programHeading (INTERFACE)? block DOT EOF
+   : programHead block DOT EOF
    ;
 
-programHeading
-   : PROGRAM identifier (LPAREN identifierList RPAREN)? SEMI
-   | UNIT identifier SEMI
+programHead
+   : PROGRAM identifier (LPAREN identifierList RPAREN)? SEMICOLON
+   | UNIT identifier SEMICOLON
+   ;
+
+block
+   : compoundStatement
    ;
 
 identifier
    : IDENT
    ;
 
-block
-   : (labelDeclarationPart | constantDefinitionPart | typeDefinitionPart | variableDeclarationPart | procedureAndFunctionDeclarationPart | usesUnitsPart | IMPLEMENTATION)* compoundStatement
-   ;
-
-usesUnitsPart
-   : USES identifierList SEMI
-   ;
-
-labelDeclarationPart
-   : LABEL label (COMMA label)* SEMI
-   ;
-
 label
    : unsignedInteger
    ;
 
-constantDefinitionPart
-   : CONST (constantDefinition SEMI) +
-   ;
-
-constantDefinition
+constantVar
    : identifier EQUAL constant
    ;
 
@@ -66,44 +52,25 @@ unsignedReal
    ;
 
 sign
-   : PLUS
-   | MINUS
+   : PLUSOP
+   | MINUSOP
    ;
 
 bool_
    : TRUE
    | FALSE
    ;
+typeIdentifier
+   : identifier
+   | (CHAR | BOOLEAN | INTEGER | REAL | STRING)
+   ;
 
 string
    : STRING_LITERAL
    ;
 
-typeDefinitionPart
-   : TYPE (typeDefinition SEMI) +
-   ;
-
-typeDefinition
-   : identifier EQUAL (type_ | functionType | procedureType)
-   ;
-
-functionType
-   : FUNCTION (formalParameterList)? COLON resultType
-   ;
-
-procedureType
-   : PROCEDURE (formalParameterList)?
-   ;
-
-type_
-   : simpleType
-   | structuredType
-   | pointerType
-   ;
-
 simpleType
    : scalarType
-   | subrangeType
    | typeIdentifier
    | stringtype
    ;
@@ -112,129 +79,9 @@ scalarType
    : LPAREN identifierList RPAREN
    ;
 
-subrangeType
-   : constant DOTDOT constant
-   ;
-
-typeIdentifier
-   : identifier
-   | (CHAR | BOOLEAN | INTEGER | REAL | STRING)
-   ;
-
-structuredType
-   : PACKED unpackedStructuredType
-   | unpackedStructuredType
-   ;
-
-unpackedStructuredType
-   : arrayType
-   | recordType
-   | setType
-   | fileType
-   ;
 
 stringtype
-   : STRING LBRACK (identifier | unsignedNumber) RBRACK
-   ;
-
-arrayType
-   : ARRAY LBRACK typeList RBRACK OF componentType
-   | ARRAY LBRACK2 typeList RBRACK2 OF componentType
-   ;
-
-typeList
-   : indexType (COMMA indexType)*
-   ;
-
-indexType
-   : simpleType
-   ;
-
-componentType
-   : type_
-   ;
-
-recordType
-   : RECORD fieldList? END
-   ;
-
-fieldList
-   : fixedPart (SEMI variantPart)?
-   | variantPart
-   ;
-
-fixedPart
-   : recordSection (SEMI recordSection)*
-   ;
-
-recordSection
-   : identifierList COLON type_
-   ;
-
-variantPart
-   : CASE tag OF variant (SEMI variant)*
-   ;
-
-tag
-   : identifier COLON typeIdentifier
-   | typeIdentifier
-   ;
-
-variant
-   : constList COLON LPAREN fieldList RPAREN
-   ;
-
-setType
-   : SET OF baseType
-   ;
-
-baseType
-   : simpleType
-   ;
-
-fileType
-   : FILE OF type_
-   | FILE
-   ;
-
-pointerType
-   : POINTER typeIdentifier
-   ;
-
-variableDeclarationPart
-   : VAR variableDeclaration (SEMI variableDeclaration)* SEMI
-   ;
-
-variableDeclaration
-   : identifierList COLON type_
-   ;
-
-procedureAndFunctionDeclarationPart
-   : procedureOrFunctionDeclaration SEMI
-   ;
-
-procedureOrFunctionDeclaration
-   : procedureDeclaration
-   | functionDeclaration
-   ;
-
-procedureDeclaration
-   : PROCEDURE identifier (formalParameterList)? SEMI block
-   ;
-
-formalParameterList
-   : LPAREN formalParameterSection (SEMI formalParameterSection)* RPAREN
-   ;
-
-formalParameterSection
-   : parameterGroup
-   | VAR parameterGroup
-   | FUNCTION parameterGroup
-   | PROCEDURE parameterGroup
-   ;
-
-parameterGroup
-   : identifierList COLON typeIdentifier
+   : STRING LBRACKET (identifier | unsignedNumber) RBRACKET
    ;
 
 identifierList
@@ -243,14 +90,6 @@ identifierList
 
 constList
    : constant (COMMA constant)*
-   ;
-
-functionDeclaration
-   : FUNCTION identifier (formalParameterList)? COLON resultType SEMI block
-   ;
-
-resultType
-   : typeIdentifier
    ;
 
 statement
@@ -265,7 +104,6 @@ unlabelledStatement
 
 simpleStatement
    : assignmentStatement
-   | procedureStatement
    | gotoStatement
    | emptyStatement_
    ;
@@ -275,7 +113,7 @@ assignmentStatement
    ;
 
 variable
-   : (AT identifier | identifier) (LBRACK expression (COMMA expression)* RBRACK | LBRACK2 expression (COMMA expression)* RBRACK2 | DOT identifier | POINTER)*
+   : (AT identifier | identifier) (LBRACKET expression (COMMA expression)* RBRACKET | LBRACKET2 expression (COMMA expression)* RBRACKET2 | DOT identifier | CARAT)*
    ;
 
 expression
@@ -284,10 +122,10 @@ expression
 
 relationaloperator
    : EQUAL
-   | NOT_EQUAL
+   | NE
    | LT
-   | LE
-   | GE
+   | LTEQ
+   | GTEQ
    | GT
    | IN
    ;
@@ -297,8 +135,8 @@ simpleExpression
    ;
 
 additiveoperator
-   : PLUS
-   | MINUS
+   : PLUSOP
+   | MINUSOP
    | OR
    ;
 
@@ -307,21 +145,20 @@ term
    ;
 
 multiplicativeoperator
-   : STAR
-   | SLASH
+   : MULTOP
+   | DIVOP
    | DIV
    | MOD
    | AND
    ;
 
 signedFactor
-   : (PLUS | MINUS)? factor
+   : (PLUSOP | MINUSOP)? factor
    ;
 
 factor
    : variable
    | LPAREN expression RPAREN
-   | functionDesignator
    | unsignedConstant
    | set_
    | NOT factor
@@ -335,17 +172,9 @@ unsignedConstant
    | NIL
    ;
 
-functionDesignator
-   : identifier LPAREN parameterList RPAREN
-   ;
-
-parameterList
-   : actualParameter (COMMA actualParameter)*
-   ;
-
 set_
-   : LBRACK elementList RBRACK
-   | LBRACK2 elementList RBRACK2
+   : LBRACKET elementList RBRACKET
+   | LBRACKET2 elementList RBRACKET2
    ;
 
 elementList
@@ -355,18 +184,6 @@ elementList
 
 element
    : expression (DOTDOT expression)?
-   ;
-
-procedureStatement
-   : identifier (LPAREN parameterList RPAREN)?
-   ;
-
-actualParameter
-   : expression parameterwidth*
-   ;
-
-parameterwidth
-   : ':' expression
    ;
 
 gotoStatement
@@ -387,6 +204,24 @@ structuredStatement
    | conditionalStatement
    | repetetiveStatement
    | withStatement
+   | writeStatement
+   | writelnStatement
+   ;
+
+writeArguments
+   :  writeArgs (COMMA writeArgs)*
+   ;
+
+writeArgs
+   : (IDENTIFIER | unsignedConstant | expression)
+   ;
+
+writeStatement
+   :  WRITE LPAREN writeArguments RPAREN
+   ;
+
+writelnStatement
+   : WRITELN LPAREN writeArguments RPAREN
    ;
 
 compoundStatement
@@ -394,7 +229,7 @@ compoundStatement
    ;
 
 statements
-   : statement (SEMI statement)*
+   : statement (SEMICOLON statement)*
    ;
 
 conditionalStatement
@@ -407,7 +242,7 @@ ifStatement
    ;
 
 caseStatement
-   : CASE expression OF caseListElement (SEMI caseListElement)* (SEMI ELSE statements)? END
+   : CASE expression OF caseListElement (SEMICOLON caseListElement)* (SEMICOLON ELSE statements)? END
    ;
 
 caseListElement
@@ -453,237 +288,259 @@ recordVariableList
    ;
 
 AND
-   : 'AND'
+   : A N D
    ;
 
 
 ARRAY
-   : 'ARRAY'
+   : A R R A Y
+   ;
+
+
+ASM
+   : A S M
    ;
 
 
 BEGIN
-   : 'BEGIN'
+   : B E G I N
+   ;
+
+
+BREAK
+   : B R E A K
    ;
 
 
 BOOLEAN
-   : 'BOOLEAN'
+   : B O O L E A N
    ;
 
 
 CASE
-   : 'CASE'
+   : C A S E
    ;
 
 
 CHAR
-   : 'CHAR'
+   : C H A R
    ;
 
 
 CHR
-   : 'CHR'
+   : C H R
    ;
 
 
 CONST
-   : 'CONST'
+   : C O N S T
+   ;
+
+
+CONSTRUCTOR
+   : C O N S T R U C T O R
+   ;
+
+
+CONTINUE
+   : C O N T I N U E
+   ;
+
+
+DESTRUCTOR
+   : D E S T R U C T O R
    ;
 
 
 DIV
-   : 'DIV'
+   : D I V
    ;
 
 
 DO
-   : 'DO'
+   : D O
    ;
 
 
 DOWNTO
-   : 'DOWNTO'
+   : D O W N T O
    ;
 
 
 ELSE
-   : 'ELSE'
+   : E L S E
    ;
 
 
 END
-   : 'END'
+   : E N D
    ;
 
 
 FILE
-   : 'FILE'
+   : F I L E
    ;
 
 
 FOR
-   : 'FOR'
+   : F O R
    ;
 
 
 FUNCTION
-   : 'FUNCTION'
+   : F U N C T I O N
    ;
 
 
 GOTO
-   : 'GOTO'
+   : G O T O
    ;
 
 
 IF
-   : 'IF'
+   : I F
    ;
 
 
 IN
-   : 'IN'
+   : I N
+   ;
+
+
+INLINE
+   : I N L I N E
    ;
 
 
 INTEGER
-   : 'INTEGER'
+   : I N T E G E R
    ;
 
 
 LABEL
-   : 'LABEL'
+   : L A B E L
    ;
 
 
 MOD
-   : 'MOD'
+   : M O D
    ;
 
 
 NIL
-   : 'NIL'
+   : N I L
+   ;
+
+
+OBJECT
+   : O B J E C T
    ;
 
 
 NOT
-   : 'NOT'
+   : N O T
    ;
 
 
 OF
-   : 'OF'
+   : O F
+   ;
+
+
+ON
+   : O N
+   ;
+
+
+OPERATOR
+   : O P E R A T O R
    ;
 
 
 OR
-   : 'OR'
+   : O R
    ;
 
 
 PACKED
-   : 'PACKED'
+   : P A C K E D
    ;
 
 
 PROCEDURE
-   : 'PROCEDURE'
+   : P R O C E D U R E
    ;
 
 
 PROGRAM
-   : 'PROGRAM'
+   : P R O G R A M
    ;
 
 
 REAL
-   : 'REAL'
+   : R E A L
    ;
 
 
 RECORD
-   : 'RECORD'
+   : R E C O R D
    ;
 
 
 REPEAT
-   : 'REPEAT'
+   : R E P E A T
    ;
 
 
 SET
-   : 'SET'
+   : S E T
    ;
 
 
 THEN
-   : 'THEN'
+   : T H E N
    ;
 
 
 TO
-   : 'TO'
+   : T O
    ;
 
 
 TYPE
-   : 'TYPE'
+   : T Y P E
    ;
 
 
 UNTIL
-   : 'UNTIL'
+   : U N T I L
    ;
 
 
 VAR
-   : 'VAR'
+   : V A R
    ;
 
 
 WHILE
-   : 'WHILE'
+   : W H I L E
    ;
 
 
 WITH
-   : 'WITH'
+   : W I T H
    ;
-
-
-PLUS
-   : '+'
+   
+WRITE
+   : W R I T E
    ;
-
-
-MINUS
-   : '-'
-   ;
-
-
-STAR
-   : '*'
-   ;
-
-
-SLASH
-   : '/'
+WRITELN
+   : W R I T E L N
    ;
 
 
 ASSIGN
    : ':='
-   ;
-
-
-COMMA
-   : ','
-   ;
-
-
-SEMI
-   : ';'
    ;
 
 
@@ -697,64 +554,16 @@ EQUAL
    ;
 
 
-NOT_EQUAL
-   : '<>'
-   ;
-
-
-LT
-   : '<'
-   ;
-
-
-LE
-   : '<='
-   ;
-
-
-GE
-   : '>='
-   ;
-
-
-GT
-   : '>'
-   ;
-
-
-LPAREN
-   : '('
-   ;
-
-
-RPAREN
-   : ')'
-   ;
-
-
-LBRACK
-   : '['
-   ;
-
-
-LBRACK2
+LBRACKET2
    : '(.'
    ;
 
 
-RBRACK
-   : ']'
-   ;
-
-
-RBRACK2
+RBRACKET2
    : '.)'
    ;
 
 
-POINTER
-   : '^'
-   ;
 
 
 AT
@@ -772,48 +581,38 @@ DOTDOT
    ;
 
 
-LCURLY
-   : '{'
-   ;
-
-
-RCURLY
-   : '}'
-   ;
-
-
 UNIT
-   : 'UNIT'
+   : U N I T
    ;
 
 
 INTERFACE
-   : 'INTERFACE'
+   : I N T E R F A C E
    ;
 
 
 USES
-   : 'USES'
+   : U S E S
    ;
 
 
 STRING
-   : 'STRING'
+   : S T R I N G
    ;
 
 
 IMPLEMENTATION
-   : 'IMPLEMENTATION'
+   : I M P L E M E N T A T I O N
    ;
 
 
 TRUE
-   : 'TRUE'
+   : T R U E
    ;
 
 
 FALSE
-   : 'FALSE'
+   : F A L S E
    ;
 
 
@@ -833,9 +632,8 @@ COMMENT_2
 
 
 IDENT
-   : ('A' .. 'Z') ('A' .. 'Z' | '0' .. '9' | '_')*
+   : [a-zA-Z][a-zA-Z0-9]* 
    ;
-
 
 STRING_LITERAL
    : '\'' ('\'\'' | ~ ('\''))* '\''
@@ -843,15 +641,181 @@ STRING_LITERAL
 
 
 NUM_INT
-   : ('0' .. '9') +
-   ;
+   : [0-9]+ ;
 
 
 NUM_REAL
-   : ('0' .. '9') + (('.' ('0' .. '9') + (EXPONENT)?)? | EXPONENT)
-   ;
+   : INTEGER '.' INTEGER
+           | INTEGER ('e' | 'E') ('+' | '-')? INTEGER
+           | INTEGER '.' INTEGER ('e' | 'E') ('+' | '-')? INTEGER
+           ;
 
 
 fragment EXPONENT
    : ('E') ('+' | '-')? ('0' .. '9') +
    ;
+
+SHL		   
+   : S H L
+   ;
+SHR		   
+   : S H R
+   ;
+XOR
+   : X O R
+   ;
+IDENTIFIER
+   : I D E N T I F I E R
+   ;
+PLUSOP
+   : '+'
+   ;
+MINUSOP
+   : '-'
+   ;
+MULTOP
+   : '*'
+   ;
+DIVOP
+   : '/'
+   ;
+NE
+   : '<>'
+   ;
+LTEQ
+   : '<='
+   ;
+GTEQ
+   : '>='
+   ;
+LT
+   : '<'
+   ;
+GT
+   : '>'
+   ;
+PLUSEQUAL
+   : '+='
+   ;
+MINUSEQUAL
+   : '-='
+   ;
+MULTEQUAL
+   : '*='
+   ;
+DIVEQUAL
+   : '/='
+   ;
+CARAT
+   : '^'
+   ;
+SEMICOLON
+   : ';'
+   ;
+COMMA
+   : ','
+   ;
+LPAREN
+   : '('
+   ;
+RPAREN
+   : ')'
+   ;
+LBRACKET
+   : '['
+   ;
+RBRACKET
+   : ']'
+   ;
+LBRACE
+   : '{'
+   ;
+RBRACE
+   : '}'
+   ;
+LCOMMENT
+   : '(*'
+   ;
+RCOMMENT
+   : '*)'
+   ;
+
+
+fragment A 
+	: ('a' | 'A') 
+	;
+fragment B 
+	: ('b' | 'B') 
+	;
+fragment C 
+	: ('c' | 'C') 
+	;
+fragment D 
+	: ('d' | 'D') 
+	;
+fragment E 
+	: ('e' | 'E') 
+	;
+fragment F 
+	: ('f' | 'F') 
+	;
+fragment G 
+	: ('g' | 'G') 
+	;
+fragment H 
+	: ('h' | 'H') 
+	;
+fragment I 
+	: ('i' | 'I') 
+	;
+fragment J 
+	: ('j' | 'J') 
+	;
+fragment K 
+	: ('k' | 'K') 
+	;
+fragment L 
+	: ('l' | 'L') 
+	;
+fragment M 
+	: ('m' | 'M') 
+	;
+fragment N 
+	: ('n' | 'N') 
+	;
+fragment O 
+	: ('o' | 'O') 
+	;
+fragment P 
+	: ('p' | 'P') 
+	;
+fragment Q 
+	: ('q' | 'Q') 
+	;
+fragment R 
+	: ('r' | 'R') 
+	;
+fragment S 
+	: ('s' | 'S') 
+	;
+fragment T 
+	: ('t' | 'T') 
+	;
+fragment U 
+	: ('u' | 'U') 
+	;
+fragment V 
+	: ('v' | 'V') 
+	;
+fragment W 
+	: ('w' | 'W') 
+	;
+fragment X 
+	: ('x' | 'X') 
+	;
+fragment Y 
+	: ('y' | 'Y') 
+	;
+fragment Z 
+	: ('z' | 'Z')
+	;
