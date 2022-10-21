@@ -277,6 +277,190 @@ antlrcpp::Any TreeVisitor1::visitForStatement(PascalParser::ForStatementContext 
 
 } 
 
+antlrcpp::Any visitProgramHead(PascalParser::ProgramHeadContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitBlock(PascalParser::BlockContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitIdentifier(PascalParser::IdentifierContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitLabel(PascalParser::LabelContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitConstantVar(PascalParser::ConstantVarContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitConstantChr(PascalParser::ConstantChrContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitConstant(PascalParser::ConstantContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitUnsignedNumber(PascalParser::UnsignedNumberContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitUnsignedInteger(PascalParser::UnsignedIntegerContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitUnsignedReal(PascalParser::UnsignedRealContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitSign(PascalParser::SignContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitBool_(PascalParser::Bool_Context *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitTypeIdentifier(PascalParser::TypeIdentifierContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitString(PascalParser::StringContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitSimpleType(PascalParser::SimpleTypeContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitScalarType(PascalParser::ScalarTypeContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitStringtype(PascalParser::StringtypeContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitIdentifierList(PascalParser::IdentifierListContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitConstList(PascalParser::ConstListContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitUnlabelledStatement(PascalParser::UnlabelledStatementContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitSimpleStatement(PascalParser::SimpleStatementContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitRelationaloperator(PascalParser::RelationaloperatorContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitSimpleExpression(PascalParser::SimpleExpressionContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitAdditiveoperator(PascalParser::AdditiveoperatorContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitMultiplicativeoperator(PascalParser::MultiplicativeoperatorContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitSignedFactor(PascalParser::SignedFactorContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitFactor(PascalParser::FactorContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitUnsignedConstant(PascalParser::UnsignedConstantContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitSet_(PascalParser::Set_Context *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitElementList(PascalParser::ElementListContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitElement(PascalParser::ElementContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitGotoStatement(PascalParser::GotoStatementContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitEmptyStatement_(PascalParser::EmptyStatement_Context *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitEmpty_(PascalParser::Empty_Context *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitStructuredStatement(PascalParser::StructuredStatementContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitWriteArguments(PascalParser::WriteArgumentsContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitWriteArgs(PascalParser::WriteArgsContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitStatements(PascalParser::StatementsContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitConditionalStatement(PascalParser::ConditionalStatementContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitCaseListElement(PascalParser::CaseListElementContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitRepetetiveStatement(PascalParser::RepetetiveStatementContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitForList(PascalParser::ForListContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitInitialValue(PascalParser::InitialValueContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitFinalValue(PascalParser::FinalValueContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitWithStatement(PascalParser::WithStatementContext *ctx) {
+    return visitChildren(ctx);
+  }
+
+antlrcpp::Any visitRecordVariableList(PascalParser::RecordVariableListContext *ctx) {
+    return visitChildren(ctx);
+  }
+
 
 
 
