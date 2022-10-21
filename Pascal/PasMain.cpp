@@ -3,6 +3,10 @@
 #include "antlr4-runtime.h"
 #include "PascalLexer.h"
 #include "PascalParser.h"
+#include "PassOne/SymtabEntry.h"
+#include "PassOne/Symtab.h"
+
+
 using namespace std;
 using namespace antlrcpp;
 using namespace antlr4;
