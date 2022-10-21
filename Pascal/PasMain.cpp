@@ -3,9 +3,7 @@
 #include "antlr4-runtime.h"
 #include "PascalLexer.h"
 #include "PascalParser.h"
-#include "PassOne/SymtabEntry.h"
-#include "PassOne/Symtab.h"
-
+#include "TreeVisitor1.h"
 
 using namespace std;
 using namespace antlrcpp;
@@ -43,6 +41,9 @@ int main(int argc, const char *args[])
   cout << tree->getText() << endl;
   cout << endl << "Parse tree (Lisp format):" << endl;
   std::cout << tree->toStringTree(&parser) << endl;
+
+  TreeVisitor1 *visitor = new TreeVisitor1();
+  visitor->visit(tree);
   ins.close();
   output.close();
   return 0;

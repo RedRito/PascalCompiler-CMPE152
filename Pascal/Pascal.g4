@@ -1,16 +1,12 @@
 grammar Pascal;
 
 program
-   : programHead block DOT EOF
+   : programHead compoundStatement DOT EOF
    ;
 
 programHead
    : PROGRAM identifier (LPAREN identifierList RPAREN)? SEMICOLON
    | UNIT identifier SEMICOLON
-   ;
-
-block
-   : compoundStatement
    ;
 
 identifier
@@ -88,9 +84,6 @@ identifierList
    : identifier (COMMA identifier)*
    ;
 
-constList
-   : constant (COMMA constant)*
-   ;
 
 statement
    : label COLON unlabelledStatement
@@ -105,7 +98,6 @@ unlabelledStatement
 simpleStatement
    : assignmentStatement
    | gotoStatement
-   | emptyStatement_
    ;
 
 assignmentStatement
@@ -160,7 +152,6 @@ factor
    : variable
    | LPAREN expression RPAREN
    | unsignedConstant
-   | set_
    | NOT factor
    | bool_
    ;
@@ -172,37 +163,18 @@ unsignedConstant
    | NIL
    ;
 
-set_
-   : LBRACKET elementList RBRACKET
-   | LBRACKET2 elementList RBRACKET2
-   ;
-
-elementList
-   : element (COMMA element)*
-   |
-   ;
-
-element
-   : expression (DOTDOT expression)?
-   ;
 
 gotoStatement
    : GOTO label
    ;
 
-emptyStatement_
-   :
-   ;
-
-empty_
-   :
-   /* empty */
-   ;
-
 structuredStatement
    : compoundStatement
-   | conditionalStatement
-   | repetetiveStatement
+   | ifStatement
+   | caseStatement
+   | whileStatement
+   | repeatStatement
+   | forStatement
    | withStatement
    | writeStatement
    | writelnStatement
@@ -213,7 +185,7 @@ writeArguments
    ;
 
 writeArgs
-   : (IDENTIFIER | unsignedConstant | expression)
+   : (identifier | unsignedConstant | expression)
    ;
 
 writeStatement
@@ -232,11 +204,6 @@ statements
    : statement (SEMICOLON statement)*
    ;
 
-conditionalStatement
-   : ifStatement
-   | caseStatement
-   ;
-
 ifStatement
    : IF expression THEN statement (: ELSE statement)?
    ;
@@ -246,13 +213,7 @@ caseStatement
    ;
 
 caseListElement
-   : constList COLON statement
-   ;
-
-repetetiveStatement
-   : whileStatement
-   | repeatStatement
-   | forStatement
+   : constant (COMMA constant)* COLON statement
    ;
 
 whileStatement
@@ -264,28 +225,13 @@ repeatStatement
    ;
 
 forStatement
-   : FOR identifier ASSIGN forList DO statement
-   ;
-
-forList
-   : initialValue (TO | DOWNTO) finalValue
-   ;
-
-initialValue
-   : expression
-   ;
-
-finalValue
-   : expression
+   : FOR identifier ASSIGN expression (TO | DOWNTO) expression DO statement
    ;
 
 withStatement
-   : WITH recordVariableList DO statement
+   : WITH variable (COMMA variable)* DO statement
    ;
 
-recordVariableList
-   : variable (COMMA variable)*
-   ;
 
 AND
    : A N D

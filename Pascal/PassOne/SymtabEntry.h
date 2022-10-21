@@ -37,7 +37,7 @@ class SymtabEntry
     Kind getKind();                                 //get the kind of entry
     void setKind(Kind kind);                        //set the kind of entry
     Symtab *getSymtab();                            //get the symbol table
-    vector<int>* getLineNumebers();                  //get the array of line numbers
+    vector<int>* getLineNumebers();                 //get the array of line numbers
     void appendLineNumber(const int number);        //Append a source line number to the entry.
     Object getValue();                              //Get the data value stored with this entry.
     void setValue(Object value);                    //Set the data value into this entry.
