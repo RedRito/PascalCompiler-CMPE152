@@ -1,6 +1,6 @@
 PROGRAM HelloWorld;
 BEGIN
-    i := 1;
+    i := -1;
     REPEAT
         writeln('Hello, world!');
          i := i + 1;

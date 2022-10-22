@@ -99,6 +99,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitEmptyStatement_(PascalParser::EmptyStatement_Context *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitAssignmentStatement(PascalParser::AssignmentStatementContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -148,6 +152,10 @@ public:
   }
 
   virtual antlrcpp::Any visitStructuredStatement(PascalParser::StructuredStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitReptitiveStatement(PascalParser::ReptitiveStatementContext *ctx) override {
     return visitChildren(ctx);
   }
 

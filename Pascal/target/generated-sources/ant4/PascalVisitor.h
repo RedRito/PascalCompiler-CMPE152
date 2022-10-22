@@ -61,6 +61,8 @@ public:
 
     virtual antlrcpp::Any visitSimpleStatement(PascalParser::SimpleStatementContext *context) = 0;
 
+    virtual antlrcpp::Any visitEmptyStatement_(PascalParser::EmptyStatement_Context *context) = 0;
+
     virtual antlrcpp::Any visitAssignmentStatement(PascalParser::AssignmentStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitVariable(PascalParser::VariableContext *context) = 0;
@@ -86,6 +88,8 @@ public:
     virtual antlrcpp::Any visitGotoStatement(PascalParser::GotoStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitStructuredStatement(PascalParser::StructuredStatementContext *context) = 0;
+
+    virtual antlrcpp::Any visitReptitiveStatement(PascalParser::ReptitiveStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitWriteArguments(PascalParser::WriteArgumentsContext *context) = 0;
 

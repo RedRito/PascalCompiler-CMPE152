@@ -44,6 +44,8 @@ int main(int argc, const char *args[])
 
   TreeVisitor1 *visitor = new TreeVisitor1();
   visitor->visit(tree);
+  Symtab *test = new Symtab();
+
   ins.close();
   output.close();
   return 0;

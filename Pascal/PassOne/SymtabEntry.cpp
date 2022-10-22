@@ -1,7 +1,7 @@
 #include "SymtabEntry.h"
 
 
-SymtabEntry::SymtabEntry(const string name, const Kind kind, Symtab *symtab) : name(name), kind(kind), symtab(symtab)
+SymtabEntry::SymtabEntry(const string name, const Kind kind) : name(name), kind(kind)
 {
     switch(kind)
     {
@@ -31,10 +31,10 @@ void SymtabEntry::setKind(Kind kind)
     this->kind = kind;
 }
 
-Symtab* SymtabEntry::getSymtab()
-{
-    return symtab;
-}
+// Symtab* SymtabEntry::getSymtab()
+// {
+//     return symtab;
+// }
 vector<int>* SymtabEntry::getLineNumebers()
 {
     return &lineNumbers;

@@ -8,8 +8,7 @@
 
 using namespace std;
 
-class SymtabEntry;
-enum class Kind;
+
 
 class Symtab{
 

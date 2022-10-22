@@ -1,5 +1,4 @@
 #include "Symtab.h"
-#include "SymtabEntry.cpp"
 
 SymtabEntry * Symtab::getOwner()
 {
@@ -13,7 +12,7 @@ void Symtab::setOwner(SymtabEntry* newOwner)
 
 SymtabEntry * Symtab::enter(const string name, const Kind kind)
 {
-    SymtabEntry *entry = new SymtabEntry(name, kind, this); //make a new entry with the name, the kind of node, and this symbol tabke
+    SymtabEntry *entry = new SymtabEntry(name, kind); //make a new entry with the name, the kind of node, and this symbol tabke
     content[name] = entry;
     return entry;
 }
@@ -43,7 +42,7 @@ void Symtab::resetVariables(Kind kind)
     map<string, SymtabEntry *>::iterator it;
 
     // Iterate over the entries and reset their kind.
-    for (it = contents.begin(); it != contents.end(); it++)
+    for (it = content.begin(); it != content.end(); it++)
     {
         SymtabEntry *entry = it->second;
         if (entry->getKind() == Kind::VARIABLE) entry->setKind(kind);

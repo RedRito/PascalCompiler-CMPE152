@@ -16,10 +16,10 @@ public:
     CHAR = 8, CHR = 9, CONST = 10, CONSTRUCTOR = 11, CONTINUE = 12, DESTRUCTOR = 13, 
     DIV = 14, DO = 15, DOWNTO = 16, ELSE = 17, END = 18, FILE = 19, FOR = 20, 
     FUNCTION = 21, GOTO = 22, IF = 23, IN = 24, INLINE = 25, INTEGER = 26, 
-    LABEL = 27, MOD = 28, NIL = 29, OBJECT = 30, NOT = 31, OF = 32, ON = 33, 
-    OPERATOR = 34, OR = 35, PACKED = 36, PROCEDURE = 37, PROGRAM = 38, REAL = 39, 
-    RECORD = 40, REPEAT = 41, SET = 42, THEN = 43, TO = 44, TYPE = 45, UNTIL = 46, 
-    VAR = 47, WHILE = 48, WITH = 49, WRITE = 50, WRITELN = 51, ASSIGN = 52, 
+    LABEL = 27, MOD = 28, NIL = 29, OBJECT = 30, WRITE = 31, WRITELN = 32, 
+    NOT = 33, OF = 34, ON = 35, OPERATOR = 36, OR = 37, PACKED = 38, PROCEDURE = 39, 
+    PROGRAM = 40, REAL = 41, RECORD = 42, REPEAT = 43, SET = 44, THEN = 45, 
+    TO = 46, TYPE = 47, UNTIL = 48, VAR = 49, WHILE = 50, WITH = 51, ASSIGN = 52, 
     COLON = 53, EQUAL = 54, LBRACKET2 = 55, RBRACKET2 = 56, AT = 57, DOT = 58, 
     DOTDOT = 59, UNIT = 60, INTERFACE = 61, USES = 62, STRING = 63, IMPLEMENTATION = 64, 
     TRUE = 65, FALSE = 66, WS = 67, COMMENT_1 = 68, COMMENT_2 = 69, IDENT = 70, 
@@ -37,15 +37,16 @@ public:
     RuleUnsignedInteger = 8, RuleUnsignedReal = 9, RuleSign = 10, RuleBool_ = 11, 
     RuleTypeIdentifier = 12, RuleString = 13, RuleSimpleType = 14, RuleScalarType = 15, 
     RuleStringtype = 16, RuleIdentifierList = 17, RuleStatement = 18, RuleUnlabelledStatement = 19, 
-    RuleSimpleStatement = 20, RuleAssignmentStatement = 21, RuleVariable = 22, 
-    RuleExpression = 23, RuleRelationaloperator = 24, RuleSimpleExpression = 25, 
-    RuleAdditiveoperator = 26, RuleTerm = 27, RuleMultiplicativeoperator = 28, 
-    RuleSignedFactor = 29, RuleFactor = 30, RuleUnsignedConstant = 31, RuleGotoStatement = 32, 
-    RuleStructuredStatement = 33, RuleWriteArguments = 34, RuleWriteArgs = 35, 
-    RuleWriteStatement = 36, RuleWritelnStatement = 37, RuleCompoundStatement = 38, 
-    RuleStatements = 39, RuleIfStatement = 40, RuleCaseStatement = 41, RuleCaseListElement = 42, 
-    RuleWhileStatement = 43, RuleRepeatStatement = 44, RuleForStatement = 45, 
-    RuleWithStatement = 46
+    RuleSimpleStatement = 20, RuleEmptyStatement_ = 21, RuleAssignmentStatement = 22, 
+    RuleVariable = 23, RuleExpression = 24, RuleRelationaloperator = 25, 
+    RuleSimpleExpression = 26, RuleAdditiveoperator = 27, RuleTerm = 28, 
+    RuleMultiplicativeoperator = 29, RuleSignedFactor = 30, RuleFactor = 31, 
+    RuleUnsignedConstant = 32, RuleGotoStatement = 33, RuleStructuredStatement = 34, 
+    RuleReptitiveStatement = 35, RuleWriteArguments = 36, RuleWriteArgs = 37, 
+    RuleWriteStatement = 38, RuleWritelnStatement = 39, RuleCompoundStatement = 40, 
+    RuleStatements = 41, RuleIfStatement = 42, RuleCaseStatement = 43, RuleCaseListElement = 44, 
+    RuleWhileStatement = 45, RuleRepeatStatement = 46, RuleForStatement = 47, 
+    RuleWithStatement = 48
   };
 
   PascalParser(antlr4::TokenStream *input);
@@ -79,6 +80,7 @@ public:
   class StatementContext;
   class UnlabelledStatementContext;
   class SimpleStatementContext;
+  class EmptyStatement_Context;
   class AssignmentStatementContext;
   class VariableContext;
   class ExpressionContext;
@@ -92,6 +94,7 @@ public:
   class UnsignedConstantContext;
   class GotoStatementContext;
   class StructuredStatementContext;
+  class ReptitiveStatementContext;
   class WriteArgumentsContext;
   class WriteArgsContext;
   class WriteStatementContext;
@@ -412,6 +415,7 @@ public:
     virtual size_t getRuleIndex() const override;
     AssignmentStatementContext *assignmentStatement();
     GotoStatementContext *gotoStatement();
+    EmptyStatement_Context *emptyStatement_();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -419,6 +423,18 @@ public:
   };
 
   SimpleStatementContext* simpleStatement();
+
+  class  EmptyStatement_Context : public antlr4::ParserRuleContext {
+  public:
+    EmptyStatement_Context(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  EmptyStatement_Context* emptyStatement_();
 
   class  AssignmentStatementContext : public antlr4::ParserRuleContext {
   public:
@@ -632,11 +648,9 @@ public:
     StructuredStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     CompoundStatementContext *compoundStatement();
+    ReptitiveStatementContext *reptitiveStatement();
     IfStatementContext *ifStatement();
     CaseStatementContext *caseStatement();
-    WhileStatementContext *whileStatement();
-    RepeatStatementContext *repeatStatement();
-    ForStatementContext *forStatement();
     WithStatementContext *withStatement();
     WriteStatementContext *writeStatement();
     WritelnStatementContext *writelnStatement();
@@ -648,14 +662,28 @@ public:
 
   StructuredStatementContext* structuredStatement();
 
+  class  ReptitiveStatementContext : public antlr4::ParserRuleContext {
+  public:
+    ReptitiveStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    WhileStatementContext *whileStatement();
+    RepeatStatementContext *repeatStatement();
+    ForStatementContext *forStatement();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  ReptitiveStatementContext* reptitiveStatement();
+
   class  WriteArgumentsContext : public antlr4::ParserRuleContext {
   public:
     WriteArgumentsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<WriteArgsContext *> writeArgs();
     WriteArgsContext* writeArgs(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> COMMA();
-    antlr4::tree::TerminalNode* COMMA(size_t i);
+    antlr4::tree::TerminalNode *COMMA();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -668,8 +696,6 @@ public:
   public:
     WriteArgsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    IdentifierContext *identifier();
-    UnsignedConstantContext *unsignedConstant();
     ExpressionContext *expression();
 
 
@@ -837,10 +863,8 @@ public:
     ForStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *FOR();
-    IdentifierContext *identifier();
-    antlr4::tree::TerminalNode *ASSIGN();
-    std::vector<ExpressionContext *> expression();
-    ExpressionContext* expression(size_t i);
+    AssignmentStatementContext *assignmentStatement();
+    ExpressionContext *expression();
     antlr4::tree::TerminalNode *DO();
     StatementContext *statement();
     antlr4::tree::TerminalNode *TO();

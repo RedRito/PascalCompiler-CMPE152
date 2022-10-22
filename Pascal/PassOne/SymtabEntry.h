@@ -4,12 +4,12 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "Symtab.h"
+//#include "Symtab.h"
 #include "../Object.h"
 
 using namespace std;
 
-class Symtab;
+//class Symtab;
 
 enum class Kind
 {
@@ -30,13 +30,13 @@ static const string KIND_STRINGS[] =
 class SymtabEntry
 {
     public:
-    SymtabEntry(const string name, const Kind kind, Symtab *symtab);
+    SymtabEntry(const string name, const Kind kind);
     virtual ~SymtabEntry(){};
 
     string getName();                               //get the name of the entry
     Kind getKind();                                 //get the kind of entry
     void setKind(Kind kind);                        //set the kind of entry
-    Symtab *getSymtab();                            //get the symbol table
+    //Symtab *getSymtab();                            //get the symbol table
     vector<int>* getLineNumebers();                 //get the array of line numbers
     void appendLineNumber(const int number);        //Append a source line number to the entry.
     Object getValue();                              //Get the data value stored with this entry.
@@ -45,7 +45,7 @@ class SymtabEntry
     private:
 
     string name;
-    Symtab *symtab;
+    //Symtab *symtab;
     Kind kind;
     vector<int> lineNumbers; //an array of linenumbers
     Object *info;

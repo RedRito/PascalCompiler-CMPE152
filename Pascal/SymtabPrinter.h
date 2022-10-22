@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 #include "PassOne/Symtab.h"
-#include "PassOne/SymtabEntry.h"
-#include "Object.h"
 
 class Symtab;
 

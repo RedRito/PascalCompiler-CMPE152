@@ -98,8 +98,11 @@ unlabelledStatement
 simpleStatement
    : assignmentStatement
    | gotoStatement
+   | emptyStatement_
    ;
-
+emptyStatement_
+   :
+   ;
 assignmentStatement
    : variable ASSIGN expression
    ;
@@ -170,22 +173,26 @@ gotoStatement
 
 structuredStatement
    : compoundStatement
+   | reptitiveStatement
    | ifStatement
    | caseStatement
-   | whileStatement
-   | repeatStatement
-   | forStatement
    | withStatement
    | writeStatement
    | writelnStatement
    ;
 
+reptitiveStatement
+   : whileStatement
+   | repeatStatement
+   | forStatement
+   ;
+
 writeArguments
-   :  writeArgs (COMMA writeArgs)*
+   :  writeArgs (COMMA writeArgs)?
    ;
 
 writeArgs
-   : (identifier | unsignedConstant | expression)
+   : expression
    ;
 
 writeStatement
@@ -225,7 +232,7 @@ repeatStatement
    ;
 
 forStatement
-   : FOR identifier ASSIGN expression (TO | DOWNTO) expression DO statement
+   : FOR assignmentStatement (TO | DOWNTO) expression DO statement
    ;
 
 withStatement
@@ -381,6 +388,13 @@ NIL
 OBJECT
    : O B J E C T
    ;
+WRITE
+   : W R I T E
+   ;
+WRITELN
+   : W R I T E L N
+   ;
+
 
 
 NOT
@@ -477,13 +491,6 @@ WITH
    : W I T H
    ;
    
-WRITE
-   : W R I T E
-   ;
-WRITELN
-   : W R I T E L N
-   ;
-
 
 ASSIGN
    : ':='
@@ -591,10 +598,10 @@ NUM_INT
 
 
 NUM_REAL
-   : INTEGER '.' INTEGER
-           | INTEGER ('e' | 'E') ('+' | '-')? INTEGER
-           | INTEGER '.' INTEGER ('e' | 'E') ('+' | '-')? INTEGER
-           ;
+   : NUM_INT DOT NUM_INT
+   | NUM_INT ('e' | 'E') ('+' | '-')? NUM_INT
+   | NUM_INT DOT NUM_INT ('e' | 'E') ('+' | '-')? NUM_INT
+   ;
 
 
 fragment EXPONENT
