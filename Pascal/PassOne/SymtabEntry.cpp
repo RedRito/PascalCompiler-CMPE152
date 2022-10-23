@@ -10,7 +10,7 @@ SymtabEntry::SymtabEntry(const string name, const Kind kind) : name(name), kind(
         case Kind::VARIABLE:
         case Kind::RECORD_FIELD:
         case Kind::VALUE_PARAMETER:
-            info.data.value = nullptr;
+            info = nullptr;
             break;
         default: break;
     }

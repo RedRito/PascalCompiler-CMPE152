@@ -30,17 +30,51 @@ static const string KIND_STRINGS[] =
 class SymtabEntry
 {
     public:
-    SymtabEntry(const string name, const Kind kind);
+    SymtabEntry(const string name, const Kind kind): name(name), kind(kind)
+    {
+        switch(kind)
+        {
+            case Kind::CONSTANT:
+            case Kind::ENUMERATION_CONSTANT:
+            case Kind::VARIABLE:
+            case Kind::RECORD_FIELD:
+            case Kind::VALUE_PARAMETER:
+                info = nullptr;
+                break;
+            default: break;
+        }
+    };
     virtual ~SymtabEntry(){};
 
-    string getName();                               //get the name of the entry
-    Kind getKind();                                 //get the kind of entry
-    void setKind(Kind kind);                        //set the kind of entry
+    string getName()
+    {
+        return name;
+    };                               //get the name of the entry
+    Kind getKind()
+    {
+        return kind;
+    };                                 //get the kind of entry
+    void setKind(Kind kind)
+    {
+        this->kind = kind;
+    };                        //set the kind of entry
     //Symtab *getSymtab();                            //get the symbol table
-    vector<int>* getLineNumebers();                 //get the array of line numbers
-    void appendLineNumber(const int number);        //Append a source line number to the entry.
-    Object getValue();                              //Get the data value stored with this entry.
-    void setValue(Object value);                    //Set the data value into this entry.
+    vector<int>* getLineNumebers()
+    {
+        return &lineNumbers;
+    };                 //get the array of line numbers
+    void appendLineNumber(const int number)
+    {
+        lineNumbers.push_back(number);
+    };        //Append a source line number to the entry.
+    Object getValue()
+    {
+        return *(info);
+    };                              //Get the data value stored with this entry.
+    void setValue(Object value)
+    {
+        info = new Object(value);
+    };                    //Set the data value into this entry.
 
     private:
 
