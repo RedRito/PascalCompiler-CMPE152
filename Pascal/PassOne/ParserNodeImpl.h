@@ -17,8 +17,6 @@ public:
 	//setter
 	ParserNode* setRoot(ParserNode* node);
 
-	ParserNode* addChild(ParserNode* node);
-
 
 private:
 	ParserNode* root;
