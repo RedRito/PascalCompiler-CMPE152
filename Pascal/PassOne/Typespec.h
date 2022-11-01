@@ -5,14 +5,19 @@
 #include <map>
 #include <vector>
 
-#include "Pascal/PassOne/Object.h"
-#include "Pascal/PassOne/Symtab.h"
+#include "../Object.h"
+#include "../Symtab.h"
 
 using namespace std;
 
 enum class TypeForm
 {
-    SCALAR, ARRAY,
+    SCALAR, ARRAY
+};
+
+static const string FORM_STRINGS[] = 
+{
+    "scalar", "array"
 };
 
 constexpr TypeForm SCALAR = TypeForm::SCALAR;
@@ -24,162 +29,127 @@ enum class TypeKey
     ARRAY_INDEX_TYPE, ARRAY_ELEMENT_TYPE, ARRAY_ELEMENT_COUNT,
 };
 
-constexpr TypeKey ARRAY_INDEX_TYPE = TypeKey::ARRAY_INDEX_TYPE;
-constexpr TypeKey ARRAY_ELEMENT_TYPE = TypeKey::ARRAY_ELEMENT_TYPE;
-constexpr TypeKey ARRAY_ELEMENT_COUNT = TypeKey::ARRAY_ELEMENT_COUNT;
+class Typespec;
 
-class TypeSpec 
+class Typespec 
 {
+    private:
+        union TypeInfo
+        {
+            struct
+            {
+                Typespec *indexType;
+                Typespec *elementType;
+                int elementCount;
+            } array;
+        };
+
+        TypeForm form;
+        SymtabEntry *identifier;  // type identifier
+        TypeInfo info;
+
 public:
     /**
      * Constructor.
      * @param form the type form.
      */
-    TypeSpec();
+    Typespec() : form((TypeForm) -1), identifier(nullptr) {}
 
     /**
      * Constructor.
      * @param form the type form.
      */
-    TypeSpec::TypeSpec() : form((TypeForm) -1), type_id(nullptr)
+    Typespec(TypeForm form) : form(form), identifier(nullptr)
     {
-        initialize();
+        switch (form)
+        {
+            case TypeForm::ARRAY:
+                info.array.indexType = nullptr;
+                info.array.elementType = nullptr;
+                info.array.elementCount = 0;
+                break;
+            default: break;
+        }
     }
 
-    TypeSpec::TypeSpec(TypeForm form) : form(form), type_id(nullptr)
-    {
-        initialize();
-    }
-
-    /**
-     * Constructor.
-     * @param value a string value.
-     */
-    TypeSpec::TypeSpec(string value)
-{
-    initialize();
-    form = (TypeForm) ARRAY;
-
-    int length = value.length();
-
-    set_attribute((TypeKey) ARRAY_INDEX_TYPE, index_type);
-    set_attribute((TypeKey) ARRAY_ELEMENT_TYPE, Predefined::char_type);
-    set_attribute((TypeKey) ARRAY_ELEMENT_COUNT, length);
-}
     /**
      * Destructor.
      */
-    TypeSpec::~TypeSpec(){}
+    virtual ~Typespec() {}
 
     /**
-     * Getter
-     * @return the type form.
+     * Determine whether or not the type is structured (array)
+     * @return true if structured, false if not.
      */
-    TypeForm TypeSpec::get_form() const 
-    { 
-        return form; 
-    }
-
-    /**
-     * Getter.
-     * @return the type identifier (symbol table entry).
-     */
-    SymtabEntry *TypeSpec::get_identifier() 
-    { 
-        return type_id; 
+    bool isStructured() const
+    {
+        return (form == ARRAY);
     }
 
     /**
-     * Setter.
-     * @param id the type identifier (symbol table entry).
+     * Get the type form.
+     * @return the form.
      */
-    void TypeSpec::set_identifier(SymtabEntry *id) 
+    Form getForm() const { return form; }
+
+    /**
+     * Get the type identifier's symbol table entry.
+     * @return the symbol table entry.
+     */
+    SymtabEntry *getIdentifier() const { return identifier; }
+
+    /**
+     * Set the type identifier's symbol table entry.
+     * @param identifier the symbol table entry.
+     */
+    void setIdentifier(SymtabEntry *identifier) { this->identifier = identifier; }
+
+    /**
+     * Get the array index data type.
+     * @return the data type.
+     */
+    Typespec *getArrayIndexType() const { return info.array.indexType; }
+
+    /**
+     * Set the array index data type.
+     * @parm index_type the data type to set.
+     */
+    void setArrayIndexType(Typespec *index_type)
     {
-        type_id = id; 
+        info.array.indexType = index_type;
     }
 
     /**
-     * Set an attribute of the specification.
-     * @param key the attribute key.
-     * @param value the attribute value.
+     * Get the array element data type.
+     * @return the data type.
      */
-    void TypeSpec::set_attribute(TypeKey key, Object value)
+    Typespec *getArrayElementType() const { return info.array.elementType; }
+
+    /**
+     * Set the array element data type.
+     * @return element_type the data type to set.
+     */
+    void setArrayElementType(Typespec *element_type)
     {
-        contents[key] = value;
+        info.array.elementType = element_type;
     }
 
     /**
-     * Get the value of an attribute of the specification.
-     * @param key the attribute key.
-     * @return the attribute value.
+     * Get the array element count.
+     * @return the count.
      */
-    Object TypeSpec::get_attribute(TypeKey key)
-    {
-        return contents[key];
-    }
+    int getArrayElementCount() const { return info.array.elementCount; }
 
     /**
-     * Implementation of wci::intermediate::TypeSpec.
-     * @return true if this is a Pascal string type.
+     * Set the array element count.
+     * @parm element_count the count to set.
      */
-    bool TypeSpec::is_pascal_string()
+    void setArrayElementCount(const int element_count)
     {
-        if (form == (TypeForm) ARRAY)
-        {
-            Object type_value = get_attribute((TypeKey) ARRAY_ELEMENT_TYPE);
-            TypeSpec *element_type = cast(type_value, TypeSpec*);
-
-            type_value = this->get_attribute((TypeKey) ARRAY_INDEX_TYPE);
-            TypeSpec *index_type = cast(type_value, TypeSpec*);
-
-            return (element_type->base_type()  == Predefined::char_type) &&
-                (index_type->base_type() == Predefined::integer_type);
-        }
-        else
-        {
-            return false;
-        }
+        info.array.elementCount = element_count;
     }
 
- 
-  
 
-private:
-    TypeForm form;
-    SymtabEntry *type_id;  // type identifier
-    map<TypeKey, Object> contents;
-
-    static bool INITIALIZED = false;
-
-    map<TypeForm, string> TypeSpec::TYPE_FORM_NAMES;
-    map<TypeKey,  string> TypeSpec::TYPE_KEY_NAMES;
-
-    /**
-     * Initialize the static maps.
-     */
-    void Typespec::initialize()
-    {
-        if (INITIALIZED) return;
-
-    vector<TypeForm> form_keys =
-    {
-        TypeForm::SCALAR,
-        TypeForm::ARRAY,
-    };
-
-    vector<string> form_names =
-    {
-        "scalar", "array",
-    };
-
-    for (int i = 0; i < form_keys.size(); i++)
-    {
-        TYPE_FORM_NAMES[form_keys[i]] = form_names[i];
-    }
-
-    INITIALIZED = true;
-    }
-}
-
+};
 
 #endif /* TYPESPEC_H_ */
