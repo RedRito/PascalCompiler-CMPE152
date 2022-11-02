@@ -29,8 +29,6 @@ enum class TypeKey
     ARRAY_INDEX_TYPE, ARRAY_ELEMENT_TYPE, ARRAY_ELEMENT_COUNT,
 };
 
-class Typespec;
-
 class Typespec 
 {
     private:
