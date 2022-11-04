@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../Object.h"
-#include "../Symtab.h"
+#include "Symtab.h"
 
 using namespace std;
 
@@ -42,9 +42,11 @@ class Typespec
             } array;
         };
 
+        Typespec *baseType;
         TypeForm form;
         SymtabEntry *identifier;  // type identifier
         TypeInfo info;
+
 
 public:
     /**
@@ -88,7 +90,7 @@ public:
      * Get the type form.
      * @return the form.
      */
-    Form getForm() const { return form; }
+    TypeForm getForm() const { return form; }
 
     /**
      * Get the type identifier's symbol table entry.
@@ -101,6 +103,15 @@ public:
      * @param identifier the symbol table entry.
      */
     void setIdentifier(SymtabEntry *identifier) { this->identifier = identifier; }
+
+    /**
+    * Return the base type of this type.
+    * @return the base type.
+    */
+    Typespec *baseType()
+    {
+        return this;
+    }
 
     /**
      * Get the array index data type.
