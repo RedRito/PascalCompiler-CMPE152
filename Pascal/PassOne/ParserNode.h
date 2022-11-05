@@ -89,25 +89,8 @@ static const string NODE_TYPE_STRINGS[] =
     "BOOLEAN_CONSTANT"
 };
 
-/*The key emun class*/
-enum class NodeKey
-{
-    LINE,
-    ID,
-    LEVEL,
-    VALUE,
-    TYPE_ID,
-};
-
-static const string NODE_KEY_STRINGS[] =
-{
-    "LINE",
-    "ID",
-    "LEVEL",
-    "VALUE",
-    "TYPE_ID"
-};
-
+/*Map for Node type names*/
+static map<NodeType, string> NT_Names;
 
 class ParserNode
 {
@@ -119,7 +102,7 @@ public:
     SymtabEntry* entry;
 
     NodeType* parent;   //parent node
-    TypeSpec TS;        //data type's spec
+    Typespec TS;        //data type's spec
 
 
     //values of the node
@@ -139,29 +122,37 @@ public:
 
     //--
     //getting map contents
-    map<NodeKey, Object>& getContent();
-    map<NodeKey, Object> contents;
+    //map<NodeKey, Object>& getContent();
+    //map<NodeKey, Object> contents;
 
-    Object getAttribute(const NodeKey key);
+    //Object getAttribute(const NodeKey key);
 
     /*Map for Node type names and key names*/
-    static map<NodeType, string> NT_Names;
-    static map<NodeKey, string> NT_Keys;
+    //static map<NodeType, string> NT_Names;
+    //static map<NodeKey, string> NT_Keys;
 
-    static bool initialize;
-    static void initMap();
 
-    /*Getter & Setter for Parent/Root/TS*/
-    //getter
-    ParserNode* getParent();
-    ParserNode* getRoot();
-    NodeType getType();
-    TypeSpec* getTS();
+    /*INITIALIZE map function moved to ParserNodeImpl.h */
+
+    /*THIS PART is moved to ParserNodeImpl 
+    ParserNode* getParent()
+    {
+        return parent;
+    }
+    ParserNode* getRoot()
+    {
+        return root;
+    }
+    NodeType getType()
+    {
+        return type;
+    }
+    Typespec* getTS();
 
     //setter
     ParserNode* setRoot(ParserNode* node);
-    void setTS(TypeSpec* TS);
-
+    void setTS(Typespec* TS);
+    */
 private:
     //map<NodeKey, Object> contents;
 };
