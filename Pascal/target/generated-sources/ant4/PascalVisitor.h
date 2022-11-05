@@ -25,6 +25,54 @@ public:
 
     virtual antlrcpp::Any visitIdentifier(PascalParser::IdentifierContext *context) = 0;
 
+    virtual antlrcpp::Any visitBlock(PascalParser::BlockContext *context) = 0;
+
+    virtual antlrcpp::Any visitUsesUnitsPart(PascalParser::UsesUnitsPartContext *context) = 0;
+
+    virtual antlrcpp::Any visitLabelDeclarationPart(PascalParser::LabelDeclarationPartContext *context) = 0;
+
+    virtual antlrcpp::Any visitConstantDefinitionPart(PascalParser::ConstantDefinitionPartContext *context) = 0;
+
+    virtual antlrcpp::Any visitConstantDefinition(PascalParser::ConstantDefinitionContext *context) = 0;
+
+    virtual antlrcpp::Any visitTypeDefinitionPart(PascalParser::TypeDefinitionPartContext *context) = 0;
+
+    virtual antlrcpp::Any visitTypeDefinition(PascalParser::TypeDefinitionContext *context) = 0;
+
+    virtual antlrcpp::Any visitFormalParameterList(PascalParser::FormalParameterListContext *context) = 0;
+
+    virtual antlrcpp::Any visitFormalParameterSection(PascalParser::FormalParameterSectionContext *context) = 0;
+
+    virtual antlrcpp::Any visitParameterGroup(PascalParser::ParameterGroupContext *context) = 0;
+
+    virtual antlrcpp::Any visitFunctionType(PascalParser::FunctionTypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitProcedureType(PascalParser::ProcedureTypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitVariableDeclarationPart(PascalParser::VariableDeclarationPartContext *context) = 0;
+
+    virtual antlrcpp::Any visitVariableDeclaration(PascalParser::VariableDeclarationContext *context) = 0;
+
+    virtual antlrcpp::Any visitProcedureAndFunctionDeclarationPart(PascalParser::ProcedureAndFunctionDeclarationPartContext *context) = 0;
+
+    virtual antlrcpp::Any visitProcedureOrFunctionDeclaration(PascalParser::ProcedureOrFunctionDeclarationContext *context) = 0;
+
+    virtual antlrcpp::Any visitProcedureDeclaration(PascalParser::ProcedureDeclarationContext *context) = 0;
+
+    virtual antlrcpp::Any visitFunctionDeclaration(PascalParser::FunctionDeclarationContext *context) = 0;
+
+    virtual antlrcpp::Any visitType_(PascalParser::Type_Context *context) = 0;
+
+    virtual antlrcpp::Any visitStructuredType(PascalParser::StructuredTypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitUnpackedStructuredType(PascalParser::UnpackedStructuredTypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitArrayType(PascalParser::ArrayTypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitTypeList(PascalParser::TypeListContext *context) = 0;
+
+    virtual antlrcpp::Any visitPointerType(PascalParser::PointerTypeContext *context) = 0;
+
     virtual antlrcpp::Any visitLabel(PascalParser::LabelContext *context) = 0;
 
     virtual antlrcpp::Any visitConstantVar(PascalParser::ConstantVarContext *context) = 0;
@@ -61,6 +109,8 @@ public:
 
     virtual antlrcpp::Any visitSimpleStatement(PascalParser::SimpleStatementContext *context) = 0;
 
+    virtual antlrcpp::Any visitProcedureStatement(PascalParser::ProcedureStatementContext *context) = 0;
+
     virtual antlrcpp::Any visitEmptyStatement_(PascalParser::EmptyStatement_Context *context) = 0;
 
     virtual antlrcpp::Any visitAssignmentStatement(PascalParser::AssignmentStatementContext *context) = 0;
@@ -84,6 +134,18 @@ public:
     virtual antlrcpp::Any visitFactor(PascalParser::FactorContext *context) = 0;
 
     virtual antlrcpp::Any visitUnsignedConstant(PascalParser::UnsignedConstantContext *context) = 0;
+
+    virtual antlrcpp::Any visitFunctionDesignator(PascalParser::FunctionDesignatorContext *context) = 0;
+
+    virtual antlrcpp::Any visitParameterList(PascalParser::ParameterListContext *context) = 0;
+
+    virtual antlrcpp::Any visitActualParameter(PascalParser::ActualParameterContext *context) = 0;
+
+    virtual antlrcpp::Any visitParameterwidth(PascalParser::ParameterwidthContext *context) = 0;
+
+    virtual antlrcpp::Any visitSet_(PascalParser::Set_Context *context) = 0;
+
+    virtual antlrcpp::Any visitElement(PascalParser::ElementContext *context) = 0;
 
     virtual antlrcpp::Any visitGotoStatement(PascalParser::GotoStatementContext *context) = 0;
 

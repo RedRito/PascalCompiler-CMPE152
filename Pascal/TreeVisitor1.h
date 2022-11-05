@@ -18,7 +18,7 @@ private:
     int tabs;
     string test;
 public:
-    TreeVisitor1(): tabs(0), test("") {symtab = new Symtab();
+    TreeVisitor1(): tabs(0), test("") {symtab = new Symtab(1);
     };
     
     virtual ~TreeVisitor1(){};
@@ -50,7 +50,7 @@ public:
         cout << "<PROGRAM ";
         test += "<PROGRAM ";
         visit(ctx->programHead());
-        visit(ctx->compoundStatement()); 
+        visit(ctx->block()); 
         cout << "</PROGRAM>" << endl;
         test += "</PROGRAM>\n";
         tabs--;

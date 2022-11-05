@@ -1,7 +1,7 @@
 grammar Pascal;
 
 program
-   : programHead compoundStatement DOT EOF
+   : programHead block DOT EOF
    ;
 
 programHead
@@ -12,6 +12,112 @@ programHead
 identifier
    : IDENT
    ;
+
+block
+   : (labelDeclarationPart | constantDefinitionPart | typeDefinitionPart | variableDeclarationPart | procedureAndFunctionDeclarationPart | usesUnitsPart | IMPLEMENTATION)* compoundStatement
+   ;
+
+usesUnitsPart
+   : USES identifierList SEMICOLON
+   ;
+
+labelDeclarationPart
+   : LABEL label (COMMA label)* SEMICOLON
+   ;
+
+constantDefinitionPart
+   : CONST (constantDefinition SEMICOLON) +
+   ;
+
+constantDefinition
+   : identifier EQUAL constant
+   ;
+
+typeDefinitionPart
+   : TYPE (typeDefinition SEMICOLON) +
+   ;
+
+typeDefinition
+   : identifier EQUAL (type_ | functionType | procedureType)
+   ;
+
+formalParameterList
+   : LPAREN formalParameterSection (SEMICOLON formalParameterSection)* RPAREN
+   ;
+
+formalParameterSection
+   : parameterGroup
+   | VAR parameterGroup
+   | FUNCTION parameterGroup
+   | PROCEDURE parameterGroup
+   ;
+
+parameterGroup
+   : identifierList COLON typeIdentifier
+   ;
+
+functionType
+   : FUNCTION (formalParameterList)? COLON typeIdentifier
+   ;
+
+procedureType
+   : PROCEDURE (formalParameterList)?
+   ;
+
+variableDeclarationPart
+   : VAR variableDeclaration (SEMICOLON variableDeclaration)* SEMICOLON
+   ;
+
+variableDeclaration
+   : identifierList COLON type_
+   ;
+
+procedureAndFunctionDeclarationPart
+   : procedureOrFunctionDeclaration SEMICOLON
+   ;
+
+procedureOrFunctionDeclaration
+   : procedureDeclaration
+   | functionDeclaration
+   ;
+
+procedureDeclaration
+   : PROCEDURE identifier (formalParameterList)? SEMICOLON block
+   ;
+
+functionDeclaration
+   : FUNCTION identifier (formalParameterList)? COLON typeIdentifier SEMICOLON block
+   ;
+
+
+type_
+   : simpleType
+   | structuredType
+   | pointerType
+   ;
+
+structuredType
+   : PACKED unpackedStructuredType
+   | unpackedStructuredType
+   ;
+
+unpackedStructuredType
+   : arrayType
+   ;
+
+arrayType
+   : ARRAY LBRACKET typeList RBRACKET OF type_
+   | ARRAY LBRACKET2 typeList RBRACKET2 OF type_
+   ;
+
+typeList
+   : simpleType (COMMA simpleType)*
+   ;
+
+pointerType
+   : CARAT typeIdentifier
+   ;
+
 
 label
    : unsignedInteger
@@ -97,9 +203,15 @@ unlabelledStatement
 
 simpleStatement
    : assignmentStatement
+   | procedureStatement
    | gotoStatement
    | emptyStatement_
    ;
+
+procedureStatement
+   : identifier (LPAREN parameterList RPAREN)?
+   ;
+
 emptyStatement_
    :
    ;
@@ -154,7 +266,9 @@ signedFactor
 factor
    : variable
    | LPAREN expression RPAREN
+   | functionDesignator
    | unsignedConstant
+   | set_
    | NOT factor
    | bool_
    ;
@@ -166,6 +280,30 @@ unsignedConstant
    | NIL
    ;
 
+functionDesignator
+   : identifier LPAREN parameterList RPAREN
+   ;
+
+parameterList
+   : actualParameter (COMMA actualParameter)*
+   ;
+
+actualParameter
+   : expression parameterwidth*
+   ;
+
+parameterwidth
+   : ':' expression
+   ;   
+
+set_
+   : LBRACKET element (COMMA element)* RBRACKET
+   | LBRACKET2 element (COMMA element)* RBRACKET2
+   ;
+
+element
+   : expression (DOTDOT expression)?
+   ;
 
 gotoStatement
    : GOTO label

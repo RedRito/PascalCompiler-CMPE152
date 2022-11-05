@@ -13,9 +13,13 @@ using namespace std;
 class Symtab{
 
     public:
-    Symtab(): owner(nullptr){};
+    Symtab(const int nestingLevel): owner(nullptr), nestingLevel(nestingLevel){};
 
     virtual ~Symtab(){};
+
+    int getNestingLevel(){
+        return nestingLevel;
+    };
     
     SymtabEntry* getOwner(){
         return owner;
@@ -88,6 +92,7 @@ class Symtab{
     private:
     SymtabEntry *owner;
     map<string, SymtabEntry*> content;
+    int nestingLevel;
 };
 
 

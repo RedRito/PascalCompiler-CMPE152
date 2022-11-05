@@ -8,7 +8,7 @@ Pascal compiler built with C++ and ANTLR4.
 ```
 make antlr
 make compile
-./main.out "filename"
+./main.out -{scan, parse, tofile} "filename"
 ```
 
 ## Make Commands

@@ -4,12 +4,13 @@
 #include <string>
 #include <map>
 #include <vector>
-//#include "Symtab.h"
+#include "Symtab.h"
+#include "Typespec.h"
 #include "../Object.h"
 
 using namespace std;
 
-//class Symtab;
+class Symtab;
 
 enum class Kind
 {
@@ -58,7 +59,9 @@ class SymtabEntry
     {
         this->kind = kind;
     };                        //set the kind of entry
-    //Symtab *getSymtab();                            //get the symbol table
+    Symtab *getSymtab(){
+        return symtab;
+    };                            //get the symbol table
     vector<int>* getLineNumebers()
     {
         return &lineNumbers;
@@ -77,10 +80,10 @@ class SymtabEntry
     };                    //Set the data value into this entry.
 
     private:
-
     string name;
-    //Symtab *symtab;
+    Symtab *symtab;
     Kind kind;
+    Typespec *typespec;
     vector<int> lineNumbers; //an array of linenumbers
     Object *info;
 };
