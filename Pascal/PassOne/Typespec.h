@@ -10,6 +10,9 @@
 
 using namespace std;
 
+class Symtab;
+class SymtabEntry;
+
 enum class TypeForm
 {
     SCALAR, ARRAY
@@ -42,7 +45,6 @@ class Typespec
             } array;
         };
 
-        Typespec *baseType;
         TypeForm form;
         SymtabEntry *identifier;  // type identifier
         TypeInfo info;
