@@ -233,41 +233,9 @@ public:
     //adopt another ParserNode as its first child
     void adopt(ParserNode* childNode);
 
-    //--
-    //getting map contents
-    //map<NodeKey, Object>& getContent();
-    //map<NodeKey, Object> contents;
 
-    //Object getAttribute(const NodeKey key);
-
-    /*Map for Node type names and key names*/
-    //static map<NodeType, string> NT_Names;
-    //static map<NodeKey, string> NT_Keys;
-
-
-    /*INITIALIZE map function moved to ParserNodeImpl.h */
-
-    /*THIS PART is moved to ParserNodeImpl 
-    ParserNode* getParent()
-    {
-        return parent;
-    }
-    ParserNode* getRoot()
-    {
-        return root;
-    }
-    NodeType getType()
-    {
-        return type;
-    }
-    Typespec* getTS();
-
-    //setter
-    ParserNode* setRoot(ParserNode* node);
-    void setTS(Typespec* TS);
-    */
 private:
-    //map<NodeKey, Object> contents;
+    
 };
 
 #endif
