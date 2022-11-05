@@ -12,7 +12,7 @@ public:
     static bool TypeChecker::isInteger(Typespec *typespec)
     {
         return    (typespec != nullptr)
-           && (typespec->baseType() == Predefined::integerType);
+           && (typespec->baseType() == Typespec::integerType);
     }
 
     static bool TypeChecker::areBothInteger(Typespec *typespec1, Typespec *typespec2)
@@ -24,7 +24,7 @@ public:
     static bool TypeChecker::isReal(Typespec *typespec)
     {
         return    (typespec != nullptr)
-           && (typespec->baseType() == Predefined::realType);
+           && (typespec->baseType() == Typespec::realType);
     }
 
     static bool TypeChecker::isIntegerOrReal(Typespec *typespec)
@@ -42,7 +42,7 @@ public:
     static bool TypeChecker::isBoolean(Typespec *typespec)
     {
         return    (typespec != nullptr)
-           && (typespec->baseType() == Predefined::booleanType);
+           && (typespec->baseType() == Typespec::booleanType);
     }
 
     static bool TypeChecker::areBothBoolean(Typespec *typespec1, Typespec *typespec2)
@@ -53,13 +53,13 @@ public:
     static bool TypeChecker::isChar(Typespec *typespec)
     {
         return    (typespec != nullptr)
-           && (typespec->baseType() == Predefined::charType);
+           && (typespec->baseType() == Typespec::charType);
     }
 
     static bool TypeChecker::isString(Typespec *typespec)
     {
         return    (typespec != nullptr)
-           && (typespec->baseType() == Predefined::stringType);
+           && (typespec->baseType() == Typespec::stringType);
     }
 
     static bool TypeChecker::areBothString(Typespec *typespec1, Typespec *typespec2)
