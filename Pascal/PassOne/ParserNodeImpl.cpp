@@ -11,6 +11,11 @@ ParserNode* ParserNodeImpl::getParent()
 	return parent;
 }
 
+ParserNode* ParserNodeImpl::getType()
+{
+	return type;
+}
+
 ParserNode* ParserNodeImpl::setRoot(ParserNode* node)
 {
 	root = node;
