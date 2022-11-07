@@ -7,6 +7,7 @@
 #include <Typespec.h>
 #include "../Scanner/PToken.h"
 #include "SymtabEntry.h"
+#include "Object.h"
 using namespace std; //lazy
 
 enum class NodeType //Type of tree nodes in parser tree, pulled form slides and online resources
@@ -121,7 +122,7 @@ static map<string, NodeType> NT_Names =
     {"LT", NodeType::LT},
     {"GT", NodeType::GT},
     {"NE", NodeType::NE},   //Not Equal
-    {"LTEQ", NodeType::LTEQ,
+    {"LTEQ", NodeType::LTEQ},
     {"GTEQ", NodeType::GTEQ},
     {"VARIABLE", NodeType::VARIABLE},
     {"INTEGER_CONSTANT", NodeType::INTEGER_CONSTANT},
@@ -129,6 +130,9 @@ static map<string, NodeType> NT_Names =
     {"STRING_CONSTANT", NodeType::STRING_CONSTANT},
     {"BOOLEAN_CONSTANT", NodeType::BOOLEAN_CONSTANT}
 };
+
+/*contents map*/
+map<string, Object>contents;
 
 class ParserNode
 {
@@ -155,6 +159,58 @@ public:
     //adopt another ParserNode as its first child
     void adopt(ParserNode* childNode);
 
+    /*Content initialized*/
+    ~ParserNode()
+    {
+        for (ParserNode* node : childrenList)
+        {
+            if (node != nullptr)
+            {
+                delete node;
+            }
+        }
+        for (pair<string, Object>c : contents)
+        {
+            if (!c.second.empty())
+            {
+                if (instanceof(p.second, SymtabEntry*))
+                {
+                    SymtabEntry* id = cast(p.second, SymtabEntry*);
+                    if (id != nullptr)
+                    {
+                        delete id;
+                    }
+                }
+            }
+        }
+    }
+
+    Object getAttribute(const string str)
+    {
+        return (contents.find(str) != contents.end()) ? contents[str]
+            : Object();
+    }
+
+    map<string, Object>& getContents()
+    {
+        return contents;
+    }
+
+    Typespec getTS() const
+    {
+        return Typespec;
+    }
+
+    /*Setters:*/
+    void setAttribute(const string str, Object val) 
+    {
+        contents[str] = val;
+    }
+
+    void setTS(Typespec* TS)
+    {
+        Typespec = TS;
+    }
 
 private:
     
