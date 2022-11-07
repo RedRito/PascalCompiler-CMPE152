@@ -148,16 +148,29 @@ public:
 
 
     //values of the node
-    object NodeObj;
+    Object NodeObj;
     
     //list of node children
     vector<ParserNode*> childrenList;
     
     //constructor
-    ParserNode(NodeType type);
+    ParserNode(NodeType type)
+    {
+        this->type = type;
+        datatext = "";
+        linenum = 0;
+        NodeValueBoolean = false;
+        NodeValueInt = 0;
+        NodeValueReal = 0.0;
+        NodeValueString = "";
+        entry = nullptr;
+    }
     
     //adopt another ParserNode as its first child
-    void adopt(ParserNode* childNode);
+    void adopt(ParserNode* childNode)
+    {
+        childrenList.push_back(childNode);
+    }
 
     /*Content initialized*/
     ~ParserNode()
@@ -198,7 +211,7 @@ public:
 
     Typespec getTS() const
     {
-        return Typespec;
+        return TS;
     }
 
     /*Setters:*/
@@ -207,9 +220,9 @@ public:
         contents[str] = val;
     }
 
-    void setTS(Typespec* TS)
+    void setTS(Typespec* NewTS)
     {
-        Typespec = TS;
+        TS = NewTS;
     }
 
 private:
