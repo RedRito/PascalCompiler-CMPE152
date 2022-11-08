@@ -7,6 +7,8 @@
 
 #include "../Object.h"
 #include "Symtab.h"
+#include "SymtabStack.h"
+#include "SymtabEntry.h"
 
 using namespace std;
 
@@ -22,6 +24,7 @@ static const string FORM_STRINGS[] =
 {
     "scalar", "array"
 };
+
 
 constexpr TypeForm SCALAR = TypeForm::SCALAR;
 constexpr TypeForm ARRAY = TypeForm::ARRAY;
@@ -51,6 +54,21 @@ class Typespec
 
 
 public:
+    static Typespec *integerType;
+    static Typespec *realType;
+    static Typespec *booleanType;
+    static Typespec *charType;
+    static Typespec *stringType;
+    static Typespec *undefinedType;
+    static Typespec *voidType;
+
+    static SymtabEntry *integer_id;
+    static SymtabEntry *real_id;
+    static SymtabEntry *boolean_id;
+    static SymtabEntry *char_id;
+    static SymtabEntry *string_id;
+    static SymtabEntry *void_id;
+
     /**
      * Constructor.
      * @param form the type form.
@@ -160,6 +178,78 @@ public:
         info.array.elementCount = element_count;
     }
 
+    /**
+     * Create a type specification of a given form.
+     * @param form the form.
+     * @return the type specification.
+     */
+    TypeSpec *create_type(const TypeForm form)
+    {
+        return new Typespec(form);
+    }
+
+    /**
+     * Create a string type specification.
+     * @param value the string value.
+     * @return the type specification.
+     */
+    TypeSpec *create_string_type(const string value)
+    {
+        return new Typespec(value);
+    }
+
+    void initialize(SymtabStack *symtabStack)
+    {
+    initializeTypes(symtabStack);
+    }
+
+    void initialize_types(SymtabStack *symtab_stack)
+    {
+    // Type integer.
+    integer_id = symtab_stack->enterLocal("Integer");
+    integerType = Typespec::create_type((TypeForm) SCALAR);
+    integerType->set_identifier(integer_id);
+    integer_id->setKind(Kind::TYPE);
+    integer_id->setType(integerType);
+
+    // Type real.
+    real_id = symtab_stack->enterLocal("Real");
+    realType = Typespec::create_type((TypeForm) SCALAR);
+    realType->set_identifier(real_id);
+    real_id->setKind(Kind::TYPE);
+    real_id->setType(realType);
+
+    // Type boolean.
+    boolean_id = symtab_stack->enterLocal("Boolean");
+    booleanType = Typespec::create_type((TypeForm) SCALAR);
+    booleanType->set_identifier(boolean_id);
+    boolean_id->setKind(Kind::TYPE);
+    boolean_id->setType(booleanType);
+
+    // Type char.
+    char_id = symtab_stack->enterLocal("Char");
+    charType = Typespec::create_type((TypeForm) SCALAR);
+    charType->set_identifier(char_id);
+    char_id->setKind(Kind::TYPE);
+    char_id->setType(charType);
+
+    // Type string
+    string_id = symtab_stack->enterLocal("String");
+    stringType = Typespec::create_type((TypeForm) SCALAR);
+    stringType->set_identifier(string_id);
+    string_id->setKind(Kind::TYPE);
+    string_id->setType(stringType);
+
+    // Undefined type.
+    undefinedType = Typespec::create_type((TypeForm) SCALAR);
+
+    // Type void.
+    void_id = symtab_stack->enterLocal("Void");
+    voidType = Typespec::create_type((TypeForm) SCALAR);
+    voidType->set_identifier(void_id);
+    void_id->setKind(Kind::TYPE);
+    void_id->setType(voidType);
+    }
 
 };
 

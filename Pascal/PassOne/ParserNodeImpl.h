@@ -8,15 +8,19 @@ class ParserNodeImpl : public ParserNode
 {
 public:
 	//constructor
-	ParserNodeImpl(const Nodetype type);
+	ParserNodeImpl(const NodeType type);
 	//getter
 	ParserNode* getParent();
 	ParserNode* getRoot();
-	Nodetype getType();
+	NodeType getType();
+	//Typespec* getTS();					//Typespec isn't set up yet
 
 	//setter
 	ParserNode* setRoot(ParserNode* node);
+	//void setTS(Typespec* TS);				//Typespec isn't set up yet
 
+	//Initialize map function   TOOK THIS OUT, AT ParserNode.h
+    
 
 private:
 	ParserNode* root;

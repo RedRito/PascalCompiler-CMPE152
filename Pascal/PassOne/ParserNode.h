@@ -7,6 +7,7 @@
 #include <Typespec.h>
 #include "../Scanner/PToken.h"
 #include "SymtabEntry.h"
+#include "Object.h"
 using namespace std; //lazy
 
 enum class NodeType //Type of tree nodes in parser tree, pulled form slides and online resources
@@ -89,25 +90,49 @@ static const string NODE_TYPE_STRINGS[] =
     "BOOLEAN_CONSTANT"
 };
 
-/*The key emun class*/
-enum class NodeKey
+/*Map for Node type names*/
+static map<string, NodeType> NT_Names =
 {
-    LINE,
-    ID,
-    LEVEL,
-    VALUE,
-    TYPE_ID,
+    {"PROGRAM", NodeType::PROGRAM},
+    {"COMPOUND", NodeType::COMPOUND},
+    {"ASSIGN", NodeType::ASSIGN},
+    {"WHILE", NodeType::WHILE},
+    {"LOOP", NodeType::LOOP},
+    {"TEST", NodeType::TEST},
+    {"FOR", NodeType::FOR},
+    {"IF", NodeType::IF},
+    {"SWITCH", NodeType::SWITCH},
+    {"VAR", NodeType::VAR},
+    {"VAR_DECLARATION", NodeType::VAR_DECLARATION},
+    {"INTEGER", NodeType::INTEGER},
+    {"WRITE", NodeType::WRITE},
+    {"WRITELN", NodeType::WRITELN},
+    {"ADD", NodeType::ADD},
+    {"SUBTRACT",NodeType::SUBTRACT},
+    {"OR", NodeType::OR},
+    {"MULTIPLY", NodeType::MULTIPLY},
+    {"DIVIDE", NodeType::DIVIDE},
+    {"NEGATE", NodeType::NEGATE},
+    {"FLOAT_DIVIDE", NodeType::FLOAT_DIVIDE},
+    {"AND", NodeType::AND},
+    {"NOT", NodeType::NOT},
+    {"SELECT_BRANCH", NodeType::SELECT_BRANCH},
+    {"SELECT_CONSTANTS", NodeType::SELECT_CONSTANTS},
+    {"EQ", NodeType::EQ},
+    {"LT", NodeType::LT},
+    {"GT", NodeType::GT},
+    {"NE", NodeType::NE},   //Not Equal
+    {"LTEQ", NodeType::LTEQ},
+    {"GTEQ", NodeType::GTEQ},
+    {"VARIABLE", NodeType::VARIABLE},
+    {"INTEGER_CONSTANT", NodeType::INTEGER_CONSTANT},
+    {"REAL_CONSTANT", NodeType::REAL_CONSTANT},
+    {"STRING_CONSTANT", NodeType::STRING_CONSTANT},
+    {"BOOLEAN_CONSTANT", NodeType::BOOLEAN_CONSTANT}
 };
 
-static const string NODE_KEY_STRINGS[] =
-{
-    "LINE",
-    "ID",
-    "LEVEL",
-    "VALUE",
-    "TYPE_ID"
-};
-
+/*contents map*/
+map<string, Object>contents;
 
 class ParserNode
 {
@@ -119,51 +144,89 @@ public:
     SymtabEntry* entry;
 
     NodeType* parent;   //parent node
-    TypeSpec TS;        //data type's spec
+    Typespec TS;        //data type's spec
 
 
     //values of the node
-    double NodeValueReal;
-    int NodeValueInt;
-    string NodeValueString;
-    bool NodeValueBoolean;
+    Object NodeObj;
     
     //list of node children
     vector<ParserNode*> childrenList;
     
     //constructor
-    ParserNode(NodeType type);
+    ParserNode(NodeType type)
+    {
+        this->type = type;
+        datatext = "";
+        linenum = 0;
+        NodeValueBoolean = false;
+        NodeValueInt = 0;
+        NodeValueReal = 0.0;
+        NodeValueString = "";
+        entry = nullptr;
+    }
     
     //adopt another ParserNode as its first child
-    void adopt(ParserNode* childNode);
+    void adopt(ParserNode* childNode)
+    {
+        childrenList.push_back(childNode);
+    }
 
-    //--
-    //getting map contents
-    map<NodeKey, Object>& getContent();
-    map<NodeKey, Object> contents;
+    /*Content initialized*/
+    ~ParserNode()
+    {
+        for (ParserNode* node : childrenList)
+        {
+            if (node != nullptr)
+            {
+                delete node;
+            }
+        }
+        for (pair<string, Object>c : contents)
+        {
+            if (!c.second.empty())
+            {
+                if (instanceof(p.second, SymtabEntry*))
+                {
+                    SymtabEntry* id = cast(p.second, SymtabEntry*);
+                    if (id != nullptr)
+                    {
+                        delete id;
+                    }
+                }
+            }
+        }
+    }
 
-    Object getAttribute(const NodeKey key);
+    Object getAttribute(const string str)
+    {
+        return (contents.find(str) != contents.end()) ? contents[str]
+            : Object();
+    }
 
-    /*Map for Node type names and key names*/
-    static map<NodeType, string> NT_Names;
-    static map<NodeKey, string> NT_Keys;
+    map<string, Object>& getContents()
+    {
+        return contents;
+    }
 
-    static bool initialize;
-    static void initMap();
+    Typespec getTS() const
+    {
+        return TS;
+    }
 
-    /*Getter & Setter for Parent/Root/TS*/
-    //getter
-    ParserNode* getParent();
-    ParserNode* getRoot();
-    NodeType getType();
-    TypeSpec* getTS();
+    /*Setters:*/
+    void setAttribute(const string str, Object val) 
+    {
+        contents[str] = val;
+    }
 
-    //setter
-    ParserNode* setRoot(ParserNode* node);
-    void setTS(TypeSpec* TS);
+    void setTS(Typespec* NewTS)
+    {
+        TS = NewTS;
+    }
 
 private:
-    //map<NodeKey, Object> contents;
+    
 };
 
 #endif
