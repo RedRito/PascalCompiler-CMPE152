@@ -6,6 +6,8 @@
 #include <string>
 #include "antlr4-runtime.h"
 #include "PassOne/Symtab.h"
+#include "ParserNode.h"
+#include "SymtabStack.h"
 #include "Object.h"
 #include "target/generated-sources/ant4/PascalBaseVisitor.h"
 #include "target/generated-sources/ant4/PascalVisitor.h"
@@ -15,10 +17,14 @@ class TreeVisitor1 : public PascalBaseVisitor
 {
 private:
     Symtab *symtab;
+    SymtabStack *symtabStack;
     int tabs;
     string test;
 public:
-    TreeVisitor1(): tabs(0), test("") {symtab = new Symtab(1);
+    //needs to create a symbol table stack and make a symbol table at stack(0)
+    TreeVisitor1(): tabs(0), test("") {
+        symtab = new Symtab(1);
+        symtabStack = new SymtabStack();
     };
     
     virtual ~TreeVisitor1(){};
@@ -45,7 +51,11 @@ public:
     };
 
     Object visitProgram(PascalParser::ProgramContext *ctx) override{ 
-        
+        //create root node
+        //set name of root node, set line etc.
+        //pushback ctx->programhead as a child
+        //pushback ctx->block as a child
+
         printTabs();
         cout << "<PROGRAM ";
         test += "<PROGRAM ";
@@ -60,12 +70,11 @@ public:
 
     Object visitProgramHead(PascalParser::ProgramHeadContext *ctx) override{ 
         
-        //cout << "VISITING PROGRAM HEAD" << endl;
+        //enter program name into the symbol table
         string programName = ctx->identifier()->getText();
 
         symtab->enter(programName, Kind::PROGRAM);
-        //cout << programName << endl;
-        //cout << "line " << ctx->getStart()->getLine() << endl;
+        
 
        
         cout << programName << ">" << endl;
@@ -76,6 +85,85 @@ public:
     return visitChildren(ctx);};    //yes
 
     Object visitIdentifier(PascalParser::IdentifierContext *ctx) override{return visitChildren(ctx);};      //no
+
+    Object visitBlock(PascalParser::BlockContext *ctx) override{
+        return visitChildren(ctx);
+    }
+
+    Object visitUsesUnitsPart(PascalParser::UsesUnitsPartContext *ctx) override {
+        return visitChildren(ctx);
+    }
+
+    Object visitLabelDeclarationPart(PascalParser::LabelDeclarationPartContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitConstantDefinitionPart(PascalParser::ConstantDefinitionPartContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitConstantDefinition(PascalParser::ConstantDefinitionContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitTypeDefinitionPart(PascalParser::TypeDefinitionPartContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitTypeDefinition(PascalParser::TypeDefinitionContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitFormalParameterList(PascalParser::FormalParameterListContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitFormalParameterSection(PascalParser::FormalParameterSectionContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitParameterGroup(PascalParser::ParameterGroupContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitFunctionType(PascalParser::FunctionTypeContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitProcedureType(PascalParser::ProcedureTypeContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitVariableDeclarationPart(PascalParser::VariableDeclarationPartContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitVariableDeclaration(PascalParser::VariableDeclarationContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitProcedureAndFunctionDeclarationPart(PascalParser::ProcedureAndFunctionDeclarationPartContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitProcedureOrFunctionDeclaration(PascalParser::ProcedureOrFunctionDeclarationContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitProcedureDeclaration(PascalParser::ProcedureDeclarationContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitFunctionDeclaration(PascalParser::FunctionDeclarationContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitType_(PascalParser::Type_Context *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitStructuredType(PascalParser::StructuredTypeContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitUnpackedStructuredType(PascalParser::UnpackedStructuredTypeContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitArrayType(PascalParser::ArrayTypeContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitTypeList(PascalParser::TypeListContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    Object visitPointerType(PascalParser::PointerTypeContext *ctx) override {
+        return visitChildren(ctx);
+    }
+
+
+
+
 
     Object visitLabel(PascalParser::LabelContext *ctx) override{return visitChildren(ctx);};                //no
 
@@ -132,13 +220,45 @@ public:
 
     Object visitIdentifierList(PascalParser::IdentifierListContext *ctx) override{return visitChildren(ctx);};
 
-    Object visitStatement(PascalParser::StatementContext *ctx) override{return visitChildren(ctx);}; 
+    Object visitStatement(PascalParser::StatementContext *ctx) override{
+        //create parserNode of statement
+        //adopt ->visitChildren(ctx);
+
+
+
+        return visitChildren(ctx);
+        
+        }; 
 
     Object visitUnlabelledStatement(PascalParser::UnlabelledStatementContext *ctx) override{return visitChildren(ctx);};
 
     Object visitSimpleStatement(PascalParser::SimpleStatementContext *ctx) override{return visitChildren(ctx);};
 
+    Object visitProcedureStatement(PascalParser::ProcedureStatementContext *ctx) override {
+        return visitChildren(ctx);
+    }
+    
+    
+    Object visitEmptyStatement_(PascalParser::EmptyStatement_Context *ctx) override {
+        return visitChildren(ctx);
+    }
+
+
     Object visitAssignmentStatement(PascalParser::AssignmentStatementContext *ctx) override{
+        //create ASSIGN parser node
+        //adopt left side of node
+        //parsenode leftside = new parsernode(Type::VARIABLE)
+        // leftside->text = ctx->variable->gettext()  
+        // leftside->
+        // lhsNode->datatext  = variableName;
+        // lhsNode->entry = variableId;
+        // lhsNode->linenum = readToken->linenum;
+
+        //ASSIGN -> adopt(LHS);
+        //ASSIGN -> adopt(visit(ctx->expression())) //adopt rhs
+    
+
+
 
         string varName = ctx->variable()->getText();
         symtab->enter(varName, Kind::VARIABLE);
@@ -158,6 +278,9 @@ public:
         return nullptr;}; 
 
     Object visitVariable(PascalParser::VariableContext *ctx) override{
+        //create a VARIABLE NODE
+        //node ->text = varname
+        //
 
         string varName = ctx->getText();
         int line = ctx->getStart()->getLine();
@@ -315,6 +438,32 @@ public:
         return nullptr;};
 
     Object visitUnsignedConstant(PascalParser::UnsignedConstantContext *ctx) override{return visitChildren(ctx);};
+
+    Object visitFunctionDesignator(PascalParser::FunctionDesignatorContext *ctx) override {
+        return visitChildren(ctx);
+    }
+
+    Object visitParameterList(PascalParser::ParameterListContext *ctx) override {
+        return visitChildren(ctx);
+    }
+
+    Object visitActualParameter(PascalParser::ActualParameterContext *ctx) override {
+        return visitChildren(ctx);
+    }
+
+    Object visitParameterwidth(PascalParser::ParameterwidthContext *ctx) override {
+        return visitChildren(ctx);
+    }
+
+    Object visitSet_(PascalParser::Set_Context *ctx) override {
+        return visitChildren(ctx);
+    }
+
+    Object visitElement(PascalParser::ElementContext *ctx) override {
+        return visitChildren(ctx);
+    }
+
+
 
     Object visitGotoStatement(PascalParser::GotoStatementContext *ctx) override{
         int line = ctx->getStart()->getLine();
