@@ -4,13 +4,18 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 #include "antlr4-runtime.h"
 #include "PassOne/Symtab.h"
 #include "PassOne/ParserNode.h"
 #include "PassOne/SymtabStack.h"
-#include "Object.h"
+
+
 #include "target/generated-sources/ant4/PascalBaseVisitor.h"
 #include "target/generated-sources/ant4/PascalVisitor.h"
+
+using namespace std;
+using namespace PassOne;
 
 typedef antlrcpp::Any Object;
 class TreeVisitor1 : public PascalBaseVisitor
@@ -18,6 +23,7 @@ class TreeVisitor1 : public PascalBaseVisitor
 private:
     Symtab *symtab;
     SymtabStack *symtabStack;
+    vector<SymtabEntry *> varList;
     int tabs;
     string test;
 public:
@@ -82,6 +88,11 @@ public:
         test += programName + ">\n";
         tabs++;
 
+        SymtabEntry *programHead = symtabStack->enterLocal(programName, Kind::PROGRAM);
+        programHead->setKind(Kind::PROGRAM);
+        programHead->setValue(SymtabKey::ROUTINE_SYMTAB, symtabStack->push());
+        symtabStack->setProgramId(programHead);
+
     return visitChildren(ctx);};    //yes
 
     Object visitIdentifier(PascalParser::IdentifierContext *ctx) override{return visitChildren(ctx);};      //no
@@ -128,6 +139,41 @@ public:
         return visitChildren(ctx);
     }
     Object visitVariableDeclaration(PascalParser::VariableDeclarationContext *ctx) override {
+        
+        cout << "VISITNG VARIABLE DELCARATION " << ctx->getText() << endl;
+        //reset varList
+        varList.resize(0);
+        //this is used for declarations like i, j, k : integer; i,j,k is the var list
+
+
+        string ident_list = ctx->identifierList()->getText();
+        cout << ident_list << endl;
+
+        vector<string> iden_array;
+        stringstream iden_stream(ident_list);
+
+        while(iden_stream.good())
+        {
+            string substr;
+            getline(iden_stream, substr, ',');
+            iden_array.push_back(substr);
+        }
+
+        for(int i = 0; i < iden_array.size(); i++)
+        {
+            SymtabEntry *var = symtabStack->enterLocal(iden_array.at(i), Kind::VARIABLE);
+            varList.push_back(var);
+        }
+
+        Typespec *type;
+
+        string tyName = ctx->type_()->getText();
+        cout << tyName << endl;
+        
+
+
+
+        
         return visitChildren(ctx);
     }
     Object visitProcedureAndFunctionDeclarationPart(PascalParser::ProcedureAndFunctionDeclarationPartContext *ctx) override {

@@ -7,15 +7,22 @@
 
 #include "../Object.h"
 #include "Symtab.h"
+#include "SymtabEntry.h"
 
 using namespace std;
 
-
+namespace PassOne{ namespace symtab {
+    class Symtab;
+    class SymtabEntry;
+    class SymtabStack;
+}}
 
 namespace PassOne { namespace type {
 
 using namespace std;
-using namespace PassOne::symtab;
+using namespace PassOne::symtab::Symtab;
+
+
 
 enum class TypeForm
 {
@@ -56,20 +63,20 @@ class Typespec
 
 
 public:
-    static Typespec *integerType;
-    static Typespec *realType;
-    static Typespec *booleanType;
-    static Typespec *charType;
-    static Typespec *stringType;
-    static Typespec *undefinedType;
-    static Typespec *voidType;
+    Typespec *integerType;
+    Typespec *realType;
+    Typespec *booleanType;
+    Typespec *charType;
+    Typespec *stringType;
+    Typespec *undefinedType;
+    Typespec *voidType;
 
-    static SymtabEntry *integer_id;
-    static SymtabEntry *real_id;
-    static SymtabEntry *boolean_id;
-    static SymtabEntry *char_id;
-    static SymtabEntry *string_id;
-    static SymtabEntry *void_id;
+    SymtabEntry *integer_id;
+    SymtabEntry *real_id;
+    SymtabEntry *boolean_id;
+    SymtabEntry *char_id;
+    SymtabEntry *string_id;
+    SymtabEntry *void_id;
 
     /**
      * Constructor.
