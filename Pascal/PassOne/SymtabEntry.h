@@ -8,9 +8,17 @@
 #include "Typespec.h"
 #include "../Object.h"
 
-using namespace std;
+namespace PassOne { namespace type { 
+    class Typespec;
+}}
 
-class Symtab;
+namespace PassOne { namespace symtab {
+    using namespace std;
+    using PassOne::type::Typespec;
+    class Symtab;
+    class SymtabEntry;
+
+
 
 enum class Kind
 {
@@ -28,10 +36,24 @@ static const string KIND_STRINGS[] =
     "undefined"
 };
 
+enum class SymtabKey
+{
+    // Constant.
+    CONSTANT_VALUE,
+
+    // Procedure or function.
+    ROUTINE_CODE, ROUTINE_SYMTAB, ROUTINE_ICODE,
+    ROUTINE_PARMS, ROUTINE_ROUTINES,
+
+    // Variable or record field value.
+    DATA_VALUE
+};
+
+
 class SymtabEntry
 {
     public:
-    SymtabEntry(const string name, const Kind kind): name(name), kind(kind)
+    SymtabEntry(const string name, const Kind kind, Symtab *symtab): name(name), kind(kind), typespec(nullptr), symtab(symtab) 
     {
         switch(kind)
         {
@@ -62,6 +84,12 @@ class SymtabEntry
     Symtab *getSymtab(){
         return symtab;
     };                            //get the symbol table
+
+    Typespec *getType() const { return typespec; }; //get the type
+
+    void setType(Typespec *typespec) { this->typespec = typespec; };
+
+
     vector<int>* getLineNumebers()
     {
         return &lineNumbers;
@@ -70,13 +98,13 @@ class SymtabEntry
     {
         lineNumbers.push_back(number);
     };        //Append a source line number to the entry.
-    Object getValue()
+    Object getValue(const SymtabKey key)
     {
-        return *(info);
+        return (contents.find(key) != contents.end()) ? contents[key] : Object();
     };                              //Get the data value stored with this entry.
-    void setValue(Object value)
+    void setValue(const SymtabKey key, Object value)
     {
-        info = new Object(value);
+        contents[key] = value;
     };                    //Set the data value into this entry.
 
     private:
@@ -85,7 +113,9 @@ class SymtabEntry
     Kind kind;
     Typespec *typespec;
     vector<int> lineNumbers; //an array of linenumbers
+    map<SymtabKey, Object> contents;
     Object *info;
 };
 
+}} //part of namespace symtab
 #endif

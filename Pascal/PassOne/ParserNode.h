@@ -3,12 +3,17 @@
 
 #include <string>
 #include <vector>
-
-#include <Typespec.h>
-#include "../Scanner/PToken.h"
+#include <utility>
+#include <map>
+#include "Typespec.h"
 #include "SymtabEntry.h"
-#include "Object.h"
+#include "../Object.h"
+
+namespace PassOne {
+
 using namespace std; //lazy
+using namespace PassOne::symtab;
+using namespace PassOne::type;
 
 enum class NodeType //Type of tree nodes in parser tree, pulled form slides and online resources
 {
@@ -132,7 +137,7 @@ static map<string, NodeType> NT_Names =
 };
 
 /*contents map*/
-map<string, Object>contents;
+map<string, Object> contents;
 
 class ParserNode
 {
@@ -141,10 +146,11 @@ public:
     NodeType type;
     int linenum;        //the linenumber of the node
     string datatext;    //the name of the node
+    int nestLevel;
     SymtabEntry* entry;
 
     NodeType* parent;   //parent node
-    Typespec TS;        //data type's spec
+    Typespec* typespec;        //data type's spec
 
 
     //values of the node
@@ -154,16 +160,16 @@ public:
     vector<ParserNode*> childrenList;
     
     //constructor
-    ParserNode(NodeType type)
+    ParserNode(NodeType type) : type(type), linenum(0), parent(nullptr), typespec(nullptr), datatext(""), nestLevel(0)
     {
-        this->type = type;
-        datatext = "";
-        linenum = 0;
-        NodeValueBoolean = false;
-        NodeValueInt = 0;
-        NodeValueReal = 0.0;
-        NodeValueString = "";
-        entry = nullptr;
+        // this->type = type;
+        // datatext = "";
+        // linenum = 0;
+        // NodeValueBoolean = false;
+        // NodeValueInt = 0;
+        // NodeValueReal = 0.0;
+        // NodeValueString = "";
+        // entry = nullptr;
     }
     
     //adopt another ParserNode as its first child
@@ -182,20 +188,6 @@ public:
                 delete node;
             }
         }
-        for (pair<string, Object>c : contents)
-        {
-            if (!c.second.empty())
-            {
-                if (instanceof(p.second, SymtabEntry*))
-                {
-                    SymtabEntry* id = cast(p.second, SymtabEntry*);
-                    if (id != nullptr)
-                    {
-                        delete id;
-                    }
-                }
-            }
-        }
     }
 
     Object getAttribute(const string str)
@@ -209,9 +201,9 @@ public:
         return contents;
     }
 
-    Typespec getTS() const
+    Typespec* getType() const
     {
-        return TS;
+        return typespec;
     }
 
     /*Setters:*/
@@ -220,13 +212,13 @@ public:
         contents[str] = val;
     }
 
-    void setTS(Typespec* NewTS)
+    void setType(Typespec* NewTS)
     {
-        TS = NewTS;
+        typespec = NewTS;
     }
 
 private:
     
 };
-
+}
 #endif

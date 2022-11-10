@@ -6,8 +6,14 @@
 #include "Symtab.h"
 #include "SymtabEntry.h"
 
+namespace PassOne { namespace symtab {
+
 
 using namespace std;
+using namespace PassOne;
+
+//using namespace symtab;
+
 
 class SymtabStack
 {
@@ -18,50 +24,30 @@ private:
     vector<Symtab *> stack;
 
 public:
-    /**
-     * Constructor.
-     */
-    SymtabStack() : current_nesting_level(0), program_id(nullptr)
+
+    SymtabStack() : current_nesting_level(0), program_id(nullptr)   //constructor
     {
         stack.push_back(new Symtab(0));
     }
 
-    /**
-     * Destructor.
-     */
-    virtual ~SymtabStack()
+    virtual ~SymtabStack()              //destructor
     {
         for (Symtab *symtab : stack) if (symtab != nullptr) delete symtab;
     }
 
-    /**
-     * Getter.
-     * @return the current nesting level.
-     */
+    //get the current nesting level
     int getCurrentNestingLevel() const { return current_nesting_level; }
 
-    /**
-     * Getter.
-     * @return the symbol table entry for the main program identifier.
-     */
+    //get the prgram id
     SymtabEntry *getProgramId() const { return program_id; }
 
-    /**
-     * Setter.
-     * @param entry the symbol table entry for the main program identifier.
-     */
+    //set the program id
     void setProgramId(SymtabEntry *id) { program_id = id; }
 
-    /**
-     * Return the local symbol table which is at the top of the stack.
-     * @return the local symbol table.
-     */
+    //get the symtab
     Symtab *getLocalSymtab() const { return stack[current_nesting_level]; }
 
-    /**
-     * Push a new symbol table onto the stack.
-     * @return the pushed symbol table.
-     */
+    //push a symtab onto the stack
     Symtab *push()
     {
         Symtab *symtab = new Symtab(++current_nesting_level);
@@ -70,11 +56,7 @@ public:
         return symtab;
     }
 
-    /**
-     * Push a symbol table onto the stack.
-     * @param symtab the symbol table to push.
-     * @return the pushed symbol table.
-     */
+    //push a symtab onto the stack with a given parameter
     Symtab *push(Symtab *symtab)
     {
         ++current_nesting_level;
@@ -83,10 +65,7 @@ public:
         return symtab;
     }
 
-    /**
-     * Pop a symbol table off the stack.
-     * @return the popped symbol table.
-     */
+    //pop the symtab off the stack
     Symtab *pop()
     {
         Symtab *symtab = stack[current_nesting_level];
@@ -96,22 +75,13 @@ public:
         return symtab;
     }
 
-    /**
-     * Create and enter a new entry into the local symbol table.
-     * @param name the name of the entry.
-     * @param kind what kind of entry.
-     * @return the new entry.
-     */
+    //enter an entry into the symtab at the nesting level
     SymtabEntry *enterLocal(const string name, const Kind kind)
     {
         return stack[current_nesting_level]->enter(name, kind);
     }
 
-    /**
-     * Look up an existing symbol table entry in the local symbol table.
-     * @param name the name of the entry.
-     * @return the entry, or null if it does not exist.
-     */
+    //lookup the symtab table
     SymtabEntry *lookupLocal(const string name) const
     {
         return stack[current_nesting_level]->lookup(name);
@@ -137,7 +107,7 @@ public:
     }
 };
 
-
+}} //part of symtab namespace
 
 
 

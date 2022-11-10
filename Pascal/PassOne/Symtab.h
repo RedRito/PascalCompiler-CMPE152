@@ -3,12 +3,13 @@
 
 #include <string>
 #include <map>
+#include <iostream>
 
 #include "SymtabEntry.h"
 
 using namespace std;
 
-
+class SymtabEntry;
 
 class Symtab{
 
@@ -31,7 +32,7 @@ class Symtab{
     };
     SymtabEntry *enter(const string name, const Kind kind)
     {
-        SymtabEntry *entry = new SymtabEntry(name, kind); //make a new entry with the name, the kind of node, and this symbol tabke
+        SymtabEntry *entry = new SymtabEntry(name, kind, this); //make a new entry with the name, the kind of node, and this symbol tabke
         content[name] = entry;
         return entry;
     }; //Create and enter a new entry into the symbol table.

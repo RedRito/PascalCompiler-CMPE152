@@ -10,6 +10,7 @@ LIB=antlr4-runtime
 PROG=PasMain.cpp
 OUT=main.out
 ANLTR_SOURCES=target/generated-sources/ant4/*.cpp
+
 SOURCES=$(ANLTR_SOURCES) $(PROG)
 
 compile:

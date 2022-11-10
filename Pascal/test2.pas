@@ -1,4 +1,10 @@
 program ParserTest;
+var
+    i, k : integer;
+    j : integer;
+    a : integer;
+    n: array [char] of char;
+
 begin 
     i:=5;
     j:=10;

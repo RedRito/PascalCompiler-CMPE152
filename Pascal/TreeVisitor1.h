@@ -6,8 +6,8 @@
 #include <string>
 #include "antlr4-runtime.h"
 #include "PassOne/Symtab.h"
-#include "ParserNode.h"
-#include "SymtabStack.h"
+#include "PassOne/ParserNode.h"
+#include "PassOne/SymtabStack.h"
 #include "Object.h"
 #include "target/generated-sources/ant4/PascalBaseVisitor.h"
 #include "target/generated-sources/ant4/PascalVisitor.h"
