@@ -6,9 +6,11 @@
 #include <string>
 #include <vector>
 #include "antlr4-runtime.h"
+#include "PassOne/Typespec.h"
 #include "PassOne/Symtab.h"
 #include "PassOne/ParserNode.h"
 #include "PassOne/SymtabStack.h"
+
 
 
 #include "target/generated-sources/ant4/PascalBaseVisitor.h"

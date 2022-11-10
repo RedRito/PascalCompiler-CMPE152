@@ -7,9 +7,15 @@
 
 #include "SymtabEntry.h"
 
-using namespace std;
 
-class SymtabEntry;
+namespace PassOne { namespace symtab {
+
+using namespace std;
+using namespace PassOne;
+
+// class SymtabEntry;
+// class SymtabStack;
+
 
 class Symtab{
 
@@ -95,6 +101,8 @@ class Symtab{
     map<string, SymtabEntry*> content;
     int nestingLevel;
 };
+
+}}//part of namespace
 
 
 #endif
