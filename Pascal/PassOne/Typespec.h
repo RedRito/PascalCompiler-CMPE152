@@ -60,13 +60,13 @@ class Typespec
 
 
 public:
-    Typespec *integerType;
-    Typespec *realType;
-    Typespec *booleanType;
-    Typespec *charType;
-    Typespec *stringType;
-    Typespec *undefinedType;
-    Typespec *voidType;
+     Typespec *integerType;
+     Typespec *realType;
+     Typespec *booleanType;
+     Typespec *charType;
+     Typespec *stringType;
+     Typespec *undefinedType;
+     Typespec *voidType;
 
     SymtabEntry *integer_id;
     SymtabEntry *real_id;
@@ -212,7 +212,7 @@ public:
     void initialize_types(SymtabStack *symtab_stack)
     {
     // Type integer.
-    const string strInt = "Integer";
+    const string strInt = "integer";
     integer_id = symtab_stack->enterLocal(strInt, Kind::TYPE);
     integerType = Typespec::create_type((TypeForm) SCALAR);
     integerType->setIdentifier(integer_id);
@@ -220,28 +220,28 @@ public:
     integer_id->setType(integerType);
 
     // Type real.
-    real_id = symtab_stack->enterLocal("Real", Kind::TYPE);
+    real_id = symtab_stack->enterLocal("real", Kind::TYPE);
     realType = Typespec::create_type((TypeForm) SCALAR);
     realType->setIdentifier(real_id);
     real_id->setKind(Kind::TYPE);
     real_id->setType(realType);
 
     // Type boolean.
-    boolean_id = symtab_stack->enterLocal("Boolean", Kind::TYPE);
+    boolean_id = symtab_stack->enterLocal("boolean", Kind::TYPE);
     booleanType = Typespec::create_type((TypeForm) SCALAR);
     booleanType->setIdentifier(boolean_id);
     boolean_id->setKind(Kind::TYPE);
     boolean_id->setType(booleanType);
 
     // Type char.
-    char_id = symtab_stack->enterLocal("Char", Kind::TYPE);
+    char_id = symtab_stack->enterLocal("char", Kind::TYPE);
     charType = Typespec::create_type((TypeForm) SCALAR);
     charType->setIdentifier(char_id);
     char_id->setKind(Kind::TYPE);
     char_id->setType(charType);
 
     // Type string
-    string_id = symtab_stack->enterLocal("String", Kind::TYPE);
+    string_id = symtab_stack->enterLocal("string", Kind::TYPE);
     stringType = Typespec::create_type((TypeForm) SCALAR);
     stringType->setIdentifier(string_id);
     string_id->setKind(Kind::TYPE);
@@ -251,7 +251,7 @@ public:
     undefinedType = Typespec::create_type((TypeForm) SCALAR);
 
     // Type void.
-    void_id = symtab_stack->enterLocal("Void", Kind::TYPE);
+    void_id = symtab_stack->enterLocal("void", Kind::TYPE);
     voidType = Typespec::create_type((TypeForm) SCALAR);
     voidType->setIdentifier(void_id);
     void_id->setKind(Kind::TYPE);

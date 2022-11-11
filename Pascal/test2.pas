@@ -1,12 +1,13 @@
 program ParserTest;
 var
     i, k : integer;
-    j : integer;
+    j : real;
     a : integer;
-    n: array [char] of char;
+    n: Array [char] of array [integer] of array [integer] of char;
 
 begin 
     i:=5;
+    k:=10;
     j:=10;
     a:= 15;
 

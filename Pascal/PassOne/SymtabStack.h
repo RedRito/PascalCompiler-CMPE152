@@ -46,6 +46,7 @@ public:
 
     //get the symtab
     Symtab *getLocalSymtab() const { return stack[current_nesting_level]; }
+    Symtab *getSymtabLevel(int level) const { if(level > stack.size()){return nullptr;}  return stack[level]; }
 
     //push a symtab onto the stack
     Symtab *push()
@@ -97,11 +98,12 @@ public:
         SymtabEntry *found_entry = nullptr;
 
         // Search the current and enclosing scopes.
-        for (int i = current_nesting_level;
-             (i >= 0) && (found_entry == nullptr); --i)
+        for (int i = current_nesting_level; (i >= 0) && (found_entry == nullptr); i--)
         {
             found_entry = stack[i]->lookup(name);
         }
+
+        
 
         return found_entry;
     }

@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "SymtabEntry.h"
+#include "Typespec.h"
 
 
 namespace PassOne { namespace symtab {
@@ -45,6 +46,7 @@ class Symtab{
 
     SymtabEntry *lookup(const string name)
     {
+        //printSymtab();
         return (content.find(name) != content.end()) ? content[name] : nullptr;
     };                 //Look up an existing symbol table entry.
     vector<SymtabEntry*> sortEntries()
@@ -77,7 +79,7 @@ class Symtab{
         cout << "PRINTING SYMBOL TABLE" << endl;
         for(auto const& x : content)
         {
-            cout << "Symtab entry: " << x.first << endl; 
+            cout << "Symtab entry: " << x.second->getName() << endl; 
         }
     };
     void printSymtabToFile(string filename)

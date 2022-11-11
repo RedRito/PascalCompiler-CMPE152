@@ -1,15 +1,25 @@
 grammar Pascal;
 
+@header{
+   #include "PassOne/Typespec.h"
+   #include "PassOne/Symtab.h"
+   #include "PassOne/SymtabStack.h"
+   #include "Object.h"
+   using namespace PassOne::symtab;
+   using namespace PassOne::type;
+}
+
+
 program
    : programHead block DOT EOF
    ;
 
-programHead
+programHead locals [ SymtabEntry *entry = nullptr ]
    : PROGRAM identifier (LPAREN identifierList RPAREN)? SEMICOLON
    | UNIT identifier SEMICOLON
    ;
 
-identifier
+identifier locals [ Typespec *type = nullptr, SymtabEntry *entry = nullptr ]
    : IDENT
    ;
 
@@ -30,7 +40,11 @@ constantDefinitionPart
    ;
 
 constantDefinition
-   : identifier EQUAL constant
+   : constantIdentifier EQUAL constant
+   ;
+
+constantIdentifier locals [ Typespec *type = nullptr, SymtabEntry *entry = nullptr ]
+   : IDENT
    ;
 
 typeDefinitionPart
@@ -38,10 +52,12 @@ typeDefinitionPart
    ;
 
 typeDefinition
-   : identifier EQUAL (type_ | functionType | procedureType)
+   : typeIdentifier EQUAL (type_ | functionType | procedureType)
    ;
 
-formalParameterList
+
+
+formalParameterList locals[ Typespec *type = nullptr ]
    : LPAREN formalParameterSection (SEMICOLON formalParameterSection)* RPAREN
    ;
 
@@ -81,27 +97,27 @@ procedureOrFunctionDeclaration
    | functionDeclaration
    ;
 
-procedureDeclaration
+procedureDeclaration locals [ SymtabEntry *entry = nullptr ]
    : PROCEDURE identifier (formalParameterList)? SEMICOLON block
    ;
 
-functionDeclaration
+functionDeclaration locals[ Typespec *type = nullptr , SymtabEntry *entry = nullptr]
    : FUNCTION identifier (formalParameterList)? COLON typeIdentifier SEMICOLON block
    ;
 
 
-type_
+type_ locals [ Typespec *type = nullptr ]
    : simpleType
    | structuredType
    | pointerType
    ;
 
-structuredType
+structuredType locals [ Typespec *type = nullptr ]
    : PACKED unpackedStructuredType
    | unpackedStructuredType
    ;
 
-unpackedStructuredType
+unpackedStructuredType locals [ Typespec *type = nullptr ]
    : arrayType
    ;
 
@@ -131,7 +147,7 @@ constantChr
    : CHR LPAREN unsignedInteger RPAREN
    ;
 
-constant
+constant locals [ Typespec *type = nullptr, Object value = nullptr]
    : unsignedNumber
    | sign unsignedNumber
    | identifier
@@ -140,7 +156,7 @@ constant
    | constantChr
    ;
 
-unsignedNumber
+unsignedNumber locals[ Typespec *type = nullptr ]
    : unsignedInteger
    | unsignedReal
    ;
@@ -162,7 +178,8 @@ bool_
    : TRUE
    | FALSE
    ;
-typeIdentifier
+
+typeIdentifier locals [ Typespec *type = nullptr, SymtabEntry *entry = nullptr ]
    : identifier
    | (CHAR | BOOLEAN | INTEGER | REAL | STRING)
    ;
@@ -171,7 +188,7 @@ string
    : STRING_LITERAL
    ;
 
-simpleType
+simpleType locals [ Typespec *type = nullptr ]
    : scalarType
    | typeIdentifier
    | stringtype
@@ -219,11 +236,17 @@ assignmentStatement
    : variable ASSIGN expression
    ;
 
-variable
-   : (AT identifier | identifier) (LBRACKET expression (COMMA expression)* RBRACKET | LBRACKET2 expression (COMMA expression)* RBRACKET2 | DOT identifier | CARAT)*
+variable locals [ Typespec *type = nullptr, SymtabEntry *entry = nullptr ]
+   : (AT variableIdentifier | variableIdentifier) modifier*
+   ;
+variableIdentifier locals [ Typespec *type = nullptr, SymtabEntry *entry = nullptr ]
+   : IDENT
+   ;
+modifier
+   : LBRACKET expression (COMMA expression)* RBRACKET | LBRACKET2 expression (COMMA expression)* RBRACKET2 | DOT identifier | CARAT
    ;
 
-expression
+expression locals [ Typespec *type = nullptr ]
    : simpleExpression (relationaloperator expression)?
    ;
 
@@ -237,17 +260,17 @@ relationaloperator
    | IN
    ;
 
-simpleExpression
+simpleExpression locals [ Typespec *type = nullptr ]
    : term (additiveoperator simpleExpression)?
    ;
 
-additiveoperator
+additiveoperator 
    : PLUSOP
    | MINUSOP
    | OR
    ;
 
-term
+term locals [ Typespec *type = nullptr ]
    : signedFactor (multiplicativeoperator term)?
    ;
 
@@ -263,7 +286,7 @@ signedFactor
    : (PLUSOP | MINUSOP)? factor
    ;
 
-factor
+factor locals [ Typespec *type = nullptr ]
    : variable
    | LPAREN expression RPAREN
    | functionDesignator

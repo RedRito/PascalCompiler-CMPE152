@@ -1,4 +1,12 @@
 
+   #include "PassOne/Typespec.h"
+   #include "PassOne/Symtab.h"
+   #include "PassOne/SymtabStack.h"
+   #include "Object.h"
+   using namespace PassOne::symtab;
+   using namespace PassOne::type;
+
+
 // Generated from Pascal.g4 by ANTLR 4.7.2
 
 #pragma once
@@ -44,6 +52,10 @@ public:
   }
 
   virtual antlrcpp::Any visitConstantDefinition(PascalParser::ConstantDefinitionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitConstantIdentifier(PascalParser::ConstantIdentifierContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -208,6 +220,14 @@ public:
   }
 
   virtual antlrcpp::Any visitVariable(PascalParser::VariableContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitVariableIdentifier(PascalParser::VariableIdentifierContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitModifier(PascalParser::ModifierContext *ctx) override {
     return visitChildren(ctx);
   }
 

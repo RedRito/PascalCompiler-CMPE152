@@ -1,4 +1,12 @@
 // Generated from \\wsl$\Ubuntu\home\brandonluong\Pascal\Pascal.g4 by ANTLR 4.9.2
+
+   #include "PassOne/Typespec.h"
+   #include "PassOne/Symtab.h"
+   #include "PassOne/SymtabStack.h"
+   #include "Object.h"
+   using namespace PassOne::symtab;
+   using namespace PassOne::type;
+
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
