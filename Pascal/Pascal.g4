@@ -24,7 +24,7 @@ identifier locals [ Typespec *type = nullptr, SymtabEntry *entry = nullptr ]
    ;
 
 block
-   : (labelDeclarationPart | constantDefinitionPart | typeDefinitionPart | variableDeclarationPart | procedureAndFunctionDeclarationPart | usesUnitsPart | IMPLEMENTATION)* compoundStatement
+   : (labelDeclarationPart | constantDefinitionPart | typeDefinitionPart | procedureAndFunctionDeclarationPart | variableDeclarationPart | usesUnitsPart | IMPLEMENTATION)* compoundStatement
    ;
 
 usesUnitsPart
@@ -72,7 +72,7 @@ parameterGroup
    : identifierList COLON typeIdentifier
    ;
 
-functionType
+functionType locals [ Typespec *type = nullptr ]
    : FUNCTION (formalParameterList)? COLON typeIdentifier
    ;
 
@@ -211,6 +211,7 @@ identifierList
 statement
    : label COLON unlabelledStatement
    | unlabelledStatement
+   | procedureAndFunctionDeclarationPart
    ;
 
 unlabelledStatement
@@ -247,7 +248,7 @@ modifier
    ;
 
 expression locals [ Typespec *type = nullptr ]
-   : simpleExpression (relationaloperator expression)?
+   : simpleExpression (relationaloperator expression)*
    ;
 
 relationaloperator
@@ -261,7 +262,7 @@ relationaloperator
    ;
 
 simpleExpression locals [ Typespec *type = nullptr ]
-   : term (additiveoperator simpleExpression)?
+   : term (additiveoperator simpleExpression)*
    ;
 
 additiveoperator 
@@ -271,7 +272,7 @@ additiveoperator
    ;
 
 term locals [ Typespec *type = nullptr ]
-   : signedFactor (multiplicativeoperator term)?
+   : signedFactor (multiplicativeoperator term)*
    ;
 
 multiplicativeoperator
@@ -296,7 +297,7 @@ factor locals [ Typespec *type = nullptr ]
    | bool_
    ;
 
-unsignedConstant
+unsignedConstant locals [ Typespec *type = nullptr ]
    : unsignedNumber
    | constantChr
    | string

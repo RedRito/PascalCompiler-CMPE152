@@ -10,6 +10,7 @@
 #include "PassOne/Symtab.h"
 #include "PassOne/ParserNode.h"
 #include "PassOne/SymtabStack.h"
+#include "PassOne/TypeChecker.h"
 #include "Object.h"
 
 
@@ -30,12 +31,14 @@ private:
     vector<PascalParser::IdentifierContext *>varCtx;
     Typespec *initial;
     int tabs;
+    vector<string> symtabPrints;
     string test;
 public:
     //needs to create a symbol table stack and make a symbol table at stack(0)
     TreeVisitor1(): tabs(0), test("") {
         symtab = new Symtab(1);
         symtabStack = new SymtabStack();
+        symtabPrints.resize(0);
         initial = new Typespec();
         initial -> initialize(symtabStack);
     };
@@ -51,7 +54,6 @@ public:
             exit(1);
         }
         file << test;
-        symtab->printSymtabToFile(filename);
         file.close();
     }
     void printSymtabStack()
@@ -60,68 +62,102 @@ public:
 
         for(int i = 0; i <= nestLevels; i++)
         {
-            cout << "LEVEL: " << i << endl;
-            if( i == 0 )
-            {
-                Symtab* temp = symtabStack->getSymtabLevel(i);
-                vector<SymtabEntry*> tabStack = temp->sortEntries();
-                for(SymtabEntry* ent : tabStack)
-                {
-                    Typespec *temp2 = ent->getType();
-                    cout << "Entry: " << ent->getName();
-                    
-                    cout << "\t\tkind: " << getKindString(ent->getKind());
-                    cout << endl;
-                }
-            }
-            else 
-            {
-                Symtab* temp = symtabStack->getSymtabLevel(i);
-                vector<SymtabEntry*> tabStack = temp->sortEntries();
-                for(SymtabEntry* ent : tabStack)
-                {
-                    Typespec *temp2 = ent->getType();
-                    cout << "Entry: " << ent->getName();
-                    cout << " type ";
-                    
-                    if(temp2->getForm() == TypeForm::SCALAR)
-                    {
-                        string typ = checkTypeString(temp2);
-                        cout << typ;
-                        
-                        cout << " SCALAR ";
-                        
-
-                        
-                    }
-                    else if(temp2->getForm() == TypeForm::ARRAY)
-                    {
-                        cout << "ARRAY ";
-                        Typespec *tempType = temp2->getArrayIndexType();
-                        string strType;
-                        strType = checkTypeString(tempType);
-
-                        cout << "[" << strType << "] of";
-                        Typespec *tempType2 = temp2->getArrayElementType();
-                        while(tempType2->getForm() == TypeForm::ARRAY)
-                        {
-                            strType = checkTypeString(tempType2->getArrayIndexType());
-                            cout << " ARRAY " << "[" << strType << "] of";
-                            tempType2 = tempType2->getArrayElementType(); 
-                        }
-                        strType = checkTypeString(tempType2);
-                        cout << " " << strType;
-                    }
-
-                    cout << "\t\tkind: " << getKindString(ent->getKind());
-
-
-                    cout << endl;
-                }
-            }
-            
-            
+            cout << printSymtabStackAtLevel(i);
+            test += printSymtabStackAtLevel(i);
         }
+        for(string tabs : symtabPrints)
+        {
+            cout << tabs;
+            test += tabs;
+        }
+
+    }
+    string printSymtabStackAtLevel(int nestLevel)
+    {
+        string result = "";
+        string level = to_string(nestLevel);
+        //cout << "LEVEL: " << level << endl;
+        result += "LEVEL: " + level + "\n";
+        if(nestLevel == 0)
+        {
+            Symtab* temp = symtabStack->getSymtabLevel(nestLevel);
+            SymtabEntry* owner = temp->getOwner();
+            if(owner != nullptr)
+            {
+                //cout << owner->getName() << endl;
+                result += "Owner:" + owner->getName() + "\n";
+            }
+            vector<SymtabEntry*> tabStack = temp->sortEntries();
+            for(SymtabEntry* ent : tabStack)
+            {
+                //Typespec *temp2 = ent->getType();
+                //cout << "Entry: " << ent->getName();
+                result += "Entry: " + ent->getName();
+                
+                //cout << "\t\tkind: " << getKindString(ent->getKind());
+                result += "\t\tkind: " + getKindString(ent->getKind()) + "\n";
+
+                //cout << endl;
+            }
+        }
+        else
+        {
+            Symtab* temp = symtabStack->getSymtabLevel(nestLevel);
+            SymtabEntry* owner = temp->getOwner();
+            if(owner != nullptr)
+            {
+                //cout << owner->getName() << endl;
+                result += "Owner:" +  owner->getName() + "\n";
+            }
+            vector<SymtabEntry*> tabStack = temp->sortEntries();
+            for(SymtabEntry* ent : tabStack)
+            {
+                Typespec *temp2 = ent->getType();
+                //cout << "Entry: " << ent->getName();
+                //cout << " type ";
+                result +=  "Entry: " + ent->getName() + " type ";
+                
+                if(temp2->getForm() == TypeForm::SCALAR)
+                {
+                    string typ = checkTypeString(temp2);
+                    result += typ + " SCALAR ";
+                    // cout << typ;
+                    
+                    // cout << " SCALAR ";
+                    
+                }
+                else if(temp2->getForm() == TypeForm::ARRAY)
+                {
+                    //cout << "ARRAY ";
+                    result += "ARRAY ";
+                    Typespec *tempType = temp2->getArrayIndexType();
+                    string strType;
+                    strType = checkTypeString(tempType);
+
+                    //cout << "[" << strType << "] of";
+                    result += "[" + strType + "] of";
+                    Typespec *tempType2 = temp2->getArrayElementType();
+                    while(tempType2->getForm() == TypeForm::ARRAY)
+                    {
+                        strType = checkTypeString(tempType2->getArrayIndexType());
+                        //cout << " ARRAY " << "[" << strType << "] of";
+                        result += " ARRAY [" + strType + "] of";
+                        tempType2 = tempType2->getArrayElementType(); 
+                    }
+                    strType = checkTypeString(tempType2);
+                    //cout << " " << strType;
+                    result += " " + strType;
+                }
+                
+
+                //cout << "\t\tkind: " << getKindString(ent->getKind());
+                result += "\t\tkind: " + getKindString(ent->getKind()) + "\n";
+
+
+                //cout << endl;
+            }
+        }
+        return result;
     }
 
     string checkTypeString(Typespec *type)
@@ -155,6 +191,7 @@ public:
 
     string getKindString(Kind kind)
     {
+
         if(kind == Kind::CONSTANT)
         {
             return "CONSTANT";
@@ -196,10 +233,7 @@ public:
     };
 
     Object visitProgram(PascalParser::ProgramContext *ctx) override{ 
-        //create root node
-        //set name of root node, set line etc.
-        //pushback ctx->programhead as a child
-        //pushback ctx->block as a child
+        
 
         printTabs();
         cout << "<PROGRAM ";
@@ -209,21 +243,8 @@ public:
         cout << "</PROGRAM>" << endl;
         test += "</PROGRAM>\n";
         tabs--;
-        symtab->printSymtab();
         printSymtabStack();
-        // Symtab *test = symtabStack->getLocalSymtab();
         
-        // vector<SymtabEntry*> tabStack = test->sortEntries();
-        // for(SymtabEntry* ent : tabStack)
-        // {
-        //     Typespec *temp = ent->getType();
-        //     cout << "Entry: " << ent->getName();
-        //     if(temp == initial->integerType)
-        //     {
-        //         cout << " type integer";
-        //     }
-        //     cout << endl;
-        // }
 
         return nullptr;
         }; //yes
@@ -231,11 +252,7 @@ public:
     Object visitProgramHead(PascalParser::ProgramHeadContext *ctx) override{ 
         
         //enter program name into the symbol table
-        string programName = ctx->identifier()->getText();
-
-        symtab->enter(programName, Kind::PROGRAM);
-        
-
+        string programName = toLowerCase(ctx->identifier()->getText());
        
         cout << programName << ">" << endl;
 
@@ -244,7 +261,7 @@ public:
 
         SymtabEntry *programHead = symtabStack->enterLocal(programName, Kind::PROGRAM);
         programHead->setKind(Kind::PROGRAM);
-        programHead->setValue(SymtabKey::ROUTINE_SYMTAB, symtabStack->push());
+        programHead->setRoutineSymtab(symtabStack->push());
         symtabStack->setProgramId(programHead);
         symtabStack->getLocalSymtab()->setOwner(programHead);
 
@@ -255,7 +272,32 @@ public:
     return nullptr;};    //yes
 
     Object visitIdentifier(PascalParser::IdentifierContext *ctx) override{
-        return visitChildren(ctx);};      //no
+        string varName = toLowerCase(ctx->getText());
+        SymtabEntry *varId = symtabStack->lookup(varName);
+        if(varId != nullptr)
+        {
+            // Typespec *temp = varId->getType();
+            // if(temp->getForm() == TypeForm::ARRAY)
+            // {
+            //     cout << "ARRAY TYPE IN VARIABLE IDENTIFIER" << endl;
+            // }
+            int linenum = ctx->getStart()->getLine();
+            ctx->type = varId->getType();
+            ctx->entry = varId;
+            varId->appendLineNumber(linenum);
+            Kind kind = varId->getKind();
+
+            if(kind == Kind::UNDEFINED)
+            {
+                cout << "UNDEFINED KIND" << endl;
+            }
+        }
+        else
+        {
+            ctx->type = initial->integerType;
+        }
+
+        return nullptr;};      //no
 
     Object visitBlock(PascalParser::BlockContext *ctx) override{
         return visitChildren(ctx);
@@ -272,7 +314,31 @@ public:
         return visitChildren(ctx);
     }
     Object visitConstantDefinition(PascalParser::ConstantDefinitionContext *ctx) override {
-        return visitChildren(ctx);
+        PascalParser::ConstantIdentifierContext *constId = ctx->constantIdentifier();
+        string constName = toLowerCase(constId->getText());
+        SymtabEntry* constIdEntry = symtabStack->lookup(constName);
+        if(constIdEntry == nullptr)
+        {
+            PascalParser::ConstantContext *constCtx = ctx->constant();
+            Object constValue = visit(constCtx);
+            constIdEntry = symtabStack->enterLocal(constName, Kind::CONSTANT);
+            constIdEntry->setValue(constValue);
+            constIdEntry->setType(constCtx->type);
+
+            constId->entry = constIdEntry;
+            constId->type  = constCtx->type;
+        }
+        else
+        {
+            cout << "Redeclared Identifier" << endl;
+            constId->entry = constIdEntry;
+            constId->type = initial->integerType;
+        }
+
+        constIdEntry->appendLineNumber(ctx->getStart()->getLine());
+
+        
+        return nullptr;
     }
     Object visitConstantIdentifier(PascalParser::ConstantIdentifierContext *ctx) override {
         return visitChildren(ctx);
@@ -281,7 +347,40 @@ public:
         return visitChildren(ctx);
     }
     Object visitTypeDefinition(PascalParser::TypeDefinitionContext *ctx) override {
-        return visitChildren(ctx);
+        PascalParser::TypeIdentifierContext *typeIdCtx = ctx->typeIdentifier();
+        string typeName = toLowerCase(typeIdCtx->getText());
+        SymtabEntry *typeEntry = symtabStack->lookupLocal(typeName);
+        Typespec *typespecCtx = nullptr;
+
+        if(typeEntry != nullptr)
+        {
+            if(ctx->type_() != nullptr)
+            {
+                visit(ctx->type_());
+                typeEntry = symtabStack->enterLocal(typeName, Kind::TYPE);
+                typeEntry->setType(ctx->type_()->type);
+                ctx->type_()->type->setIdentifier(typeEntry);
+                typespecCtx = ctx->type_()->type;
+            }
+            else if(ctx->functionType() != nullptr)
+            {
+                visit(ctx->functionType());
+                typeEntry = symtabStack->enterLocal(typeName, Kind::TYPE);
+                typeEntry->setType(ctx->functionType()->type);
+                ctx->functionType()->type->setIdentifier(typeEntry);
+                typespecCtx = ctx->functionType()->type;
+            }
+        }
+        else
+        {
+            cout << "REDECLARED IDENTIFIER" << endl;
+        }
+
+        typeIdCtx->entry = typeEntry;
+        typeIdCtx->type = typespecCtx;
+        typeEntry->appendLineNumber(ctx->getStart()->getLine());
+
+        return nullptr;
     }
     Object visitFormalParameterList(PascalParser::FormalParameterListContext *ctx) override {
         return visitChildren(ctx);
@@ -293,7 +392,10 @@ public:
         return visitChildren(ctx);
     }
     Object visitFunctionType(PascalParser::FunctionTypeContext *ctx) override {
-        return visitChildren(ctx);
+        visitChildren(ctx);
+        ctx->type = ctx->typeIdentifier()->type;
+        
+        return nullptr;
     }
     Object visitProcedureType(PascalParser::ProcedureTypeContext *ctx) override {
         return visitChildren(ctx);
@@ -303,41 +405,8 @@ public:
     }
     Object visitVariableDeclaration(PascalParser::VariableDeclarationContext *ctx) override {
 
-        // PascalParser::Type_Context *typectx = ctx->type_();
-        // visit(typectx);
-
-        // PascalParser::IdentifierListContext *listCtx = ctx->identifierList();
-
-        // for( PascalParser::IdentifierContext *idCtx : listCtx->identifier())
-        // {
-        //     int line = idCtx->getStart()->getLine();
-        //     string varName = toLowerCase(idCtx->getText());
-        //     cout << "VARNAME " << varName << endl;
-        //     SymtabEntry *varId = symtabStack->lookupLocal(varName);
-        //     if(varId == nullptr)
-        //     {
-        //         cout << "null " << endl;
-        //         SymtabEntry *temp = symtabStack->enterLocal(varName, Kind::VARIABLE);
-        //         // if(typectx->type != nullptr)
-        //         // {
-        //         //     cout << "integer" << endl;
-        //         // }
-        //         //varId->setType(typectx->type);
-        //         //Symtab *tab = varId->getSymtab();
-        //         //idCtx->entry = varId;
-        //     }
-        //     else
-        //     {
-        //         cout << "UNDECLARED " << endl;
-        //     }
-        //     //varId->appendLineNumber(line);
-
-        // }
         
-        
-
-        
-        cout << "VISITNG VARIABLE DELCARATION " << ctx->getText() << endl;
+        //cout << "VISITNG VARIABLE DELCARATION " << ctx->getText() << endl;
         //reset varList
         varList.resize(0);
         varCtx.resize(0);
@@ -345,8 +414,8 @@ public:
         //this is used for declarations like i, j, k : integer; i,j,k is the var list
 
 
-        string ident_list = ctx->identifierList()->getText();
-        cout << ident_list << endl;
+        string ident_list = toLowerCase(ctx->identifierList()->getText());
+        //cout << ident_list << endl;
 
         vector<string> iden_array;
         stringstream iden_stream(ident_list);
@@ -418,15 +487,6 @@ public:
         
         
         return nullptr;
-
-        //type->
-
-
-
-
-
-        
-        //return nullptr;
     }
     Object visitProcedureAndFunctionDeclarationPart(PascalParser::ProcedureAndFunctionDeclarationPartContext *ctx) override {
         return visitChildren(ctx);
@@ -435,36 +495,267 @@ public:
         return visitChildren(ctx);
     }
     Object visitProcedureDeclaration(PascalParser::ProcedureDeclarationContext *ctx) override {
-        return visitChildren(ctx);
+        string procName = ctx->identifier()->getText();
+        
+        printTabs();
+        cout << "<PROCEDURE " << procName << " line " << ctx->getStart()->getLine() << ">" << endl;
+        test += "<PROCEDURE " + procName + " line " + to_string(ctx->getStart()->getLine()) + ">\n";
+
+        tabs++;
+
+        visit(ctx->identifier());
+
+
+        SymtabEntry *varEn = symtabStack->lookupLocal(procName);
+        if(varEn != nullptr)
+        {
+            cout << "Redeclared identifier to function" << endl;
+        }
+        else
+        {
+            SymtabEntry *newProc = symtabStack->enterLocal(procName, Kind::PROCEDURE);
+            newProc->setKind(Kind::PROCEDURE);
+            newProc->setType(initial->voidType);
+            newProc->setRoutineSymtab(symtabStack->push());
+            symtabStack->getLocalSymtab()->setOwner(newProc);
+            
+            ctx->entry = newProc;
+        }
+        
+
+        if(ctx->formalParameterList() != nullptr)
+        {
+                visit(ctx->formalParameterList());
+                
+                varCtx.resize(0);
+
+                //this is used for declarations like i, j, k : integer; i,j,k is the var list
+
+                int count = ctx->formalParameterList()->formalParameterSection().size();
+                PascalParser::FormalParameterSectionContext *formalParamCtx = nullptr;
+                for(int i = 0; i < count; i++)
+                {
+                    varList.resize(0);
+                    formalParamCtx = ctx->formalParameterList()->formalParameterSection()[i];
+                    
+                    string ident_list = toLowerCase(formalParamCtx->parameterGroup()->identifierList()->getText());
+                    vector<string> iden_array;
+                    stringstream iden_stream(ident_list);
+                    while(iden_stream.good())
+                    {
+                        string substr;
+                        getline(iden_stream, substr, ',');
+                        iden_array.push_back(substr);
+                    }
+                    for(int i = 0; i < iden_array.size(); i++)
+                    {
+                        SymtabEntry *var = symtabStack->enterLocal(iden_array.at(i), Kind::VARIABLE);
+                        varList.push_back(var);
+                    }
+                    Typespec *type;
+
+                    string tyName = formalParamCtx->parameterGroup()->typeIdentifier()->getText();
+                    tyName = toLowerCase(tyName);
+                    string ArrayChecker = "array";
+                    
+
+                    if(tyName == "integer")
+                    {
+                        type = initial->integerType;
+                    }
+                    else if(tyName == "real")
+                    {
+                        type = initial->realType;
+                    }
+                    else if(tyName == "boolean")
+                    {
+                        type = initial->booleanType;
+                    }
+                    else if(tyName == "char")
+                    {
+                        type = initial->charType;
+                    }
+                    else if(tyName == "void")
+                    {
+                        type = initial->voidType;
+                    }
+                    else if(tyName == "String")
+                    {
+                        type = initial->stringType;
+                    }
+                    else type = initial->undefinedType;
+
+                    for( SymtabEntry *ent : varList)
+                    {
+                        ent->setType(type);
+                    }
+
+                }
+        }
+        visitChildren(ctx);
+
+        tabs--;
+        printTabs();
+        cout << "<PROCEDURE />" << endl;
+        test += "<PROCEDURE />\n";
+        //cout << printSymtabStackAtLevel(symtabStack->getCurrentNestingLevel());
+
+
+
+        //vector<SymtabEntry *> *parameters = 
+        symtabPrints.push_back(printSymtabStackAtLevel(symtabStack->getCurrentNestingLevel()));
+        symtabStack->pop();
+
+
+
+
+
+        
+        return nullptr;
     }
     Object visitFunctionDeclaration(PascalParser::FunctionDeclarationContext *ctx) override {
+        string functionName = ctx->identifier()->getText();
+        
+        printTabs();
+        cout << "<FUNCTION " << functionName << " line " << ctx->getStart()->getLine() << ">" << endl;
+        test += "<FUNCTION " + functionName + " line " + to_string(ctx->getStart()->getLine()) + ">\n";
+        
+        tabs++;
+
+
+        
+
+        visit(ctx->identifier());
+        visit(ctx->typeIdentifier());
+
+        SymtabEntry *varEn = symtabStack->lookupLocal(functionName);
+        Typespec *funcType = ctx->typeIdentifier()->type;
+        if(varEn != nullptr)
+        {
+            cout << "Redeclared identifier to function" << endl;
+        }
+        else
+        {
+            SymtabEntry *newFunction = symtabStack->enterLocal(functionName, Kind::FUNCTION);
+            newFunction->setKind(Kind::FUNCTION);
+            newFunction->setRoutineSymtab(symtabStack->push());
+            
+            symtabStack->getLocalSymtab()->setOwner(newFunction);
+            ctx->entry = newFunction;
+            ctx->type = funcType;
+            newFunction->setType(funcType);
+
+        }
+
+
+        if(ctx->formalParameterList() != nullptr)
+        {
+            visit(ctx->formalParameterList());
+                varCtx.resize(0);
+
+                //this is used for declarations like i, j, k : integer; i,j,k is the var list
+
+                int count = ctx->formalParameterList()->formalParameterSection().size();
+                PascalParser::FormalParameterSectionContext *formalParamCtx = nullptr;
+                for(int i = 0; i < count; i++)
+                {
+                    varList.resize(0);
+                    formalParamCtx = ctx->formalParameterList()->formalParameterSection()[i];
+                    
+                    string ident_list = toLowerCase(formalParamCtx->parameterGroup()->identifierList()->getText());
+                    vector<string> iden_array;
+                    stringstream iden_stream(ident_list);
+                    while(iden_stream.good())
+                    {
+                        string substr;
+                        getline(iden_stream, substr, ',');
+                        iden_array.push_back(substr);
+                    }
+                    for(int i = 0; i < iden_array.size(); i++)
+                    {
+                        SymtabEntry *var = symtabStack->enterLocal(iden_array.at(i), Kind::VARIABLE);
+                        varList.push_back(var);
+                    }
+                    Typespec *type;
+
+                    string tyName = formalParamCtx->parameterGroup()->typeIdentifier()->getText();
+                    tyName = toLowerCase(tyName);
+                    string ArrayChecker = "array";
+                    
+
+                    if(tyName == "integer")
+                    {
+                        type = initial->integerType;
+                    }
+                    else if(tyName == "real")
+                    {
+                        type = initial->realType;
+                    }
+                    else if(tyName == "boolean")
+                    {
+                        type = initial->booleanType;
+                    }
+                    else if(tyName == "char")
+                    {
+                        type = initial->charType;
+                    }
+                    else if(tyName == "void")
+                    {
+                        type = initial->voidType;
+                    }
+                    else if(tyName == "String")
+                    {
+                        type = initial->stringType;
+                    }
+                    else type = initial->undefinedType;
+
+                    for( SymtabEntry *ent : varList)
+                    {
+                        ent->setType(type);
+                    }
+
+                }
+        }
+        visitChildren(ctx);
+        
+        tabs--;
+        printTabs();
+        cout << "<FUNCTION />" << endl;
+        test += "<FUNCTION />\n";
+
+
+
+        //vector<SymtabEntry *> *parameters = 
+        symtabPrints.push_back(printSymtabStackAtLevel(symtabStack->getCurrentNestingLevel()));
+        symtabStack->pop();
+        
 
 
 
 
-        return visitChildren(ctx);
+        return nullptr;
     }
     Object visitType_(PascalParser::Type_Context *ctx) override {
         PascalParser::StructuredTypeContext *strType = ctx->structuredType();
         PascalParser::SimpleTypeContext *simType = ctx->simpleType();
         if(strType != nullptr)
         {
-            cout << "STRUCTURED TYPE" << endl;
+            //cout << "STRUCTURED TYPE" << endl;
             visit(strType);
             ctx->type = strType->type;
             
         }
         else if(simType != nullptr)
         {
-            cout << "SIMP TYPE" << endl;
+            //cout << "SIMP TYPE" << endl;
             visit(simType);
             ctx->type = simType->type;
-            
         }
-        
-
-        //visitChildren(ctx);
-        //ctx->type = 
+        else if(ctx->pointerType() != nullptr)
+        {
+            visit(ctx->pointerType());
+            ctx->type = ctx->pointerType()->typeIdentifier()->type;
+        } 
         return nullptr;
     }
     Object visitStructuredType(PascalParser::StructuredTypeContext *ctx) override {
@@ -474,7 +765,7 @@ public:
     }
     Object visitUnpackedStructuredType(PascalParser::UnpackedStructuredTypeContext *ctx) override {
         Typespec *arr = new Typespec(TypeForm::ARRAY);
-        cout << "unpacked struc " << ctx->getText() << endl;
+        //cout << "unpacked struc " << ctx->getText() << endl;
         PascalParser::ArrayTypeContext *ctx1 = ctx->arrayType(); //array ctx
         PascalParser::TypeListContext *ctx2 = ctx1->typeList(); // list ctx
 
@@ -483,7 +774,7 @@ public:
         for(int i = 0; i < count; i++)
         {
             PascalParser::SimpleTypeContext *ctx3 = ctx2->simpleType()[i];
-            cout << ctx3->getText() << endl;
+            //cout << ctx3->getText() << endl;
             visit(ctx3);
             arr->setArrayIndexType(ctx3->type);
             arr->setArrayElementCount(1);
@@ -525,7 +816,7 @@ public:
             // }
             //arr->setArrayIndexType(ctx2->)
         }
-        cout << "count: " << count << endl;
+        //cout << "count: " << count << endl;
 
 
         return visitChildren(ctx);
@@ -548,9 +839,84 @@ public:
     Object visitConstantChr(PascalParser::ConstantChrContext *ctx) override{return visitChildren(ctx);};    //no
 
     Object visitConstant(PascalParser::ConstantContext *ctx) override{
-        return visitChildren(ctx);};          //no
+        if(ctx->identifier() != nullptr)
+        {
+            string constName = toLowerCase(ctx->identifier()->getText());
+            SymtabEntry *constId = symtabStack->lookup(constName);
+            
+            if(constId != nullptr)
+            {
+                Kind kind = constId->getKind();
+                if((kind != Kind::CONSTANT))
+                {
+                    cout << "Invalid Constant" << endl;
+                }
+                ctx->type = constId->getType();
+                ctx->value = constId->getValue();
+                constId->appendLineNumber(ctx->getStart()->getLine());
+            }
+            else
+            {
+                cout << "undeclared identifier" << endl;
+                ctx->type = initial->integerType;
+                ctx->value = 0;
+            }
 
-    Object visitUnsignedNumber(PascalParser::UnsignedNumberContext *ctx) override{return visitChildren(ctx);};  //no
+        }
+        else if(ctx->string() !=nullptr)
+        {
+            string pascalString = ctx->string()->getText();
+            string unquoted = pascalString.substr(1, pascalString.length()-2);
+            size_t pos = 0;
+            while ((pos = unquoted.find("''", pos)) != string::npos)
+            {
+                unquoted.replace(pos++, 2, "'");
+            }
+
+            pos = 0;
+            while ((pos = unquoted.find("\"", pos)) != string::npos)
+            {
+                unquoted.replace(pos++, 2, "\\\"");
+            }
+
+            ctx->type = initial->stringType;
+            ctx->value = new string(unquoted);
+        }
+        else if(ctx->constantChr() != nullptr)
+        {
+            ctx->type = initial->charType;
+            ctx->value = ctx->constantChr()->unsignedInteger()->getText();
+        }
+        else if(ctx->unsignedNumber() != nullptr)
+        {
+            PascalParser::UnsignedNumberContext *unsignedCtx = ctx->unsignedNumber();
+            if (unsignedCtx->unsignedInteger() != nullptr)
+            {
+                ctx->type = initial->integerType;
+                ctx->value = stoi(ctx->getText());
+            }
+            else
+            {
+                ctx->type = initial->realType;
+                ctx->value = stod(ctx->getText());
+            }
+        }
+        return Object(ctx->value);
+
+        };          //no
+
+    Object visitUnsignedNumber(PascalParser::UnsignedNumberContext *ctx) override{
+        if(ctx->unsignedInteger() != nullptr)
+        {
+            ctx->type = initial->integerType;
+        }
+        else if(ctx->unsignedReal() != nullptr)
+        {
+            ctx->type = initial->realType;
+        }
+        visitChildren(ctx);
+
+        return nullptr;};  //no
 
     Object visitUnsignedInteger(PascalParser::UnsignedIntegerContext *ctx) override{
         
@@ -585,7 +951,7 @@ public:
         {
             if(typeId->getKind() != Kind::TYPE)
             {
-                //cout << "ERROR!" << endl;
+                cout << "ERROR!" << endl;
                 ctx->type = initial->integerType;
             }
             else
@@ -596,7 +962,7 @@ public:
         }
         else
         {
-            //cout << "UNDECLARED" << endl;
+            cout << "UNDECLARED" << endl;
             ctx->type = initial->integerType;
         }
         ctx->entry = typeId;
@@ -656,12 +1022,7 @@ public:
         PascalParser::VariableContext *varCtx = ctx->variable();
         PascalParser::ExpressionContext *exprCtx = ctx->expression();
 
-
-
         string varName = ctx->variable()->getText();
-        symtab->enter(varName, Kind::VARIABLE);
-
-        
         
         printTabs();
         cout << "<ASSIGN " << "line " << ctx->getStart()->getLine() << ">" << endl;
@@ -669,7 +1030,16 @@ public:
        
         test += "<ASSIGN line " + to_string(line) + ">\n";
         tabs++;
-        visitChildren(ctx);
+            visitChildren(ctx);
+            Typespec *lhs = varCtx->type;
+            Typespec *rhs = exprCtx->type;
+            if(!TypeChecker::areAssignmentCompatible(lhs, rhs, initial))
+            {
+                cout << "NOT ASSIGNMENT COMPATIBLE" << endl;
+            }
+            //I THINK THIS NEEDS WORK I THINK IT SHOULD SET THE VALUE OF THE GIVEN VARIABLE
+
+
         tabs--;
         printTabs();
         cout << "</ASSIGN>" << endl;
@@ -683,8 +1053,9 @@ public:
         //
         PascalParser::VariableIdentifierContext *variCtx = ctx->variableIdentifier();
         visit(variCtx);
+
         ctx->entry = variCtx->entry;
-        ctx->type = variCtx->type;
+        ctx->type = variableDataType(ctx, variCtx->type);
 
         string varName = ctx->getText();
         int line = ctx->getStart()->getLine();
@@ -692,37 +1063,51 @@ public:
         cout << "<VARIABLE " << varName << " line " << ctx->getStart()->getLine() << "/>" << endl;
         test += "<VARIABLE " + varName + " line " + to_string(line) + "/>\n";
 
-        visitChildren(ctx);
+        // visitChildren(ctx);
         //ctx->type = ctx->identifier()->type;
         return nullptr;}; 
 
     Object visitModifier(PascalParser::ModifierContext *ctx) override {
         return visitChildren(ctx);
     }
-    Typespec *variableDataType(PascalParser::VariableIdentifierContext *variCtx, Typespec *variableType)
+    Typespec *variableDataType(PascalParser::VariableContext *variCtx, Typespec *variableType)
     {
         Typespec *type = variableType;
-        // for(PascalParser::ModifierContext *modCtx : variCtx->modifier())
-        // {
-        //     if(modCtx->expression() != nullptr)
-        //     {
-        //        if(type->getForm() == TypeForm::ARRAY)
-        //        {
-        //          Typespec *indType = type->getArrayIndexType();
-        //          PascalParser::ExpressionContext *exCtx = modCtx->expression();
-        //          visit(exCtx);
-        //          if(indType->baseType() != exCtx->type->baseType())
-        //          {
-        //             cout << "ERROR" << endl;
-        //          }
-        //          type = type->getArrayElementType();
-        //        }
-        //        else
-        //        {
-        //          cout << "NOT ARRAY" << endl;
-        //        }
-        //     }
-        // }
+
+        for(PascalParser::ModifierContext *modCtx : variCtx->modifier())
+        {
+            int count = modCtx->expression().size();
+            PascalParser::ExpressionContext *expCtx = nullptr;
+            // cout << "TESTING THIS NOW" << endl;
+            // cout << count << endl;
+            for(int i = 0; i < count; i++)
+            {
+                expCtx = modCtx->expression()[i];
+            }
+            // if(type->getForm() == TypeForm::ARRAY)
+            // {
+            //     cout << "VARIABLE DATA TYPE ARRAY" << endl;
+            // }
+
+            // if(modCtx->expression()[0] != nullptr){}
+            // {
+            //    if(type->getForm() == TypeForm::ARRAY)
+            //    {
+            //      Typespec *indType = type->getArrayIndexType();
+            //      PascalParser::ExpressionContext *exCtx = modCtx->expression();
+            //      visit(exCtx);
+            //      if(indType->baseType() != exCtx->type->baseType())
+            //      {
+            //         cout << "ERROR" << endl;
+            //      }
+            //      type = type->getArrayElementType();
+            //    }
+            //    else
+            //    {
+            //      cout << "NOT ARRAY" << endl;
+            //    }
+            // }
+        }
         return type;
     }
 
@@ -731,11 +1116,17 @@ public:
         SymtabEntry *varId = symtabStack->lookup(varName);
         if(varId != nullptr)
         {
+            // Typespec *temp = varId->getType();
+            // if(temp->getForm() == TypeForm::ARRAY)
+            // {
+            //     cout << "ARRAY TYPE IN VARIABLE IDENTIFIER" << endl;
+            // }
             int linenum = ctx->getStart()->getLine();
             ctx->type = varId->getType();
             ctx->entry = varId;
             varId->appendLineNumber(linenum);
             Kind kind = varId->getKind();
+
             if(kind == Kind::UNDEFINED)
             {
                 cout << "UNDEFINED KIND" << endl;
@@ -750,17 +1141,37 @@ public:
     }
 
     Object visitExpression(PascalParser::ExpressionContext *ctx) override{
+        //cout << "EXPRESSION " << ctx->getText() << endl;
         PascalParser::SimpleExpressionContext *simpExprCtx = ctx->simpleExpression();
 
-        visit(simpExprCtx);
-        Typespec *simpleType1 = simpExprCtx->type;
-        ctx->type = simpleType1;
+        //Typespec *simpleType1 = simpExprCtx->type;
 
+        //check for second expression
+        int count = ctx->relationaloperator().size();
+        PascalParser::RelationaloperatorContext *ctx2 = nullptr;
+        for(int i = 0; i < count; i++)
+        {
+            ctx2 = ctx->relationaloperator()[i];
+        }
 
-        PascalParser::RelationaloperatorContext *ctx2 = ctx->relationaloperator();
+        Typespec *simpExpr1 = nullptr;
+
 
         if(ctx2 != nullptr)
         {
+            //second expr
+            int count2 = ctx->expression().size();
+            PascalParser::ExpressionContext *expr2 = nullptr;
+            for(int i = 0; i < count2; i++)
+            {
+                expr2 = ctx->expression()[i];
+            }
+            //cout << "SECOND EXPRESSION " << expr2->getText() << endl;
+
+            Typespec *simpExpr2 = nullptr;
+
+
+            //used for printing xml
             string op = ctx2->getText();
             if(op == "=")
             {
@@ -791,13 +1202,33 @@ public:
             cout << "<" << toUpperCase(op) << ">" << endl;
             test += "<" + toUpperCase(op) + ">\n";
             tabs++;
-                visitChildren(ctx);
+                if(expr2 != nullptr)
+                {
+                    visit(ctx->simpleExpression());
+                    simpExpr1 = ctx->simpleExpression()->type;
+                    visit(expr2);
+                    simpExpr2 = expr2->simpleExpression()->type;
+
+                    if(!TypeChecker::TypeChareComparisonCompatible(simpExpr1, simpExpr2, initial))
+                    {
+                        cout << "NOT COMPARABLE" << endl;
+                    }
+                    simpExpr1 = initial->booleanType;
+
+                }
             tabs--;
             printTabs();
             cout << "</" << toUpperCase(op) << ">" << endl;
             test += "</" + toUpperCase(op) + ">\n";
         }
-        else visitChildren(ctx);
+        else
+        {
+            visit(ctx->simpleExpression());
+            simpExpr1 = ctx->simpleExpression()->type;
+        }
+
+        ctx->type = simpExpr1;
+        
         
 
         return nullptr;
@@ -806,11 +1237,31 @@ public:
     Object visitRelationaloperator(PascalParser::RelationaloperatorContext *ctx) override{return visitChildren(ctx);};
         
     Object visitSimpleExpression(PascalParser::SimpleExpressionContext *ctx) override{
+        //cout << "SIMPLE EXPRESSION "<< ctx->getText() << endl;
+        PascalParser::AdditiveoperatorContext *ctx1 = nullptr;
+        int count = ctx->additiveoperator().size();
+        for(int i = 0; i < count; i++)
+        {
+            ctx1 = ctx->additiveoperator()[i];
+        }
+        
+        Typespec *term1 = nullptr;
 
-        PascalParser::AdditiveoperatorContext *ctx1 = ctx->additiveoperator();
         if(ctx1 != nullptr)
         {
+            // second simp expr
+            count = ctx->simpleExpression().size();
+            
+            PascalParser::SimpleExpressionContext *simpExpr2 = nullptr;
+            for(int i = 0; i < count; i++)
+            {
+                simpExpr2 = ctx->simpleExpression()[i];
+            }
+            //cout << "SECOND SIMPLE EXPRESSION "<< simpExpr2->getText() << endl;
+            Typespec *term2 = nullptr;
+
             string op = ctx1->getText();
+            op = toLowerCase(op);
             if(op == "+")
             {
                 op = "ADD";
@@ -819,17 +1270,105 @@ public:
             {
                 op = "SUBTRACT";
             }
-
             printTabs();
             cout << "<" << toUpperCase(op) << ">" << endl;
             test += "<" + toUpperCase(op) + ">\n";
             tabs++;
-                visitChildren(ctx);
+                if(simpExpr2 != nullptr)
+                {
+                    visit(ctx->term());
+                    term1 = ctx->term()->type;
+                    visit(simpExpr2);
+                    term2 = simpExpr2->term()->type;
+
+                    if(op == "ADD")
+                    {
+                        //if both are int the result is int
+                        if(TypeChecker::areBothInteger(term1, term2, initial))
+                        {
+                            term2 = initial->integerType;
+                        }
+                        //if atleast one is a real the result is a real
+                        else if(TypeChecker::isAtLeastOneReal(term1, term2, initial))
+                        {
+                            term2 = initial->realType;
+                        }
+                        //string concating
+                        else if(TypeChecker::areBothString(term1, term2, initial))
+                        {
+                            term2 = initial->stringType;
+                        }
+                        else
+                        {
+                            if (!TypeChecker::isIntegerOrReal(term1, initial))
+                            {
+                                cout << "Type mismatch factor 1" << endl;
+                                term2 = initial->integerType;
+                            }
+                            if (!TypeChecker::isIntegerOrReal(term2, initial))
+                            {
+                                cout << "Type mismatch factor 2" << endl;
+                                term2 = initial->integerType;
+                            }
+                        }
+
+                    }
+                    else if(op == "SUBTRACT")
+                    {
+                        //if both are int the result is int
+                        if(TypeChecker::areBothInteger(term1, term2, initial))
+                        {
+                            term2 = initial->integerType;
+                        }
+                        //if atleast one is a real the result is a real
+                        else if(TypeChecker::isAtLeastOneReal(term1, term2, initial))
+                        {
+                            term2 = initial->realType;
+                        }
+                        else
+                        {
+                            if (!TypeChecker::isIntegerOrReal(term1, initial))
+                            {
+                                cout << "Type mismatch factor 1" << endl;
+                                term2 = initial->integerType;
+                            }
+                            if (!TypeChecker::isIntegerOrReal(term2, initial))
+                            {
+                                cout << "Type mismatch factor 2" << endl;
+                                term2 = initial->integerType;
+                            }
+                        }
+
+                    }
+                    else if(op == "or")
+                    {
+                        if (!TypeChecker::isBoolean(term1, initial))
+                        {
+                            cout << "Type mismatch factor 1" << endl;
+                            term2 = initial->booleanType;
+                        }
+                        if (!TypeChecker::isBoolean(term2, initial))
+                        {
+                            cout << "Type mismatch factor 2" << endl;
+                            term2 = initial->booleanType;
+                        }
+                    }
+                    //finished checking result
+                    term1 = term2;
+
+                }
+                
             tabs--;
             printTabs();
             cout << "</" << toUpperCase(op) << ">" << endl;
             test += "</" + toUpperCase(op) + ">\n";
-        }else visitChildren(ctx);
+        }
+        else
+        {
+            visit(ctx->term());
+            term1 = ctx->term()->type;
+        } 
+        ctx->type = term1;
 
         return nullptr;
         };
@@ -837,12 +1376,32 @@ public:
     Object visitAdditiveoperator(PascalParser::AdditiveoperatorContext *ctx) override{return visitChildren(ctx);};
 
     Object visitTerm(PascalParser::TermContext *ctx) override{
+        //cout << "TERM " << ctx->getText() << endl;
+        int count = ctx->multiplicativeoperator().size();
+        PascalParser::MultiplicativeoperatorContext *ctx1 = nullptr;
+        for(int i = 0; i < count; i++)
+        {
+            ctx1 = ctx->multiplicativeoperator()[i];
+        }
 
-        PascalParser::MultiplicativeoperatorContext *ctx1 = ctx->multiplicativeoperator();
-
+        PascalParser::FactorContext *facCtx = nullptr;
+        Typespec *factor1 = nullptr;
         if(ctx1 != nullptr)
         {
+            count = ctx->term().size();
+            PascalParser::TermContext *termCtx = nullptr;
+            for(int i = 0; i < count; i++)
+            {
+                termCtx = ctx->term()[i];
+            }
+            //cout << "SECOND TERM " << termCtx->getText() << endl;
+
+            Typespec *factor2 = nullptr;
+
+
             string op = ctx1->getText();
+            op = toLowerCase(op);
+            //cout << "OP " << op << endl;
             if(op == "*")
             {
                 op = "MULTIPLY";
@@ -851,16 +1410,117 @@ public:
             {
                 op = "DIVIDE";
             }
+            
             printTabs();
             cout << "<" << toUpperCase(op) << ">" << endl;
             test += "<" + toUpperCase(op) + ">\n";
             tabs++;
-                visitChildren(ctx);
+                if(termCtx != nullptr)
+                {
+                    visit(ctx->signedFactor());
+                    factor1 = ctx->signedFactor()->factor()->type; 
+                    visit(termCtx);
+                    factor2 = termCtx->signedFactor()->factor()->type;
+
+                    if(op == "MULTIPLY")
+                    {
+                        //result is int if both are int else if one is a real the result is a real
+                        if(TypeChecker::areBothInteger(factor1, factor2, initial))
+                        {
+                            factor2 = initial->integerType;
+                        }
+                        else if(TypeChecker::isAtLeastOneReal(factor1, factor2, initial))
+                        {
+                            factor2 = initial->realType;
+                        }
+                        else
+                        {
+                            if (!TypeChecker::isIntegerOrReal(factor1, initial))
+                            {
+                                cout << "Type mismatch factor 1" << endl;
+                                factor2 = initial->integerType;
+                            }
+                            if (!TypeChecker::isIntegerOrReal(factor2, initial))
+                            {
+                                cout << "Type mismatch factor 2" << endl;
+                                factor2 = initial->integerType;
+                            }
+                        }
+
+                    }
+                    else if(op == "DIVIDE")
+                    {
+                        //result is always an real;
+                        cout << "dividing!";
+                        if(TypeChecker::areBothInteger(factor1, factor2, initial))
+                        {
+                            cout << " both are int" << endl;
+                            factor2 = initial->realType;
+                        }
+                        else if(TypeChecker::isAtLeastOneReal(factor1, factor2, initial))
+                        {
+                            cout << " one is real " <<endl;
+                            factor2 = initial->realType;
+                        }
+                        else
+                        {
+                            if (!TypeChecker::isIntegerOrReal(factor1, initial))
+                            {
+                                cout << "Type mismatch factor 1" << endl;
+                                factor2 = initial->integerType;
+                            }
+                            if (!TypeChecker::isIntegerOrReal(factor2, initial))
+                            {
+                                cout << "Type mismatch factor 2" << endl;
+                                factor2 = initial->integerType;
+                            }
+                        }
+
+                    }
+                    else if((op == "div") || (op == "mod"))
+                    {
+                        //result is an int
+                        if (!TypeChecker::isInteger(factor1, initial))
+                        {
+                            cout << "Type mismatch factor 1" << endl;
+                            factor2 = initial->integerType;
+                        }
+                        if (!TypeChecker::isInteger(factor2, initial))
+                        {
+                            cout << "Type mismatch factor 2" << endl;
+                            factor2 = initial->integerType;
+                        }
+                        
+                    }
+                    else if(op == "and")
+                    {
+                        if (!TypeChecker::isBoolean(factor1, initial))
+                        {
+                            cout << "Type mismatch factor 1" << endl;
+                            factor2 = initial->booleanType;
+                        }
+                        if (!TypeChecker::isBoolean(factor2, initial))
+                        {
+                            cout << "Type mismatch factor 2" << endl;
+                            factor2 = initial->booleanType;
+                        }
+                    }
+
+                    //finished checking the resulting type
+                    factor1 = factor2;
+
+                }
             tabs--;
             printTabs();
             cout << "</" << toUpperCase(op) << ">" << endl;
             test += "</" + toUpperCase(op) + ">\n";
-        }else visitChildren(ctx);
+        }
+        else
+        {
+            visit(ctx->signedFactor());
+            factor1 = ctx->signedFactor()->factor()->type;
+        } 
+        ctx->type = factor1;
 
 
         return nullptr;}; 
@@ -884,24 +1544,76 @@ public:
         return nullptr;};
                     
     Object visitFactor(PascalParser::FactorContext *ctx) override{
-        
-        if(ctx->NOT() != nullptr)
+        //cout << "FACTOR "<< ctx->getText() << endl;
+        if(ctx->variable() != nullptr)
+        {
+            visit(ctx->variable());
+            ctx->type = ctx->variable()->type;
+            // cout << "variable type ";
+            // string ty = checkTypeString(ctx->type);
+            // cout << ty << endl;
+
+        }
+        else if(ctx->expression() != nullptr)
+        {
+            visit(ctx->expression());
+            ctx->type = ctx->expression()->type;
+            // cout << "FACTOR EXPRESSION" << endl;
+            // cout << checkTypeString(ctx->type) << endl;
+        }
+        else if(ctx->unsignedConstant() != nullptr)
+        {
+            visit(ctx->unsignedConstant());
+            ctx->type = ctx->unsignedConstant()->type;
+            // cout << "unsigned const type ";
+            // string ty = checkTypeString(ctx->type);
+            // cout << ty << endl;
+        }
+        else if(ctx->NOT() != nullptr)
         {
             printTabs();
             cout << "<NEGATE>" << endl;
             test += "<NEGATE>\n";
 
             tabs++;
-            visitChildren(ctx);
+
+            visit(ctx->factor());
+
             tabs--;
             printTabs();
             cout << "</NEGATE>" << endl;
             test += "<NEGATE>\n";
-        }else visitChildren(ctx);
+
+            if(ctx->factor()->type != initial->booleanType)
+            {
+                cout << "Must be boolean" << endl;
+            }
+            ctx->type = initial->booleanType;
+        }
+        else if(ctx->bool_() != nullptr)
+        {
+            ctx->type = initial->booleanType;
+        }
 
         return nullptr;};
 
-    Object visitUnsignedConstant(PascalParser::UnsignedConstantContext *ctx) override{return visitChildren(ctx);};
+    Object visitUnsignedConstant(PascalParser::UnsignedConstantContext *ctx) override{
+        if(ctx->unsignedNumber() != nullptr)
+        {
+            visit(ctx->unsignedNumber());
+            ctx->type = ctx->unsignedNumber()->type;
+        }
+        else if(ctx->constantChr() != nullptr)
+        {
+            ctx->type = initial->charType;
+        }
+        else if(ctx->string() != nullptr)
+        {
+            ctx->type = initial->stringType;
+        }
+
+        return nullptr;
+    };
 
     Object visitFunctionDesignator(PascalParser::FunctionDesignatorContext *ctx) override {
         return visitChildren(ctx);
@@ -1009,6 +1721,10 @@ public:
         test += "<IF line " + to_string(line) + ">\n";
         tabs++;
             visitChildren(ctx);
+            if(!TypeChecker::isBoolean(ctx->expression()->type, initial))
+            {
+                cout << "Type must be boolean" << endl;
+            }
         tabs--;
 
         printTabs();
@@ -1047,11 +1763,16 @@ public:
             test += "<TEST>\n";
                 tabs++;
                 visit(ctx->expression());
+                if(!TypeChecker::isBoolean(ctx->expression()->type, initial))
+                {
+                    cout << "Type must be boolean" << endl;
+                }
                 tabs--;
             printTabs();
             cout << "</TEST>" << endl;
             test += "</TEST>\n";
         tabs--;
+            visit(ctx->statement());
         
         printTabs();
         cout << "</WHILE>" << endl;
@@ -1074,6 +1795,10 @@ public:
             test += "<TEST>\n";
                 tabs++;
                 visit(ctx->expression());
+                if(!TypeChecker::isBoolean(ctx->expression()->type, initial))
+                {
+                    cout << "Type must be boolean" << endl;
+                }
                 tabs--;
             printTabs();
             cout << "</TEST>" << endl;
@@ -1107,6 +1832,10 @@ public:
             test += "<" + toOrDownTo + ">\n";
                 tabs++;
                 visit(ctx->expression());
+                if(!TypeChecker::isBoolean(ctx->expression()->type, initial))
+                {
+                    cout << "Type must be boolean" << endl;
+                }
                 tabs--;
             printTabs();
             cout << "</" << toOrDownTo << ">" << endl;

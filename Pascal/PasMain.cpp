@@ -38,16 +38,16 @@ int main(int argc, const char *args[])
   PascalParser parser(&tokens);
   tree::ParseTree *tree = parser.program();
 
-  cout << "Tokens:" << endl;
-    for (Token *token : tokens.getTokens())
-    {
-      std::cout << token->toString() << std::endl;
-    }
+ 
   
 
   if(arg == "-scan")
   {
-    
+    cout << "Tokens:" << endl;
+    for (Token *token : tokens.getTokens())
+    {
+      std::cout << token->toString() << std::endl;
+    }
   }
   else if(arg == "-parse")
   {

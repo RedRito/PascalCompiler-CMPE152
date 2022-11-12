@@ -48,7 +48,14 @@ enum class SymtabKey
     // Variable or record field value.
     DATA_VALUE
 };
-
+enum class Routine
+{
+    DECLARED, FORWARD,
+    READ, READLN, WRITE, WRITELN,
+    ABS, ARCTAN, CHR, COS, EXP, LN, ODD, ORD,
+    EOF_FUNCTION, EOLN_FUNCTION,
+    PRED, ROUND, SIN, SQR, SQRT, SUCC, TRUNC,
+};
 
 class SymtabEntry
 {
@@ -63,6 +70,13 @@ class SymtabEntry
             case Kind::RECORD_FIELD:
             case Kind::VALUE_PARAMETER:
                 info = nullptr;
+                break;
+            case Kind::PROGRAM:
+            case Kind::PROCEDURE:
+            case Kind::FUNCTION:
+                routine.symtab = nullptr;
+                routine.parameters  = new vector<SymtabEntry *>();
+                routine.subroutines = new vector<SymtabEntry *>();
                 break;
             default: break;
         }
@@ -98,14 +112,84 @@ class SymtabEntry
     {
         lineNumbers.push_back(number);
     };        //Append a source line number to the entry.
-    Object getValue(const SymtabKey key)
+    Object getValue()
     {
-        return (contents.find(key) != contents.end()) ? contents[key] : Object();
+        return *info;
     };                              //Get the data value stored with this entry.
-    void setValue(const SymtabKey key, Object value)
+    void setValue(Object value)
     {
-        contents[key] = value;
+        info = new Object(value);
     };                    //Set the data value into this entry.
+    Routine getRoutineCode() const { return routine.code; }
+
+    /**
+     * Set the routine code.
+     * @parm code the code to set.
+     */
+    void setRoutineCode(const Routine code) { routine.code = code;}
+
+    /**
+     * Get the routine's symbol table.
+     * @return the symbol table.
+     */
+    Symtab *getRoutineSymtab() const { return routine.symtab; }
+
+    /**
+     * Set the routine's symbol table.
+     * @parm symtab the symbol table to set.
+     */
+    void setRoutineSymtab(Symtab *symtab) { routine.symtab = symtab; }
+
+    /**
+     * Get the vector of symbol table entries of the routine's formal parameters.
+     * @return the vector.
+     */
+    vector<SymtabEntry *> *getRoutineParameters() const
+    {
+        return routine.parameters;
+    }
+
+    /**
+     * Set the vector symbol table entries of parameters of the routine.
+     * @parm parameters the vector to set.
+     */
+    void setRoutineParameters(vector<SymtabEntry *> *parameters)
+    {
+        routine.parameters = parameters;
+    }
+
+    /**
+     * Get the vector of symbol table entries of the nested subroutines.
+     * @return the vector.
+     */
+    vector<SymtabEntry *> *getSubroutines() const
+    {
+        return routine.subroutines;
+    }
+
+    /**
+     * Append to the arraylist of symbol table entries of the nested subroutines.
+     * @parm subroutineId the symbol table entry of the subroutine to append.
+     */
+    void appendSubroutine(SymtabEntry *subroutineId)
+    {
+        routine.subroutines->push_back(subroutineId);
+    }
+
+    /**
+     * Get the routine's executable code.
+     * @return the executable code.
+     */
+    Object getExecutable() const { return *routine.executable; }
+
+    /**
+     * Set the routine's executable code.
+     * @parm executable the executable code to set.
+     */
+    void setExecutable(Object executable)
+    {
+        routine.executable = new Object(executable);
+    }
 
     private:
     string name;
@@ -115,6 +199,15 @@ class SymtabEntry
     vector<int> lineNumbers; //an array of linenumbers
     map<SymtabKey, Object> contents;
     Object *info;
+    struct 
+    {
+        Routine code;                        // routine code
+        Symtab *symtab;                      // routine's symbol table
+        vector<SymtabEntry *> *parameters;   // routine's formal parameters
+        vector<SymtabEntry *> *subroutines;  // symtab entries of subroutines
+        Object *executable;
+    } routine;
+    
 };
 
 }} //part of namespace symtab

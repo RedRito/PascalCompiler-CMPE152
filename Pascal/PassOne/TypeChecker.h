@@ -9,66 +9,66 @@ class TypeChecker
 {
 public:
     
-    static bool TypeChecker::isInteger(Typespec *typespec, Typespec *initial)
+    static bool isInteger(Typespec *typespec, Typespec *initial)
     {
 
         return    (typespec != nullptr)
            && (typespec->baseType() == initial->integerType);
     }
 
-    static bool TypeChecker::areBothInteger(Typespec *typespec1, Typespec *typespec2, Typespec *initial)
+    static bool areBothInteger(Typespec *typespec1, Typespec *typespec2, Typespec *initial)
     {
         return isInteger(typespec1, initial) && isInteger(typespec2, initial);
     }
 
    
-    static bool TypeChecker::isReal(Typespec *typespec, Typespec *initial)
+    static bool isReal(Typespec *typespec, Typespec *initial)
     {
         return    (typespec != nullptr)
            && (typespec->baseType() == initial->realType);
     }
 
-    static bool TypeChecker::isIntegerOrReal(Typespec *typespec, Typespec *initial)
+    static bool isIntegerOrReal(Typespec *typespec, Typespec *initial)
     {
         return isInteger(typespec, initial) || isReal(typespec, initial);
     }
 
-    static bool TypeChecker::isAtLeastOneReal(Typespec *typespec1, Typespec *typespec2, Typespec *initial)
+    static bool isAtLeastOneReal(Typespec *typespec1, Typespec *typespec2, Typespec *initial)
     {
         return (isReal(typespec1, initial) && isReal(typespec2, initial)) ||
            (isReal(typespec1, initial) && isInteger(typespec2, initial)) ||
            (isInteger(typespec1, initial) && isReal(typespec2, initial));
     }
 
-    static bool TypeChecker::isBoolean(Typespec *typespec, Typespec *initial)
+    static bool isBoolean(Typespec *typespec, Typespec *initial)
     {
         return    (typespec != nullptr)
            && (typespec->baseType() == initial->booleanType);
     }
 
-    static bool TypeChecker::areBothBoolean(Typespec *typespec1, Typespec *typespec2, Typespec *initial)
+    static bool areBothBoolean(Typespec *typespec1, Typespec *typespec2, Typespec *initial)
     {
         return isBoolean(typespec1, initial) && isBoolean(typespec2, initial);
     }
 
-    static bool TypeChecker::isChar(Typespec *typespec, Typespec *initial)
+    static bool isChar(Typespec *typespec, Typespec *initial)
     {
         return    (typespec != nullptr)
            && (typespec->baseType() == initial->charType);
     }
 
-    static bool TypeChecker::isString(Typespec *typespec, Typespec *initial)
+    static bool isString(Typespec *typespec, Typespec *initial)
     {
         return    (typespec != nullptr)
            && (typespec->baseType() == initial->stringType);
     }
 
-    static bool TypeChecker::areBothString(Typespec *typespec1, Typespec *typespec2, Typespec *initial)
+    static bool areBothString(Typespec *typespec1, Typespec *typespec2, Typespec *initial)
     {
         return isString(typespec1, initial) && isString(typespec2, initial);
     }
 
-    static bool TypeChecker::areAssignmentCompatible(Typespec *targetTypespec, Typespec *valueTypespec, Typespec *initial)
+    static bool areAssignmentCompatible(Typespec *targetTypespec, Typespec *valueTypespec, Typespec *initial)
     {
         if ((targetTypespec == nullptr) || (valueTypespec == nullptr)) return false;
 
@@ -84,7 +84,7 @@ public:
         return compatible;
     }   
 
-    static bool TypeChecker::TypeChareComparisonCompatible (Typespec *typespec1, Typespec *typespec2, Typespec *initial)
+    static bool TypeChareComparisonCompatible (Typespec *typespec1, Typespec *typespec2, Typespec *initial)
     {
         if ((typespec1 == nullptr) || (typespec2 == nullptr))  return false;
 

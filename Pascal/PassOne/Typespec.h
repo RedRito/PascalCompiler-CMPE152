@@ -118,6 +118,7 @@ public:
      */
     TypeForm getForm() const { return form; }
 
+
     /**
      * Get the type identifier's symbol table entry.
      * @return the symbol table entry.
