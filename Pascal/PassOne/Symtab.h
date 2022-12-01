@@ -47,7 +47,8 @@ class Symtab{
     SymtabEntry *lookup(const string name)
     {
         //printSymtab();
-        return (content.find(name) != content.end()) ? content[name] : nullptr;
+        string lowerName = toLowerCase(name);
+        return (content.find(lowerName) != content.end()) ? content[lowerName] : nullptr;
     };                 //Look up an existing symbol table entry.
     vector<SymtabEntry*> sortEntries()
     {

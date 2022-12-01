@@ -78,8 +78,8 @@ public:
 
     //enter an entry into the symtab at the nesting level
     SymtabEntry *enterLocal(const string name, const Kind kind)
-    {
-        return stack[current_nesting_level]->enter(name, kind);
+    {        
+        return stack[current_nesting_level]->enter(toLowerCase(name), kind);
     }
 
     //lookup the symtab table

@@ -4,6 +4,7 @@
 #include "PascalLexer.h"
 #include "PascalParser.h"
 #include "TreeVisitor1.h"
+#include "TreeVisitor2.h"
 
 using namespace std;
 using namespace antlrcpp;
@@ -12,10 +13,9 @@ using namespace antlr4;
 
 int main(int argc, const char *args[])
 {
-
   if(argc != 3)
   {
-    cout << "RUN BY ./main -{scan, parse, tofile} [\"FileName\"]" << endl;
+    cout << "RUN BY ./main -{scan, parse, tofile, compile} [\"FileName\"]" << endl;
     exit(1);
   }
   string arg = args[1];
@@ -37,9 +37,6 @@ int main(int argc, const char *args[])
   // to create a parse tree.
   PascalParser parser(&tokens);
   tree::ParseTree *tree = parser.program();
-
- 
-  
 
   if(arg == "-scan")
   {
@@ -67,9 +64,18 @@ int main(int argc, const char *args[])
     visitor->visit(tree);
     visitor->printToFile("test-out.txt");
   }
+  else if(arg == "-compile")
+  {
+    cout << endl << "Compile:" << endl;
+//    TreeVisitor1 *visitor = new TreeVisitor1();
+//    visitor->visit(tree);
+    cout << endl << "Generate code:" << endl;
+    TreeVisitor2 *visitor = new TreeVisitor2();
+    visitor->visit(tree);
+  }
   else
   {
-    cout << "RUN BY ./main -{scan, parse, tofile} [\"FileName\"]" << endl;
+    cout << "RUN BY ./main -{scan, parse, tofile, compile} [\"FileName\"]" << endl;
   }
   
 

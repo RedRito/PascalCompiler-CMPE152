@@ -1314,7 +1314,8 @@ public:
     virtual size_t getRuleIndex() const override;
     std::vector<WriteArgsContext *> writeArgs();
     WriteArgsContext* writeArgs(size_t i);
-    antlr4::tree::TerminalNode *COMMA();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;

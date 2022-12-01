@@ -350,7 +350,7 @@ reptitiveStatement
    ;
 
 writeArguments
-   :  writeArgs (COMMA writeArgs)?
+   :  writeArgs (COMMA writeArgs)*
    ;
 
 writeArgs

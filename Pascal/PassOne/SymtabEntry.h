@@ -44,9 +44,15 @@ enum class SymtabKey
     // Procedure or function.
     ROUTINE_CODE, ROUTINE_SYMTAB, ROUTINE_ICODE,
     ROUTINE_PARMS, ROUTINE_ROUTINES,
+    ROUTINE_VARS_SIZE,  // total size of local variables on stack (in bytes)
+    ROUTINE_PARMS_SIZE, // total size of parameters on stack (in bytes)
+    ROUTINE_SERIAL,     // serial number (used for routine labels)
+    ROUTINE_NESTING_LEVEL, // nesting level (starting from 1..)
 
     // Variable or record field value.
-    DATA_VALUE
+    DATA_VALUE,
+    SIZE,  // variable size in bytes
+    LOCATION        // location in stack frame 
 };
 enum class Routine
 {
@@ -120,6 +126,18 @@ class SymtabEntry
     {
         info = new Object(value);
     };                    //Set the data value into this entry.
+    void setAttribute(SymtabKey key, Object value) 
+    {
+        contents[key] = value;
+    }
+    Object getAttribute(SymtabKey key)
+    {
+        return contents[key];
+    }
+    bool hasAttribute(SymtabKey key)
+    {
+        return (contents.find(key) != contents.end());
+    }
     Routine getRoutineCode() const { return routine.code; }
 
     /**
@@ -195,7 +213,7 @@ class SymtabEntry
     string name;
     Symtab *symtab;
     Kind kind;
-    Typespec *typespec;
+    Typespec *typespec;    
     vector<int> lineNumbers; //an array of linenumbers
     map<SymtabKey, Object> contents;
     Object *info;
