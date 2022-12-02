@@ -310,7 +310,7 @@ public:
         }
         
         // Check for stack overflow
-        int spaceRequired = 3 + entry->getAttribute(SymtabKey::ROUTINE_VARS_SIZE);
+        int spaceRequired = 3 + (int)entry->getAttribute(SymtabKey::ROUTINE_VARS_SIZE);
         if (parameters) {
             int count = parameters->actualParameter().size();
             spaceRequired += count*3;
