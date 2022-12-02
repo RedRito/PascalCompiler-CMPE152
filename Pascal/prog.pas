@@ -1,4 +1,4 @@
-{ if statement }
+{ for statement }
 program Main1;
 var i,j:integer;
 

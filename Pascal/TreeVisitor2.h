@@ -1200,14 +1200,123 @@ public:
                 {
                     visit(ctx->simpleExpression());
                     simpExpr1 = ctx->simpleExpression()->type;
+                    //simp expression 1 is stored in a
+                    //move to B for comparison
+                    emit("", "RMO", "A,B");
+
                     visit(expr2);
                     simpExpr2 = expr2->simpleExpression()->type;
+                    //simp expression 2 is now stored in a
+
 
                     if(!TypeChecker::TypeChareComparisonCompatible(simpExpr1, simpExpr2, initial))
                     {
                         cout << "NOT COMPARABLE" << endl;
                     }
                     simpExpr1 = initial->booleanType;
+
+                    //compare the two registers, determine the value, 1 or 0 / true or false
+                    emit("","COMPR", "B,A", "comparing simp expression 1 to simp expression 2");
+                    if(op == "EQUAL")
+                    {
+                        //both are equal the output is true
+                        int equalLabel = ++labCounter;
+
+                        emit("", "JEQ", "E"+to_string(equalLabel), "it is equal");
+                        emit("", "LDA", "#0", "FALSE");
+                        int endOf = ++labCounter;
+                        emit("", "J", "E" + to_string(endOf), "end of expression check");
+                        //true
+                        emit("E"+to_string(equalLabel), "LDA", "#1", "TRUE");
+                        //end
+                        emit("E" + to_string(endOf), "RMO", "A,A", "end");
+                    }
+                    else if(op == "NE")
+                    {
+                        //both are equal the output is true
+                        int equalLabel = ++labCounter;
+
+                        emit("", "JEQ", "E"+to_string(equalLabel), "it is NOT equal");
+                        emit("", "LDA", "#1", "TRUE");
+                        int endOf = ++labCounter;
+                        emit("", "J", "E" + to_string(endOf), "end of expression check");
+                        //flase
+                        emit("E"+to_string(equalLabel), "LDA", "#0", "FALSE");
+                        //end
+                        emit("E" + to_string(endOf), "RMO", "A,A", "end");
+                    }
+                    else if(op == "LT")
+                    {
+                        //both are equal the output is true
+                        int equalLabel = ++labCounter;
+
+                        emit("", "JLT", "E"+to_string(equalLabel), "it is less than");
+                        emit("", "LDA", "#0", "FALSE");
+                        int endOf = ++labCounter;
+                        emit("", "J", "E" + to_string(endOf), "end of expression check");
+                        //true
+                        emit("E"+to_string(equalLabel), "LDA", "#1", "TRUE");
+                        //end
+                        emit("E" + to_string(endOf), "RMO", "A,A", "end");
+                    }
+                    else if(op == "GT")
+                    {
+                        //both are equal the output is true
+                        int equalLabel = ++labCounter;
+
+                        emit("", "JGT", "E"+to_string(equalLabel), "it is greater");
+                        emit("", "LDA", "#0", "FALSE");
+                        int endOf = ++labCounter;
+                        emit("", "J", "E" + to_string(endOf), "end of expression check");
+                        //true
+                        emit("E"+to_string(equalLabel), "LDA", "#1", "TRUE");
+                        //end
+                        emit("E" + to_string(endOf), "RMO", "A,A", "end");
+                    }
+                    else if(op == "LTEQ")
+                    {
+                        //both are equal the output is true
+                        int equalLabel = ++labCounter;
+
+                        emit("", "JLT", "E"+to_string(equalLabel));
+                        emit("", "LDA", "#0", "FALSE");
+                        // NO LESS THAN EQUAL instruction
+                        emit("E"+to_string(equalLabel),"","", "TRUE");
+
+                        //now we check equality
+                        equalLabel = ++labCounter;
+
+                        emit("", "JEQ", "E"+to_string(equalLabel), "it is equal");
+                        emit("", "LDA", "#0", "FALSE");
+                        int endOf = ++labCounter;
+                        emit("", "J", "E" + to_string(endOf), "end of expression check");
+                        //true
+                        emit("E"+to_string(equalLabel), "LDA", "#1", "TRUE");
+                        //end
+                        emit("E" + to_string(endOf), "RMO", "A,A", "end");
+                    }
+                    else if(op == "GTEQ")
+                    {
+                        //both are equal the output is true
+                        int equalLabel = ++labCounter;
+
+                        emit("", "JGT", "E"+to_string(equalLabel));
+                        emit("", "LDA", "#0", "FALSE");
+                        //true
+                        emit("E"+to_string(equalLabel),"","", "TRUE");
+
+                        //now we check equality
+                        equalLabel = ++labCounter;
+
+                        emit("", "JEQ", "E"+to_string(equalLabel), "it is equal");
+                        emit("", "LDA", "#0", "FALSE");
+                        int endOf = ++labCounter;
+                        emit("", "J", "E" + to_string(endOf), "end of expression check");
+                        //true
+                        emit("E"+to_string(equalLabel), "LDA", "#1", "TRUE");
+                        //end
+                        emit("E" + to_string(endOf), "RMO", "A,A", "end");
+                    }
 
                 }
         }
@@ -1216,7 +1325,7 @@ public:
             visit(ctx->simpleExpression());
             simpExpr1 = ctx->simpleExpression()->type;
         }
-
+        
         ctx->type = simpExpr1;
         
         
@@ -1768,18 +1877,46 @@ public:
 
     Object visitWhileStatement(PascalParser::WhileStatementContext *ctx) override{
         int line = ctx->getStart()->getLine();
+        comment("start of while loop");
+        //test condition
+        int whileTest = ++labCounter;
+        emit("W" + to_string(whileTest), "", "");
         visit(ctx->expression());
+        emit("", "COMP", "ZERO", "test if value is false");
+        //jump to end of loop if false
+        
+        int endOf = ++labCounter;
+        emit("","JEQ", "W" + to_string(endOf), "jump to end");
+
         if(!TypeChecker::isBoolean(ctx->expression()->type, initial))
         {
             cout << "Type must be boolean" << endl;
         }
         visit(ctx->statement());
+        emit("", "J", "W" + to_string(whileTest), "jump to start");
+
+        emit("W" + to_string(endOf), "", "", "end of loop");
         return nullptr;};
 
     Object visitRepeatStatement(PascalParser::RepeatStatementContext *ctx) override{
         int line = ctx->getStart()->getLine();
+
+        PascalParser::StatementContext *statements = nullptr;
+        int size = ctx->statements()->statement().size();
+        int repeatLabel = ++labCounter;
+        emit("R" + to_string(repeatLabel), "","", "Repeat statment");
+        //visit all the statements in the loop
         visit(ctx->statements());
+
+        //test condition
         visit(ctx->expression());
+        //load test condition into A register
+        emit("", "COMP", "ZERO", "test if value is false");
+        //if condition is false go back to start
+        //if value is not equal
+        emit("", "JEQ", "R" + to_string(repeatLabel), "jump to start of repeat");
+        comment("end of repeat statement");
+
         if(!TypeChecker::isBoolean(ctx->expression()->type, initial))
         {
             cout << "Type must be boolean" << endl;

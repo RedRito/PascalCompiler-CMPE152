@@ -18,7 +18,7 @@ pstr1	TD	outdev	. test to see if output device is ready
 	J	pstr	. loop
 newline	WORD	10	. NEWLINE constant
 	.  
-. LINE 5: begin
+. LINE 4: begin
 . subroutine body, nesting level 1
 SUB0		
 	. local variable "i" at [X + 0]
@@ -27,30 +27,39 @@ SUB0
 	SUBR	A,X
 	STL	6,X
 	STX	DISP1	. initial stack frame
-. LINE 6: fori:=10to20doj:=j+10
-	. For statment
-. LINE 6: i:=10
-	LDA	#10
+. LINE 5: j:=5
+	LDA	#5
+	STA	3,X	. A -> j
+. LINE 6: i:=0
+	LDA	#0
 	STA	0,X	. A -> i
-	LDA	#20
-	LDT	0,X	. i -> T
-L1	COMPR	A,T	. test if value is less than
-	JLT	L2
-. LINE 6: j:=j+10
+	. start of while loop
+W1		
+	LDA	0,X	. i -> A
+	RMO	A,B
+	LDA	#10
+	COMPR	B,A	. comparing simp expression 1 to simp expression 2
+	JLT	E2	. it is less than
+	LDA	#0	. FALSE
+	J	E3	. end of expression check
+E2	LDA	#1	. TRUE
+E3	RMO	A,A	. end
+	COMP	ZERO	. test if value is false
+	JEQ	W4	. jump to end
+. LINE 9: j:=j+10
 	LDA	#10
 	RMO	A,B
 	LDA	3,X	. j -> A
 	ADDR	B,A
 	STA	3,X	. A -> j
-	. incrementing / decrementing
-	LDT	0,X	. i -> T
-	LDS	#1	. load 1 into register
-	ADDR	S,T	. Increment
-	STT	0,X	. A -> i
-	LDA	#20
-	J	L1	. Retest condition
-L2			. end of for loop
-	. End of for statment
+. LINE 10: i:=i+1
+	LDA	#1
+	RMO	A,B
+	LDA	0,X	. i -> A
+	ADDR	B,A
+	STA	0,X	. A -> i
+	J	W1	. jump to start
+W4			. end of loop
 	RMO	A,A
 END0		
 	LDL	6,X
