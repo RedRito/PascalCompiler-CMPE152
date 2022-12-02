@@ -308,6 +308,17 @@ public:
             cout << "CANNOT CALL OUTER ROUTINE \"" << name << "\"" << endl;
             return;
         }
+        
+        // Check for stack overflow
+        int spaceRequired = 3 + entry->getAttribute(SymtabKey::ROUTINE_VARS_SIZE);
+        if (parameters) {
+            int count = parameters->actualParameter().size();
+            spaceRequired += count*3;
+        }
+        emit("", "LDA", to_string(spaceRequired));
+        emit("", "COMPR", "X,A");
+        emit("", "JLT", "STACK OVERFLOW");
+        
         bool isNested = (procLevel > curLevel);
         
         // For nested call - save X to SMON[level]
